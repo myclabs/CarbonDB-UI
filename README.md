@@ -30,10 +30,10 @@ The JavaScript modules are organized as follows:
 ### Dev Mode
 
 * Load dependencies via `play update`
-* Run via `play ~run`
+* Run via `play run`
 * Go to [localhost:9000](http://localhost:9000)
-Or:
-* Launch activator UI via `activator ui`
+
+Or launch activator UI via `activator ui`
 
 This uses the normal JavaScript files and loads libraries from the downloaded WebJars.
 
