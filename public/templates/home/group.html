@@ -1,0 +1,32 @@
+<h1>{{label}}</h1>
+<p>
+  <p>URI: {{URI}}</p>
+  <p>Unit: {{unit}}</p>
+  <p ng-if="commonKeywords">Common keywords: 
+  	<span ng-repeat="keyword in commonKeywords">{{keyword.label}} </span>
+  </p>
+  <p>This group has {{dimensionsNumber}} dimensions and contains {{elementsNumber}} elements</p>
+  <div cdb-dim-number></div cdb-dim-number>
+  </p>
+
+    <h2>Elements</h2>
+    <div tmd row-dimensions="rowDimensions" line-dimensions="lineDimensions" common-keywords="commonKeywords" values="elements" round-values="type == 'PROCESS'"></div>
+
+    <h2>Relations</h2>
+	<table class="table tmd table-nonfluid">
+		<tr>
+			<th>Upsteam</th>
+			<th>Coefficient</th>
+			<th>Downstream</th>
+		</tr>
+		<tr ng-repeat="macroRelation in macroRelations">
+			<td ng-if="macroRelation.source.uri != URI"><a ng-href="#/group/{{macroRelation.source.id}}">{{macroRelation.source.label}}</a></td>
+			<td ng-if="macroRelation.source.uri == URI">{{macroRelation.source.label}}</td>
+			<td ng-if="macroRelation.coeff.uri != URI"><a ng-href="#/group/{{macroRelation.coeff.id}}">{{macroRelation.coeff.label}} <sup ng-if="macroRelation.exponent == -1">-1</sup></a></td>
+			<td ng-if="macroRelation.coeff.uri == URI">{{macroRelation.coeff.label}} <sup ng-if="macroRelation.exponent == -1">-1</sup></td>
+			<td ng-if="macroRelation.destination.uri != URI"><a ng-href="#/group/{{macroRelation.destination.id}}">{{macroRelation.destination.label}}</a></td>
+			<td ng-if="macroRelation.destination.uri == URI">{{macroRelation.destination.label}}</td>
+	 	</tr>
+	</table>
+<hr />
+ 

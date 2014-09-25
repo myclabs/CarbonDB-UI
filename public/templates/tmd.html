@@ -1,0 +1,12 @@
+<table class="table tmd table-nonfluid">
+ <tr ng-repeat="line in tmd">
+  <th ng-if="cell.header && cell.col" ng-repeat="cell in line track by $index" colspan="{{cell.span}}">{{cell.value}}</th>
+  <th ng-if="cell.header && !cell.col" ng-repeat="cell in line track by $index" rowspan="{{cell.span}}">{{cell.value}}</th>
+  <!-- <td ng-if="!cell.header && cell.col" ng-repeat="cell in line track by $index" colspan="{{cell.span}}">{{cell.value}} ± {{cell.uncertainty}}%</td>
+  <td ng-if="!cell.header && !cell.col" ng-repeat="cell in line track by $index" rowspan="{{cell.span}}">{{cell.value}} ± {{cell.uncertainty}}%</td> -->
+
+  <td ng-if="!cell.header && cell.col" ng-repeat="cell in line track by $index" colspan="{{cell.span}}">{{cell.value}}</td>
+  <td ng-if="!cell.header && !cell.col" ng-repeat="cell in line track by $index" rowspan="{{cell.span}}">{{cell.value}}</td>
+
+ </tr>
+</table>
