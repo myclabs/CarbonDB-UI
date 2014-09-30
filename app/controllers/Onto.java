@@ -212,7 +212,7 @@ public class Onto extends Controller {
         if (model.contains(ResourceFactory.createResource(group.getURI()), RDF.type, Datatype.ProcessGroup)) {
             isProcessGroup = true;
         }
-        HashMap<String, Value> elementsValue = new HashMap<String, Value>();
+        HashMap<String, Object> elementsValue = new HashMap<String, Object>();
 
         String unit = group.getUnit();
         String unitLabel;
@@ -261,13 +261,15 @@ public class Onto extends Controller {
                 elementResource = null;
             }
             if (null == elementResource) {
-                elementsValue.put(joinDimensionKeywords(element), new Value(0.0, 0.0));
+                elementsValue.put(joinDimensionKeywords(element), "empty");
             }
             else if (isProcessGroup) {
+                printRelationsForElement(elementResource, model, Datatype.SingleProcess);
                 HashMap<Resource, Value> emissions = RepoFactory.getSingleElementRepo().getCalculatedEmissionsForProcess(elementResource);
                 elementsValue.put(joinDimensionKeywords(element), calculateProcessImpact(emissions));
             }
             else {
+                // the element is a coefficient
                 if (elementResource.hasProperty(Datatype.value) && null != elementResource.getProperty(Datatype.value)) {
                     elementsValue.put(
                         joinDimensionKeywords(element),
@@ -279,11 +281,7 @@ public class Onto extends Controller {
                 }
                 else {
                     elementsValue.put(
-                        joinDimensionKeywords(element),
-                        new Value(
-                            0.0,
-                            RepoFactory.getSingleElementRepo().getUncertainty(elementResource)
-                        )
+                        joinDimensionKeywords(element), "empty"
                     );
                 }
             }
@@ -397,7 +395,6 @@ public class Onto extends Controller {
     }
 
     public static Result getGroup(String groupId) {
-        System.out.println("group access");
         try {
             DB db = mongoConnect();
             DBCollection groupsColl = db.getCollection("groups");

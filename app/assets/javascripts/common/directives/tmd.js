@@ -22,6 +22,7 @@ define(["angular"], function(angular) {
       link: function (scope, element, attrs) {
 
         function createTMD(rowDimensions, lineDimensions, commonKeywords, values, roundValues) {
+          console.log(values);
           var commonKeywordsCoordinate = new Array();
           for (var i = 0; i < commonKeywords.length; i++) {
             commonKeywordsCoordinate.push(commonKeywords[i].name);
@@ -84,12 +85,17 @@ define(["angular"], function(angular) {
                 coordinateList = coordinateList.concat(rowsCoordinates[j]);
               }
               var coordinate = coordinateList.sort().join("").replace(/\./g, "____");
-              var uncertainty = Math.round(values[coordinate].uncertainty*100)/100;
-              if (roundValues) {
-                var value = sigFigs(values[coordinate].value, 3);
+              if (values[coordinate] == 'empty') {
+                value = '-';
               }
               else {
-                var value = values[coordinate].value;
+                var uncertainty = Math.round(values[coordinate].uncertainty*100)/100;
+                if (roundValues) {
+                  var value = sigFigs(values[coordinate].value, 3);
+                }
+                else {
+                  var value = values[coordinate].value;
+                }
               }
               tmd[i].push({'value': value, 'uncertainty': uncertainty, 'span': 1, 'header': false, 'col': false});
             }
