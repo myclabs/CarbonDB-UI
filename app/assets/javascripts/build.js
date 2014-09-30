@@ -13,7 +13,7 @@ requirejs.config({
     "angular": "empty:",
     "angular-cookies": "empty:",
     "angular-route": "empty:",
-    "angular-upload-file": "empty:",
+    "angular-file-upload": "empty:",
     "angular-tree-control": "empty:",
     "d3js": "empty:",
     // empty: so the optimizer doesn't try to find jsRoutes.js in our project
