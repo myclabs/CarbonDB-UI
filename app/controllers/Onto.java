@@ -264,7 +264,6 @@ public class Onto extends Controller {
                 elementsValue.put(joinDimensionKeywords(element), "empty");
             }
             else if (isProcessGroup) {
-                printRelationsForElement(elementResource, model, Datatype.SingleProcess);
                 HashMap<Resource, Value> emissions = RepoFactory.getSingleElementRepo().getCalculatedEmissionsForProcess(elementResource);
                 elementsValue.put(joinDimensionKeywords(element), calculateProcessImpact(emissions));
             }
