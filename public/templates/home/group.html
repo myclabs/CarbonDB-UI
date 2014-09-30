@@ -3,7 +3,7 @@
   <p>URI: {{URI}}</p>
   <p>Unit: {{unit}}</p>
   <p ng-if="commonKeywords">Common keywords: 
-  	<span ng-repeat="keyword in commonKeywords">{{keyword.label}} </span>
+  	<span ng-repeat="keyword in commonKeywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
   </p>
   <p>This group has {{dimensionsNumber}} dimensions and contains {{elementsNumber}} elements</p>
   <div cdb-dim-number></div cdb-dim-number>
@@ -19,13 +19,13 @@
 			<th>Coefficient</th>
 			<th>Downstream</th>
 		</tr>
-		<tr ng-repeat="macroRelation in macroRelations">
-			<td ng-if="macroRelation.source.uri != URI"><a ng-href="#/group/{{macroRelation.source.id}}">{{macroRelation.source.label}}</a></td>
-			<td ng-if="macroRelation.source.uri == URI">{{macroRelation.source.label}}</td>
-			<td ng-if="macroRelation.coeff.uri != URI"><a ng-href="#/group/{{macroRelation.coeff.id}}">{{macroRelation.coeff.label}} <sup ng-if="macroRelation.exponent == -1">-1</sup></a></td>
-			<td ng-if="macroRelation.coeff.uri == URI">{{macroRelation.coeff.label}} <sup ng-if="macroRelation.exponent == -1">-1</sup></td>
-			<td ng-if="macroRelation.destination.uri != URI"><a ng-href="#/group/{{macroRelation.destination.id}}">{{macroRelation.destination.label}}</a></td>
-			<td ng-if="macroRelation.destination.uri == URI">{{macroRelation.destination.label}}</td>
+		<tr ng-repeat="sourceRelation in sourceRelations">
+			<td ng-if="sourceRelation.source.uri != URI"><a ng-href="#/group/{{sourceRelation.source.id}}">{{sourceRelation.source.label}}</a></td>
+			<td ng-if="sourceRelation.source.uri == URI">{{sourceRelation.source.label}}</td>
+			<td ng-if="sourceRelation.coeff.uri != URI"><a ng-href="#/group/{{sourceRelation.coeff.id}}">{{sourceRelation.coeff.label}} <sup ng-if="sourceRelation.exponent == -1">-1</sup></a></td>
+			<td ng-if="sourceRelation.coeff.uri == URI">{{sourceRelation.coeff.label}} <sup ng-if="sourceRelation.exponent == -1">-1</sup></td>
+			<td ng-if="sourceRelation.destination.uri != URI"><a ng-href="#/group/{{sourceRelation.destination.id}}">{{sourceRelation.destination.label}}</a></td>
+			<td ng-if="sourceRelation.destination.uri == URI">{{sourceRelation.destination.label}}</td>
 	 	</tr>
 	</table>
 <hr />
