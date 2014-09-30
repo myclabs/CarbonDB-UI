@@ -125,7 +125,7 @@ define(["angular"], function(angular) {
       $scope.dimensionsNumber = data.dimensions.length;
       $scope.elements = data.elements;
       $scope.elementsNumber = data.elementsNumber;
-      $scope.macroRelations = data.macroRelations;
+      $scope.sourceRelations = data.sourceRelations;
       $scope.unit = data.unit;
       $scope.commonKeywords = data.commonKeywords;
       $scope.type = data.type;

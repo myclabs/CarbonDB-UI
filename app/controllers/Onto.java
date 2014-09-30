@@ -186,12 +186,12 @@ public class Onto extends Controller {
         dbObject.append("_id", "nodes");
         graphColl.insert(dbObject);*/
 
-        ArrayList<Resource> macroRelationResources = RepoFactory.getRelationRepo().getMacroRelationsResources();
-        for (Resource macroRelationResource: macroRelationResources) {
-            String sourceURI = macroRelationResource.getProperty(Datatype.hasOriginProcess).getResource().getURI();
-            String targetURI = macroRelationResource.getProperty(Datatype.hasDestinationProcess).getResource().getURI();
+        ArrayList<Resource> sourceRelationResources = RepoFactory.getRelationRepo().getSourceRelationsResources();
+        for (Resource sourceRelationResource: sourceRelationResources) {
+            String sourceURI = sourceRelationResource.getProperty(Datatype.hasOriginProcess).getResource().getURI();
+            String targetURI = sourceRelationResource.getProperty(Datatype.hasDestinationProcess).getResource().getURI();
             HashMap<String, Object> link = new HashMap<>();
-            link.put("uri", macroRelationResource.getURI());
+            link.put("uri", sourceRelationResource.getURI());
             link.put("source", nodesURI.indexOf(sourceURI));
             link.put("target", nodesURI.indexOf(targetURI));
             links.add(link);
@@ -293,7 +293,7 @@ public class Onto extends Controller {
         output.put("dimensions", group.dimSet.dimensions);
         output.put("unit", unitLabel);
         output.put("commonKeywords", group.commonKeywords.keywords);
-        output.put("macroRelations", RepoFactory.getRelationRepo().getMacroRelationsForProcessGroup(ResourceFactory.createResource(group.getURI())));
+        output.put("sourceRelations", RepoFactory.getRelationRepo().getSourceRelationsForProcessGroup(ResourceFactory.createResource(group.getURI())));
         output.put("type", group.type);
 
         if (isProcessGroup) {
