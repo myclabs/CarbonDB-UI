@@ -90,7 +90,7 @@ define(["angular"], function(angular) {
               }
               else {
                 var uncertainty = Math.round(values[coordinate].uncertainty*100)/100;
-                if (roundValues) {
+                if (roundValues && values[coordinate].value != 0) {
                   var value = sigFigs(values[coordinate].value, 3);
                 }
                 else {

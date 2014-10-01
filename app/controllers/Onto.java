@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
 import java.io.InputStream;
 import java.io.File;
 import java.io.IOException;
@@ -244,6 +246,8 @@ public class Onto extends Controller {
             unitLabel = "kg équ. CO2 / " + unitLabel;
         }
 
+        HashMap<String, Value> impacts = new HashMap<>();
+        HashMap<String, Value> elementaryFlows = new HashMap<>();
         for (Dimension element: group.elements.dimensions) {
             Resource elementResource;
             try {
@@ -264,8 +268,14 @@ public class Onto extends Controller {
                 elementsValue.put(joinDimensionKeywords(element), "empty");
             }
             else if (isProcessGroup) {
-                HashMap<Resource, Value> emissions = RepoFactory.getSingleElementRepo().getCalculatedEmissionsForProcess(elementResource);
-                elementsValue.put(joinDimensionKeywords(element), calculateProcessImpact(emissions));
+                impacts = RepoFactory.getSingleElementRepo().getImpactsForProcess(elementResource);
+                elementaryFlows = RepoFactory.getSingleElementRepo().getCalculatedEmissionsForProcess(elementResource);
+                if (impacts.containsKey(Datatype.getURI() + "ti/ghg_emission_measured_using_gwp_over_100_years")) {
+                    elementsValue.put(joinDimensionKeywords(element), impacts.get(Datatype.getURI() + "ti/ghg_emission_measured_using_gwp_over_100_years"));
+                }
+                else {
+                    elementsValue.put(joinDimensionKeywords(element), new Value(0.0, 0.0));
+                }
             }
             else {
                 // the element is a coefficient
@@ -291,6 +301,8 @@ public class Onto extends Controller {
         output.put("elementsNumber", elementsValue.size());
         output.put("dimensions", group.dimSet.dimensions);
         output.put("unit", unitLabel);
+        output.put("impacts", transformValueHashMapURIKeys(impacts));
+        output.put("elementaryFlows", transformValueHashMapURIKeys(elementaryFlows));
         output.put("commonKeywords", group.commonKeywords.keywords);
         output.put("sourceRelations", RepoFactory.getRelationRepo().getSourceRelationsForProcessGroup(ResourceFactory.createResource(group.getURI())));
         output.put("type", group.type);
@@ -302,6 +314,16 @@ public class Onto extends Controller {
         }
 
         return toJson(output).toString();
+    }
+
+    protected static HashMap<String, Value> transformValueHashMapURIKeys(HashMap<String, Value> input) {
+        HashMap<String, Value> output = new HashMap<>();
+        Iterator it = input.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pairs = (Map.Entry)it.next();
+            output.put(((String)pairs.getKey()).replace('.', '_'), (Value)pairs.getValue());
+        }
+        return output;
     }
 
     protected static DB mongoConnect() throws Exception {
@@ -434,26 +456,6 @@ public class Onto extends Controller {
                                + relation.getProperty(Datatype.hasDestinationProcess).getResource().getURI()
                                + " (" + relation.getURI() + ")");
         }
-    }
-
-    public static Value calculateProcessImpact(HashMap<Resource, Value> emissions)
-    {
-        Value value = new Value(0.0, 0.0);
-        for (Resource key: emissions.keySet()) {
-            if (key.getURI().equals(Datatype.getURI() + "ghg/ch4")) {
-                value.add(new Value(emissions.get(key).value * 34, emissions.get(key).uncertainty));
-            }
-            else if (key.getURI().equals(Datatype.getURI() + "ghg/n2o")) {
-                value.add(new Value(emissions.get(key).value * 298, emissions.get(key).uncertainty));
-            }
-            else if (key.getURI().equals(Datatype.getURI() + "ghg/co2")) {
-                value.add(emissions.get(key));
-            }
-            else {
-                value.add(emissions.get(key));
-            }
-        }
-        return value;
     }
 
     public static Result getProcessGroups() {
