@@ -22,7 +22,6 @@ define(["angular"], function(angular) {
       link: function (scope, element, attrs) {
 
         function createTMD(rowDimensions, lineDimensions, commonKeywords, values, roundValues) {
-          console.log(values);
           var commonKeywordsCoordinate = new Array();
           for (var i = 0; i < commonKeywords.length; i++) {
             commonKeywordsCoordinate.push(commonKeywords[i].name);

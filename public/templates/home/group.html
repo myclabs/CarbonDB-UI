@@ -6,9 +6,19 @@
   	<span ng-repeat="keyword in commonKeywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
   </p>
   <p>This group has {{dimensionsNumber}} dimensions and contains {{elementsNumber}} elements</p>
-  <div cdb-dim-number></div cdb-dim-number>
-  </p>
-
+  <div class="row col-sm-12">
+    <div class="form-horizontal">
+        <label class="col-sm-2 control-label" for="formGroupInputLarge">View</label>
+        <div class="col-sm-4">
+            <select class="form-control col-md-4" ng-model="viewType">
+               <option disabled>Impacts</option>
+               <option ng-repeat="(impactTypeURI, impactTypeLabel) in impactTypes" value="{{impactTypeURI}}">&nbsp;&nbsp;{{impactTypeLabel}}</option>
+               <option disabled>Elementary flows</option>
+               <option ng-repeat="(flowTypeURI, flowTypeLabel) in flowTypes" value="{{flowTypeURI}}">&nbsp;&nbsp;{{flowTypeLabel}}</option>
+            </select>
+        </div>
+    </div>
+  </div>
     <h2>Elements</h2>
     <div tmd row-dimensions="rowDimensions" line-dimensions="lineDimensions" common-keywords="commonKeywords" values="elements" round-values="type == 'PROCESS'"></div>
 
@@ -29,4 +39,3 @@
 	 	</tr>
 	</table>
 <hr />
- 

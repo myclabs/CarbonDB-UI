@@ -114,11 +114,16 @@ define(["angular"], function(angular) {
   };
   UploadCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$upload", "$window", "playRoutes"];
 
-  var GroupCtrl = function($scope, $rootScope, $location, helper, $http, $routeParams, $window, playRoutes) {
+  var GroupCtrl = function($scope, $rootScope, $location, helper, $http, $routeParams, $window, playRoutes, ontologyTypes) {
     $rootScope.pageTitle = "CarbonDB";
     $scope.groupName = $routeParams.uri;
+    $scope.impactTypes = ontologyTypes.getImpactTypes();
+    $scope.flowTypes = ontologyTypes.getFlowTypes();
+    $scope.viewType = "http://www____myc-sense____com/ontologies/bc#ti/ghg_emission_measured_using_gwp_over_100_years";
+
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
+
     playRoutes.controllers.Onto.getGroup($routeParams.type + '/' + $routeParams.uri).get().success(function(data) {
       $scope.URI = data.URI;
       $scope.label = data.label;
@@ -150,10 +155,15 @@ define(["angular"], function(angular) {
         else
           $scope.rowDimensions.push(data.dimensions[i].keywords.sort(sortKeywordsCompare));
       }
+      $scope.$watch('viewType',
+          function (newValue, oldValue, scope) {
+            console.log("viewType = " + scope.viewType);
+          }
+        );
     });
 
   };
-  GroupCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$routeParams", "$window", "playRoutes"];
+  GroupCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$routeParams", "$window", "playRoutes", "ontologyTypes"];
 
   /*mod.filter('escape', function(value) {
     return encodeURIComponent(value);

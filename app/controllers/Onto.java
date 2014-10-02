@@ -172,6 +172,37 @@ public class Onto extends Controller {
         dbObject = (BasicDBObject) JSON.parse(toJson(RepoFactory.getCategoryRepo().getCategoriesTree()).toString());
         categoriesColl.insert(dbObject);
 
+        DBCollection impactAndFlowTypesColl = db.getCollection("impactAndFlowTypes");
+        impactAndFlowTypesColl.drop();
+
+        HashMap<String, String> impactTypes = new HashMap<>();
+        for (Resource impactTypeResource: RepoFactory.getSingleElementRepo().getImpactTypes()) {
+            impactTypes.put(mongonize(impactTypeResource.getURI()), RepoFactory.getSingleElementRepo().getLabelOrURI(impactTypeResource));
+        }
+        HashMap<String, String> flowTypes = new HashMap<>();
+        for (Resource flowTypeResource: RepoFactory.getSingleElementRepo().getElementaryFlowTypes()) {
+            flowTypes.put(mongonize(flowTypeResource.getURI()), RepoFactory.getSingleElementRepo().getLabelOrURI(flowTypeResource));
+        }
+        /*
+        Variation:
+        ArrayList<HashMap<String, String>> impactTypes = new ArrayList<>();
+        for (Resource impactTypeResource: RepoFactory.getSingleElementRepo().getImpactTypes()) {
+            HashMap<String, String> impactType = new HashMap<>();
+            impactType.put("id": mongonize(impactTypeResource.getURI()));
+            impactType.put("label": RepoFactory.getSingleElementRepo().getLabelOrURI(impactTypeResource));
+            impactTypes.add(impactType);
+        }
+        HashMap<String, String> flowTypes = new HashMap<>();
+        for (Resource flowTypeResource: RepoFactory.getSingleElementRepo().getElementaryFlowTypes()) {
+            flowTypes.put("id": mongonize(flowTypeResource.getURI()));
+            flowTypes.put("label": RepoFactory.getSingleElementRepo().getLabelOrURI(flowTypeResource));
+            flowTypes.add(impactType);
+        }
+        */
+        dbObject = (BasicDBObject) JSON.parse("{impactTypes:" + toJson(impactTypes).toString()
+                                            + ", flowTypes:" + toJson(flowTypes).toString() + "}");
+        impactAndFlowTypesColl.insert(dbObject);
+
         DBCollection groupsColl = db.getCollection("groups");
         groupsColl.drop();
 
@@ -214,7 +245,9 @@ public class Onto extends Controller {
         if (model.contains(ResourceFactory.createResource(group.getURI()), RDF.type, Datatype.ProcessGroup)) {
             isProcessGroup = true;
         }
-        HashMap<String, Object> elementsValue = new HashMap<String, Object>();
+        HashMap<String, Object> elementsValue = new HashMap<>();
+        HashMap<String, Object> elementsFlows = new HashMap<>();
+        HashMap<String, Object> elementsImpacts = new HashMap<>();
 
         String unit = group.getUnit();
         String unitLabel;
@@ -246,8 +279,6 @@ public class Onto extends Controller {
             unitLabel = "kg équ. CO2 / " + unitLabel;
         }
 
-        HashMap<String, Value> impacts = new HashMap<>();
-        HashMap<String, Value> elementaryFlows = new HashMap<>();
         for (Dimension element: group.elements.dimensions) {
             Resource elementResource;
             try {
@@ -268,8 +299,15 @@ public class Onto extends Controller {
                 elementsValue.put(joinDimensionKeywords(element), "empty");
             }
             else if (isProcessGroup) {
-                impacts = RepoFactory.getSingleElementRepo().getImpactsForProcess(elementResource);
-                elementaryFlows = RepoFactory.getSingleElementRepo().getCalculatedEmissionsForProcess(elementResource);
+                elementsFlows.put(
+                    joinDimensionKeywords(element),
+                    transformValueHashMapURIKeys(RepoFactory.getSingleElementRepo().getCalculatedEmissionsForProcess(elementResource))
+                );
+                elementsImpacts.put(
+                    joinDimensionKeywords(element),
+                    transformValueHashMapURIKeys(RepoFactory.getSingleElementRepo().getImpactsForProcess(elementResource))
+                );
+                HashMap<String, Value> impacts = RepoFactory.getSingleElementRepo().getImpactsForProcess(elementResource);
                 if (impacts.containsKey(Datatype.getURI() + "ti/ghg_emission_measured_using_gwp_over_100_years")) {
                     elementsValue.put(joinDimensionKeywords(element), impacts.get(Datatype.getURI() + "ti/ghg_emission_measured_using_gwp_over_100_years"));
                 }
@@ -301,11 +339,13 @@ public class Onto extends Controller {
         output.put("elementsNumber", elementsValue.size());
         output.put("dimensions", group.dimSet.dimensions);
         output.put("unit", unitLabel);
-        output.put("impacts", transformValueHashMapURIKeys(impacts));
-        output.put("elementaryFlows", transformValueHashMapURIKeys(elementaryFlows));
         output.put("commonKeywords", group.commonKeywords.keywords);
         output.put("sourceRelations", RepoFactory.getRelationRepo().getSourceRelationsForProcessGroup(ResourceFactory.createResource(group.getURI())));
         output.put("type", group.type);
+        if (isProcessGroup) {
+            output.put("elementsFlows", elementsFlows);
+            output.put("elementsImpacts", elementsImpacts);
+        }
 
         if (isProcessGroup) {
             nodesLabel.add(group.getLabel());
@@ -321,9 +361,13 @@ public class Onto extends Controller {
         Iterator it = input.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pairs = (Map.Entry)it.next();
-            output.put(((String)pairs.getKey()).replace('.', '_'), (Value)pairs.getValue());
+            output.put(mongonize((String)pairs.getKey()), (Value)pairs.getValue());
         }
         return output;
+    }
+
+    protected static String mongonize(String fieldName) {
+        return fieldName.replace(".", "____");
     }
 
     protected static DB mongoConnect() throws Exception {
@@ -356,6 +400,20 @@ public class Onto extends Controller {
             DB db = mongoConnect();
             DBCollection graphColl = db.getCollection("graph");
             String response = graphColl.findOne().toString();
+            mongoClose();
+            return ok(response);
+        }
+        catch (Exception e) {
+            return ok(e.getMessage());
+        }
+    }
+
+    public static Result getImpactAndFlowTypes() {
+        authorizeCrossRequests();
+        try {
+            DB db = mongoConnect();
+            DBCollection impactAndFlowTypesColl = db.getCollection("impactAndFlowTypes");
+            String response = impactAndFlowTypesColl.findOne().toString();
             mongoClose();
             return ok(response);
         }
@@ -485,7 +543,7 @@ public class Onto extends Controller {
         }
         Arrays.sort(keywords);
         for (i = 0; i < keywords.length; i++) {
-            output += keywords[i].replace(".", "____");
+            output += mongonize(keywords[i]);
         }
         return output;
     }

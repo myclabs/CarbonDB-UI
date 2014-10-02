@@ -11,7 +11,17 @@ define(["angular", "./controllers", "common"], function(angular, controllers) {
       .when("/upload",  {templateUrl: "/assets/templates/home/upload.html", controller:controllers.UploadCtrl})
       .when("/about",  {templateUrl: "/assets/templates/home/about.html", controller:controllers.AboutCtrl})
       .when("/help",  {templateUrl: "/assets/templates/home/help.html", controller:controllers.HelpCtrl})
-      .when("/group/:type/:uri",  {templateUrl: "/assets/templates/home/group.html", controller:controllers.GroupCtrl})
+      .when("/group/:type/:uri",
+        {
+          templateUrl: "/assets/templates/home/group.html",
+          controller:controllers.GroupCtrl,
+          resolve:{
+            'ontologyTypesData': function(ontologyTypes) {
+              // hack to initialize the service when the group url is requested
+              return ontologyTypes.promise;
+            }
+          }
+        })
       .otherwise( {templateUrl: "/assets/templates/home/notFound.html"});
   }]);
   return mod;
