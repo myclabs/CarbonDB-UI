@@ -110,8 +110,16 @@ define(["angular"], function(angular) {
           var mult = Math.pow(10, sig - Math.floor(Math.log(n) / Math.LN10) - 1);
           return Math.round(n * mult) / mult;
         }
-
-        scope.$watch(
+        scope.$watch('values',
+          function (newValue, oldValue, scope) {
+            if (typeof scope.rowDimensions !== 'undefined'
+                           && typeof scope.lineDimensions !== 'undefined'
+                           && typeof scope.values !== 'undefined') {
+              createTMD(scope.rowDimensions, scope.lineDimensions, scope.commonKeywords, scope.values, scope.roundValues);
+            }
+          }
+        );
+        /*scope.$watch(
           function () {return typeof scope.rowDimensions !== 'undefined'
                            && typeof scope.lineDimensions !== 'undefined'
                            && typeof scope.values !== 'undefined'},
@@ -120,7 +128,7 @@ define(["angular"], function(angular) {
               createTMD(scope.rowDimensions, scope.lineDimensions, scope.commonKeywords, scope.values, scope.roundValues);
             }
           }
-        );
+        );*/
       }
     };
   }]);

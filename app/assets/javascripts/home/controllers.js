@@ -128,7 +128,6 @@ define(["angular"], function(angular) {
       $scope.URI = data.URI;
       $scope.label = data.label;
       $scope.dimensionsNumber = data.dimensions.length;
-      $scope.elements = data.elements;
       $scope.elementsNumber = data.elementsNumber;
       $scope.sourceRelations = data.sourceRelations;
       $scope.unit = data.unit;
@@ -157,7 +156,21 @@ define(["angular"], function(angular) {
       }
       $scope.$watch('viewType',
           function (newValue, oldValue, scope) {
-            console.log("viewType = " + scope.viewType);
+            $scope.elements = {};
+            var elements = data.elementsFlows;
+            if ($scope.impactTypes.hasOwnProperty($scope.viewType)) {
+              elements = data.elementsImpacts;
+            }
+            for (var element in elements) {
+              if (elements.hasOwnProperty(element)) {
+                  if (elements[element].hasOwnProperty($scope.viewType)) {
+                    $scope.elements[element] = elements[element][$scope.viewType];
+                  }
+                  else {
+                    $scope.elements[element] = {'value': 0.0, 'uncertainty': 0.0};
+                  }
+              }
+            }
           }
         );
     });
