@@ -26,12 +26,6 @@ define(["angular"], function(angular) {
         return node.hasOwnProperty('unit') ? true : false;
       }
     };
-    $scope.d3Data = [
-      {name: "Greg", score: 98},
-      {name: "Ari", score: 96},
-      {name: 'Q', score: 75},
-      {name: "Loser", score: 48}
-    ];
 
     playRoutes.controllers.Onto.getGraph().get().success(function(data) {
       $scope.d3Nodes = [];
@@ -132,6 +126,7 @@ define(["angular"], function(angular) {
       $scope.sourceRelations = data.sourceRelations;
       $scope.unit = data.unit;
       $scope.commonKeywords = data.commonKeywords;
+      $scope.elementsImpactsAndFlows = data.elementsImpactsAndFlows;
       $scope.type = data.type;
 
       // setting up the line and row dimensions
@@ -156,15 +151,15 @@ define(["angular"], function(angular) {
       }
       $scope.$watch('viewType',
           function (newValue, oldValue, scope) {
+            console.log(newValue);
+            console.log(scope.viewType.replace(/\./g, "____"));
             $scope.elements = {};
-            var elements = data.elementsFlows;
-            if ($scope.impactTypes.hasOwnProperty($scope.viewType)) {
-              elements = data.elementsImpacts;
-            }
+
+            var elements = data.elementsImpactsAndFlows;
             for (var element in elements) {
               if (elements.hasOwnProperty(element)) {
-                  if (elements[element].hasOwnProperty($scope.viewType)) {
-                    $scope.elements[element] = elements[element][$scope.viewType];
+                  if (elements[element].hasOwnProperty($scope.viewType.replace(/\./g, "____"))) {
+                    $scope.elements[element] = elements[element][$scope.viewType.replace(/\./g, "____")];
                   }
                   else {
                     $scope.elements[element] = {'value': 0.0, 'uncertainty': 0.0};

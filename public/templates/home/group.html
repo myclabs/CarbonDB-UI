@@ -10,11 +10,15 @@
     <div class="form-horizontal">
         <label class="col-sm-2 control-label" for="formGroupInputLarge">View</label>
         <div class="col-sm-4">
-            <select class="form-control col-md-4" ng-model="viewType">
-               <option disabled>Impacts</option>
-               <option ng-repeat="(impactTypeURI, impactTypeLabel) in impactTypes" value="{{impactTypeURI}}">&nbsp;&nbsp;{{impactTypeLabel}}</option>
-               <option disabled>Elementary flows</option>
-               <option ng-repeat="(flowTypeURI, flowTypeLabel) in flowTypes" value="{{flowTypeURI}}">&nbsp;&nbsp;{{flowTypeLabel}}</option>
+            <select class="form-control col-md-4" ng-model="viewType" id="viewType">
+              <option disabled>Impacts</option>
+              <option ng-repeat-start="impactTypeCategory in impactTypes.children" disabled>&nbsp;&nbsp;{{impactTypeCategory.label}}</option>
+                <option ng-repeat="impactType in impactTypeCategory.children" value="{{impactType.uri}}">&nbsp;&nbsp;&nbsp;&nbsp;{{impactType.label}}</option>
+              <option ng-repeat-end disabled style="display: none;">------</option>
+              <option disabled>Elementary flows</option>
+              <option ng-repeat-start="flowTypeCategory in flowTypes.children" disabled>&nbsp;&nbsp;{{flowTypeCategory.label}}</option>
+                <option ng-repeat="flowType in flowTypeCategory.children" value="{{flowType.uri}}">&nbsp;&nbsp;&nbsp;&nbsp;{{flowType.label}}</option>
+              <option ng-repeat-end disabled style="display: none;">------</option>
             </select>
         </div>
     </div>
@@ -39,3 +43,5 @@
 	 	</tr>
 	</table>
 <hr />
+
+

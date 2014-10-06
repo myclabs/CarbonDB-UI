@@ -203,6 +203,13 @@ public class Onto extends Controller {
                                             + ", flowTypes:" + toJson(flowTypes).toString() + "}");
         impactAndFlowTypesColl.insert(dbObject);
 
+        // Impact and elementary flow types tree retrieval and insertion in a collection
+        DBCollection impactAndFlowTypesTreeColl = db.getCollection("impactAndFlowTypesTree");
+        impactAndFlowTypesTreeColl.drop();
+        dbObject = (BasicDBObject) JSON.parse("{impactTypesTree:" + toJson(RepoFactory.getSingleElementRepo().getImpactTypesTree()).toString()
+                                            + ", flowTypesTree:" + toJson(RepoFactory.getSingleElementRepo().getElementaryFlowTypesTree()).toString() + "}");
+        impactAndFlowTypesTreeColl.insert(dbObject);
+
         DBCollection groupsColl = db.getCollection("groups");
         groupsColl.drop();
 
@@ -248,6 +255,8 @@ public class Onto extends Controller {
         HashMap<String, Object> elementsValue = new HashMap<>();
         HashMap<String, Object> elementsFlows = new HashMap<>();
         HashMap<String, Object> elementsImpacts = new HashMap<>();
+        HashMap elementImpactsAndFlows;
+        HashMap<String, Object> elementsImpactsAndFlows = new HashMap<>();
 
         String unit = group.getUnit();
         String unitLabel;
@@ -299,21 +308,10 @@ public class Onto extends Controller {
                 elementsValue.put(joinDimensionKeywords(element), "empty");
             }
             else if (isProcessGroup) {
-                elementsFlows.put(
-                    joinDimensionKeywords(element),
-                    transformValueHashMapURIKeys(RepoFactory.getSingleElementRepo().getCalculatedEmissionsForProcess(elementResource))
-                );
-                elementsImpacts.put(
-                    joinDimensionKeywords(element),
-                    transformValueHashMapURIKeys(RepoFactory.getSingleElementRepo().getImpactsForProcess(elementResource))
-                );
-                HashMap<String, Value> impacts = RepoFactory.getSingleElementRepo().getImpactsForProcess(elementResource);
-                if (impacts.containsKey(Datatype.getURI() + "ti/ghg_emission_measured_using_gwp_over_100_years")) {
-                    elementsValue.put(joinDimensionKeywords(element), impacts.get(Datatype.getURI() + "ti/ghg_emission_measured_using_gwp_over_100_years"));
-                }
-                else {
-                    elementsValue.put(joinDimensionKeywords(element), new Value(0.0, 0.0));
-                }
+                elementImpactsAndFlows = new HashMap();
+                elementImpactsAndFlows.putAll(transformValueHashMapURIKeys(RepoFactory.getSingleElementRepo().getCalculatedEmissionsForProcess(elementResource)));
+                elementImpactsAndFlows.putAll(transformValueHashMapURIKeys(RepoFactory.getSingleElementRepo().getImpactsForProcess(elementResource)));
+                elementsImpactsAndFlows.put(joinDimensionKeywords(element), elementImpactsAndFlows);
             }
             else {
                 // the element is a coefficient
@@ -327,15 +325,12 @@ public class Onto extends Controller {
                     );
                 }
                 else {
-                    elementsValue.put(
-                        joinDimensionKeywords(element), "empty"
-                    );
+                    elementsValue.put(joinDimensionKeywords(element), "empty");
                 }
             }
         }
         output.put("URI", group.getURI());
         output.put("label", group.getLabel());
-        output.put("elements", elementsValue);
         output.put("elementsNumber", elementsValue.size());
         output.put("dimensions", group.dimSet.dimensions);
         output.put("unit", unitLabel);
@@ -343,14 +338,13 @@ public class Onto extends Controller {
         output.put("sourceRelations", RepoFactory.getRelationRepo().getSourceRelationsForProcessGroup(ResourceFactory.createResource(group.getURI())));
         output.put("type", group.type);
         if (isProcessGroup) {
-            output.put("elementsFlows", elementsFlows);
-            output.put("elementsImpacts", elementsImpacts);
-        }
-
-        if (isProcessGroup) {
+            output.put("elementsImpactsAndFlows", elementsImpactsAndFlows);
             nodesLabel.add(group.getLabel());
             nodesURI.add(group.getURI());
             nodesId.add(group.getId());
+        }
+        else {
+            output.put("elementsValue", elementsValue);
         }
 
         return toJson(output).toString();
@@ -408,12 +402,26 @@ public class Onto extends Controller {
         }
     }
 
-    public static Result getImpactAndFlowTypes() {
+    public static Result getImpactAndFlowTypesPlain() {
         authorizeCrossRequests();
         try {
             DB db = mongoConnect();
             DBCollection impactAndFlowTypesColl = db.getCollection("impactAndFlowTypes");
             String response = impactAndFlowTypesColl.findOne().toString();
+            mongoClose();
+            return ok(response);
+        }
+        catch (Exception e) {
+            return ok(e.getMessage());
+        }
+    }
+
+    public static Result getImpactAndFlowTypes() {
+        authorizeCrossRequests();
+        try {
+            DB db = mongoConnect();
+            DBCollection impactAndFlowTypesTreeColl = db.getCollection("impactAndFlowTypesTree");
+            String response = impactAndFlowTypesTreeColl.findOne().toString();
             mongoClose();
             return ok(response);
         }
