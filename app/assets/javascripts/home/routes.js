@@ -16,7 +16,7 @@ define(["angular", "./controllers", "common"], function(angular, controllers) {
           templateUrl: "/assets/templates/home/group.html",
           controller:controllers.GroupCtrl,
           resolve:{
-            'ontologyTypesData': function(ontologyTypes) {
+            'ontologyTypesData': ["ontologyTypes", function(ontologyTypes) {
               // hack to initialize the service when the group url is requested
               return ontologyTypes.promise;
             }
