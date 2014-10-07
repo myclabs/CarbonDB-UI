@@ -72,8 +72,6 @@ public class Onto extends Controller {
     protected static ArrayList<String> nodesURI = new ArrayList<>();
     protected static ArrayList<String> nodesId = new ArrayList<>();
     protected static ArrayList<HashMap<String, Object>> links = new ArrayList<>();
-    protected static HashMap<String, Double> conversionFactors = new HashMap<>();
-    protected static HashMap<String, HashMap<String, Boolean>> compatibleUnits = new HashMap<>();
 
     protected static MongoClient mongoClient;
 
@@ -113,6 +111,7 @@ public class Onto extends Controller {
                 try {
                     Cache.set("conversionFactors", ((UnitsRepoCache)unitsRepo).getConversionFactorsCache());
                     Cache.set("compatibleUnits", ((UnitsRepoCache)unitsRepo).getCompatibleUnitsCache());
+                    Cache.set("unitSymbols", ((UnitsRepoCache)unitsRepo).getSymbolsCache());
                     Model model = getInferredModel();
                     System.out.println("feeding MongoDB");
                     feedMongoDB(model);
@@ -258,71 +257,37 @@ public class Onto extends Controller {
         HashMap elementImpactsAndFlows;
         HashMap<String, Object> elementsImpactsAndFlows = new HashMap<>();
 
-        String unit = group.getUnit();
-        String unitLabel;
-        if (!unitsLabel.containsKey(unit)) {
-            Response response = ClientBuilder.newClient()
-                            .target("http://units.myc-sense.com/api")
-                            .path("unit")
-                            .path(unit)
-                            .request(MediaType.TEXT_PLAIN_TYPE)
-                            .get();
-            if (response.getStatus() == 200) {
-                String responseString = response.readEntity(String.class);
-                JSONObject obj = new JSONObject(responseString);
-                if (obj.getJSONObject("symbol").isNull("en")) {
-                    unitLabel = "-";
-                }
-                else {
-                    unitLabel = obj.getJSONObject("symbol").getString("en");
-                }
-            }
-            else {
-                unitLabel = unit;
-            }
-            unitsLabel.put(unit, unitLabel);
-        }
-
-        unitLabel = unitsLabel.get(unit);
-        if (isProcessGroup) {
-            unitLabel = "kg équ. CO2 / " + unitLabel;
-        }
+        String unitLabel = unitsRepo.getUnitSymbol(group.getUnit());
 
         for (Dimension element: group.elements.dimensions) {
             Resource elementResource;
             try {
                 if (isProcessGroup) {
                     elementResource = RepoFactory.getSingleElementRepo().getProcessForDimension(element, group.getUnitURI());
+                    elementImpactsAndFlows = new HashMap();
+                    elementImpactsAndFlows.putAll(transformValueHashMapURIKeys(RepoFactory.getSingleElementRepo().getCalculatedEmissionsForProcess(elementResource)));
+                    elementImpactsAndFlows.putAll(transformValueHashMapURIKeys(RepoFactory.getSingleElementRepo().getImpactsForProcess(elementResource)));
+                    elementsImpactsAndFlows.put(joinDimensionKeywords(element), elementImpactsAndFlows);
                 }
                 else {
                     elementResource = RepoFactory.getSingleElementRepo().getCoefficientForDimension(element, group.getUnitURI());
+                    if (elementResource.hasProperty(Datatype.value) && null != elementResource.getProperty(Datatype.value)) {
+                        elementsValue.put(
+                            joinDimensionKeywords(element),
+                            new Value(
+                                elementResource.getProperty(Datatype.value).getDouble(),
+                                RepoFactory.getSingleElementRepo().getUncertainty(elementResource)
+                            )
+                        );
+                    }
+                    else {
+                        elementsValue.put(joinDimensionKeywords(element), "empty");
+                    }
                 }
             }
-            catch (NoElementFoundException e) {
-                elementResource = null;
-            }
-            catch (MultipleElementsFoundException e) {
-                elementResource = null;
-            }
-            if (null == elementResource) {
-                elementsValue.put(joinDimensionKeywords(element), "empty");
-            }
-            else if (isProcessGroup) {
-                elementImpactsAndFlows = new HashMap();
-                elementImpactsAndFlows.putAll(transformValueHashMapURIKeys(RepoFactory.getSingleElementRepo().getCalculatedEmissionsForProcess(elementResource)));
-                elementImpactsAndFlows.putAll(transformValueHashMapURIKeys(RepoFactory.getSingleElementRepo().getImpactsForProcess(elementResource)));
-                elementsImpactsAndFlows.put(joinDimensionKeywords(element), elementImpactsAndFlows);
-            }
-            else {
-                // the element is a coefficient
-                if (elementResource.hasProperty(Datatype.value) && null != elementResource.getProperty(Datatype.value)) {
-                    elementsValue.put(
-                        joinDimensionKeywords(element),
-                        new Value(
-                            elementResource.getProperty(Datatype.value).getDouble(),
-                            RepoFactory.getSingleElementRepo().getUncertainty(elementResource)
-                        )
-                    );
+            catch (NoElementFoundException | MultipleElementsFoundException e) {
+                if (isProcessGroup) {
+                    elementsImpactsAndFlows.put(joinDimensionKeywords(element), "empty");
                 }
                 else {
                     elementsValue.put(joinDimensionKeywords(element), "empty");
@@ -455,7 +420,10 @@ public class Onto extends Controller {
         if (null == unitsRepo) {
             unitsRepo = new UnitsRepoWebService();
             if (null != Cache.get("conversionFactors")) {
-                ((UnitsRepoCache)unitsRepo).setConversionFactorsCache((HashMap)Cache.get("conversionFactors"));                
+                ((UnitsRepoCache)unitsRepo).setConversionFactorsCache((HashMap)Cache.get("conversionFactors"));
+            }
+            if (null != Cache.get("unitSymbols")) {
+                ((UnitsRepoCache)unitsRepo).setSymbolsCache((HashMap)Cache.get("unitSymbols"));
             }
             if (null != Cache.get("compatibleUnits")) {
                 ((UnitsRepoCache)unitsRepo).setCompatibleUnitsCache((HashMap)Cache.get("compatibleUnits"));

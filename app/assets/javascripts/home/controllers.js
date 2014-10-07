@@ -124,6 +124,7 @@ define(["angular"], function(angular) {
       $scope.elementsNumber = data.elementsNumber;
       $scope.sourceRelations = data.sourceRelations;
       $scope.unit = data.unit;
+      $scope.baseUnit = data.unit;
       $scope.commonKeywords = data.commonKeywords;
       $scope.elementsImpactsAndFlows = data.elementsImpactsAndFlows;
       $scope.type = data.type;
@@ -151,7 +152,7 @@ define(["angular"], function(angular) {
 
       // setting up the elements
       if (data.type == 'COEFFICIENT') {
-        $scope.elements = data.elements;
+        $scope.elements = data.elementsValue;
       }
       else { // type = 'PROCESS'
         $scope.$watch('viewType',
@@ -160,7 +161,10 @@ define(["angular"], function(angular) {
 
               var elements = data.elementsImpactsAndFlows;
               for (var element in elements) {
-                if (elements.hasOwnProperty(element)) {
+                if (elements[element] == 'empty') {
+                  $scope.elements[element] = elements[element];
+                }
+                else if (elements.hasOwnProperty(element)) {
                     if (elements[element].hasOwnProperty($scope.viewType.replace(/\./g, "____"))) {
                       $scope.elements[element] = elements[element][$scope.viewType.replace(/\./g, "____")];
                     }
@@ -170,10 +174,28 @@ define(["angular"], function(angular) {
                 }
               }
               viewType.selection = $scope.viewType;
+              var types = [$scope.impactTypes, $scope.flowTypes];
+              for (var t = 0; t < 2; t++) {
+                for (var i = 0; i < types[t].children.length; i++) {
+                  for (var j = 0; j < types[t].children[i].children.length; j++) {
+                    if (types[t].children[i].children[j].uri == $scope.viewType) {
+                      $("#viewType option:selected").text((t == 0 ? "[I]" : "[EF]") + " "
+                        + types[t].children[i].label
+                        + " - "
+                        + types[t].children[i].children[j].label);
+                      $scope.unit = types[t].children[i].children[j].unit + " / " + data.unit;
+                    }
+                    else {
+                      $("#viewType option[value='" + types[t].children[i].children[j].uri + "']")
+                        .html("&nbsp;&nbsp;&nbsp;&nbsp;" + types[t].children[i].children[j].label);
+                    }
+                  }
+                }
+              }
             }
           );
           if (!viewType.selection) {
-            $scope.viewType = "http://www.myc-sense.com/ontologies/bc#ti/ghg_emission_measured_using_gwp_over_100_years";
+            $scope.viewType = "http://www.myc-sense.com/ontologies/bc#it/ghg_emission_measured_using_gwp_over_100_years";
           }
           else {
             $scope.viewType = viewType.selection;

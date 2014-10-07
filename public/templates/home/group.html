@@ -1,14 +1,13 @@
 <h1>{{label}}</h1>
 <p>
-  <p>URI: {{URI}}</p>
-  <p>Unit: {{unit}}</p>
-  <p ng-if="commonKeywords">Common keywords: 
+  <p><strong>Unit:</strong> {{unit}}</p>
+  <p ng-if="commonKeywords">
+    <strong>Common keywords:</strong>
   	<span ng-repeat="keyword in commonKeywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
   </p>
-  <p>This group has {{dimensionsNumber}} dimensions and contains {{elementsNumber}} elements</p>
   <div class="row col-sm-12" ng-show="type == 'PROCESS'">
     <div class="form-horizontal">
-        <label class="col-sm-2 control-label" for="formGroupInputLarge">View</label>
+        <label class="col-sm-2 control-label" id="labelViewType" for="viewType">Nature of displayed data:</label>
         <div class="col-sm-4">
             <select class="form-control col-md-4" ng-model="viewType" id="viewType">
               <option disabled>Impacts</option>
