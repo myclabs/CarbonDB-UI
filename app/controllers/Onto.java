@@ -12,6 +12,7 @@ import play.cache.Cache;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.HashSet;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -72,6 +73,7 @@ public class Onto extends Controller {
     protected static ArrayList<String> nodesURI = new ArrayList<>();
     protected static ArrayList<String> nodesId = new ArrayList<>();
     protected static ArrayList<HashMap<String, Object>> links = new ArrayList<>();
+    protected static HashMap<String, HashMap<String, Object>> processes = new HashMap<>();
 
     protected static MongoClient mongoClient;
 
@@ -218,6 +220,17 @@ public class Onto extends Controller {
             groupsColl.insert(dbObject);
         }
 
+        DBCollection processesColl = db.getCollection("processes");
+        processesColl.drop();
+
+        for(Entry<String, HashMap<String, Object>> entry : processes.entrySet()) {
+            String uri = entry.getKey();
+            HashMap process = entry.getValue();
+            dbObject = (BasicDBObject) JSON.parse(toJson(process).toString());
+            dbObject.append("_id", mongonize(uri));
+            processesColl.insert(dbObject);
+        }
+
         DBCollection graphColl = db.getCollection("graph");
         graphColl.drop();
 
@@ -256,6 +269,7 @@ public class Onto extends Controller {
         HashMap<String, Object> elementsImpacts = new HashMap<>();
         HashMap elementImpactsAndFlows;
         HashMap<String, Object> elementsImpactsAndFlows = new HashMap<>();
+        HashMap<String, Object> processInfos;
 
         String unitLabel = unitsRepo.getUnitSymbol(group.getUnit());
 
@@ -268,6 +282,22 @@ public class Onto extends Controller {
                     elementImpactsAndFlows.putAll(transformValueHashMapURIKeys(RepoFactory.getSingleElementRepo().getCalculatedEmissionsForProcess(elementResource)));
                     elementImpactsAndFlows.putAll(transformValueHashMapURIKeys(RepoFactory.getSingleElementRepo().getImpactsForProcess(elementResource)));
                     elementsImpactsAndFlows.put(joinDimensionKeywords(element), elementImpactsAndFlows);
+
+                    // process: keywords, impacts, flows, unit, groups (where the process is referenced), individual relations
+                    if (!processes.containsKey(elementResource.getURI())) {
+                        processInfos = new HashMap<>();
+                        processInfos.put("keywords", element);
+                        processInfos.put("impacts", RepoFactory.getSingleElementRepo().getImpactsForProcess(elementResource));
+                        processInfos.put("flows", RepoFactory.getSingleElementRepo().getCalculatedEmissionsForProcess(elementResource));
+                        processInfos.put("unit", unitLabel);
+                        processInfos.put("unit", unitLabel);
+                        processInfos.put("groups", new HashMap<String, Object>());
+                        processes.put(elementResource.getURI(), processInfos);
+                    }
+                    else {
+                        processInfos = processes.get(elementResource.getURI());
+                    }
+                    ((HashMap)processInfos.get("groups")).put(group.getURI(), group.getLabel());
                 }
                 else {
                     elementResource = RepoFactory.getSingleElementRepo().getCoefficientForDimension(element, group.getUnitURI());
