@@ -108,12 +108,11 @@ define(["angular"], function(angular) {
   };
   UploadCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$upload", "$window", "playRoutes"];
 
-  var GroupCtrl = function($scope, $rootScope, $location, helper, $http, $routeParams, $window, playRoutes, ontologyTypes) {
+  var GroupCtrl = function($scope, $rootScope, $location, helper, $http, $routeParams, $window, playRoutes, ontologyTypes, viewType) {
     $rootScope.pageTitle = "CarbonDB";
     $scope.groupName = $routeParams.uri;
     $scope.impactTypes = ontologyTypes.getImpactTypes();
     $scope.flowTypes = ontologyTypes.getFlowTypes();
-    $scope.viewType = "http://www____myc-sense____com/ontologies/bc#ti/ghg_emission_measured_using_gwp_over_100_years";
 
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
@@ -149,29 +148,41 @@ define(["angular"], function(angular) {
         else
           $scope.rowDimensions.push(data.dimensions[i].keywords.sort(sortKeywordsCompare));
       }
-      $scope.$watch('viewType',
-          function (newValue, oldValue, scope) {
-            console.log(newValue);
-            console.log(scope.viewType.replace(/\./g, "____"));
-            $scope.elements = {};
 
-            var elements = data.elementsImpactsAndFlows;
-            for (var element in elements) {
-              if (elements.hasOwnProperty(element)) {
-                  if (elements[element].hasOwnProperty($scope.viewType.replace(/\./g, "____"))) {
-                    $scope.elements[element] = elements[element][$scope.viewType.replace(/\./g, "____")];
-                  }
-                  else {
-                    $scope.elements[element] = {'value': 0.0, 'uncertainty': 0.0};
-                  }
+      // setting up the elements
+      if (data.type == 'COEFFICIENT') {
+        $scope.elements = data.elements;
+      }
+      else { // type = 'PROCESS'
+        $scope.$watch('viewType',
+            function (newValue, oldValue, scope) {
+              $scope.elements = {};
+
+              var elements = data.elementsImpactsAndFlows;
+              for (var element in elements) {
+                if (elements.hasOwnProperty(element)) {
+                    if (elements[element].hasOwnProperty($scope.viewType.replace(/\./g, "____"))) {
+                      $scope.elements[element] = elements[element][$scope.viewType.replace(/\./g, "____")];
+                    }
+                    else {
+                      $scope.elements[element] = {'value': 0.0, 'uncertainty': 0.0};
+                    }
+                }
               }
+              viewType.selection = $scope.viewType;
             }
+          );
+          if (!viewType.selection) {
+            $scope.viewType = "http://www.myc-sense.com/ontologies/bc#ti/ghg_emission_measured_using_gwp_over_100_years";
           }
-        );
+          else {
+            $scope.viewType = viewType.selection;
+          }
+      }
     });
 
   };
-  GroupCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$routeParams", "$window", "playRoutes", "ontologyTypes"];
+  GroupCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$routeParams", "$window", "playRoutes", "ontologyTypes", "viewType"];
 
   /*mod.filter('escape', function(value) {
     return encodeURIComponent(value);

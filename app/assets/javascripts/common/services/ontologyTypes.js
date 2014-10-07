@@ -21,5 +21,8 @@ define(["angular"], function(angular) {
       }
     };
   }]);
+  mod.factory('viewType', [function(){
+    return {selection: ''};
+  }]);
   return mod;
 });
