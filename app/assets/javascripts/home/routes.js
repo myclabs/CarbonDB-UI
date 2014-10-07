@@ -20,7 +20,7 @@ define(["angular", "./controllers", "common"], function(angular, controllers) {
               // hack to initialize the service when the group url is requested
               return ontologyTypes.promise;
             }
-          }
+          }]
         })
       .otherwise( {templateUrl: "/assets/templates/home/notFound.html"});
   }]);
