@@ -111,8 +111,8 @@ define(["angular"], function(angular) {
   var GroupCtrl = function($scope, $rootScope, $location, helper, $http, $routeParams, $window, playRoutes, ontologyTypes, viewType) {
     $rootScope.pageTitle = "CarbonDB";
     $scope.groupName = $routeParams.uri;
-    $scope.impactTypes = ontologyTypes.getImpactTypes();
-    $scope.flowTypes = ontologyTypes.getFlowTypes();
+    $scope.impactTypes = ontologyTypes.getImpactTypesTree();
+    $scope.flowTypes = ontologyTypes.getFlowTypesTree();
 
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
@@ -128,17 +128,12 @@ define(["angular"], function(angular) {
       $scope.commonKeywords = data.commonKeywords;
       $scope.elementsImpactsAndFlows = data.elementsImpactsAndFlows;
       $scope.type = data.type;
+      $scope.elementsURI = data.elementsURI;
+      console.log($scope.elementsURI);
 
       // setting up the line and row dimensions
       $scope.rowDimensions = new Array();
       $scope.lineDimensions = new Array();
-      var sortKeywordsCompare = function (k1, k2) {
-        if (k1.label > k2.label)
-          return 1;
-        if (k1.label < k2.label)
-          return -1;
-        return 0;
-      }
       for (var i =0; i < data.dimensions.length; i++) {
         if (data.dimensions[i].orientation == 'VERTICAL')
           $scope.lineDimensions.push(data.dimensions[i].keywords.sort(sortKeywordsCompare));
@@ -206,6 +201,57 @@ define(["angular"], function(angular) {
   };
   GroupCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$routeParams", "$window", "playRoutes", "ontologyTypes", "viewType"];
 
+  var ProcessCtrl = function($scope, $rootScope, $location, helper, $http, $routeParams, $window, playRoutes, ontologyTypes) {
+    $rootScope.pageTitle = "CarbonDB";
+    $scope.impactTypes = ontologyTypes.getImpactTypesTree();
+    $scope.flowTypes = ontologyTypes.getFlowTypesTree();
+    console.log(ontologyTypes.getImpactTypesTree());
+
+    if ($location.host() != 'localhost')
+      $window.ga('send', 'pageview', { page: $location.path() });
+
+    playRoutes.controllers.Onto.getProcess("sp/" + $routeParams.id).get().success(function(data) {
+      $scope.URI = data.URI;
+      $scope.label = data.label;
+      $scope.sourceRelations = data.sourceRelations;
+      $scope.unit = data.unit;
+      $scope.impactsAndFlows = [];
+      $scope.groups = data.groups;
+      $scope.keywords = data.keywords.keywords.sort(sortKeywordsCompare);
+      $scope.relations = data.relations;
+      var types = [$scope.impactTypes, $scope.flowTypes];
+      var processData = [data.impacts, data.flows];
+      for (var t = 0; t < 2; t++) {
+        for (var i = 0; i < types[t].children.length; i++) {
+          var impactTypeCategory = types[t].children[i];
+          $scope.impactsAndFlows[impactTypeCategory.uri] = new Array();
+          for (var j = 0; j < impactTypeCategory.children.length; j++) {
+            var impactType = impactTypeCategory.children[j];
+            console.log("looking for: " + impactType.uri);
+            var impactTypeURI = impactType.uri.replace(/\./g, "____");
+            if (processData[t].hasOwnProperty(impactTypeURI)) {
+              var impact = {
+                label: impactType.label,
+                value: sigFigs(processData[t][impactTypeURI].value, 3),
+                uncertainty: processData[t][impactTypeURI].uncertainty,
+                unit: impactType.unit
+              }
+              $scope.impactsAndFlows[impactTypeCategory.uri].push(impact);
+            }
+          }
+        }
+      }
+console.log($scope.impactsAndFlows);
+      /*for (var impact in data.impacts) {
+        if (data.impacts.hasOwnProperty(impact)) {
+          $scope.impacts[impact].type = $scope.impactTypes[impact];
+        }
+      }*/
+    });
+
+  };
+  ProcessCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$routeParams", "$window", "playRoutes", "ontologyTypes"];
+
   /*mod.filter('escape', function(value) {
     return encodeURIComponent(value);
   });*/
@@ -233,11 +279,25 @@ define(["angular"], function(angular) {
   };
   //FooterCtrl.$inject = ["$scope"];
 
+  var sortKeywordsCompare = function (k1, k2) {
+    if (k1.label > k2.label)
+      return 1;
+    if (k1.label < k2.label)
+      return -1;
+    return 0;
+  }
+
+  function sigFigs(n, sig) {
+    var mult = Math.pow(10, sig - Math.floor(Math.log(n) / Math.LN10) - 1);
+    return Math.round(n * mult) / mult;
+  }
+
   return {
     HeaderCtrl: HeaderCtrl,
     FooterCtrl: FooterCtrl,
     HomeCtrl: HomeCtrl,
     GroupCtrl: GroupCtrl,
+    ProcessCtrl: ProcessCtrl,
     UploadCtrl: UploadCtrl,
     AboutCtrl: AboutCtrl,
     HelpCtrl: HelpCtrl

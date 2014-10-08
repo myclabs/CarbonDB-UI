@@ -7,9 +7,13 @@ define(["angular"], function(angular) {
   mod.factory('ontologyTypes', ['playRoutes', function (playRoutes) {
     var impactTypes = new Array();
     var flowTypes = new Array();
+    var impactTypesTree = new Array();
+    var flowTypesTree = new Array();
     var promise = playRoutes.controllers.Onto.getImpactAndFlowTypes().get().success(function(data) {
-      impactTypes = data.impactTypesTree;
-      flowTypes = data.flowTypesTree;
+      impactTypes = data.plain.impactTypes;
+      flowTypes = data.plain.flowTypes;
+      impactTypesTree = data.tree.impactTypesTree;
+      flowTypesTree = data.tree.flowTypesTree;
     });
     return {
       promise: promise,
@@ -18,6 +22,12 @@ define(["angular"], function(angular) {
       },
       getFlowTypes: function() {
         return flowTypes;
+      },
+      getImpactTypesTree: function () {
+        return impactTypesTree;
+      },
+      getFlowTypesTree: function() {
+        return flowTypesTree;
       }
     };
   }]);

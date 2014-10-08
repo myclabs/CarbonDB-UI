@@ -1,0 +1,69 @@
+<h1>
+  <span ng-repeat="keyword in keywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
+</h1>
+<p>
+  <p ng-if="commonKeywords">
+    <strong>Tag:</strong>
+  	<span ng-repeat="keyword in keywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
+  </p>
+  <p><strong>Unit:</strong> {{unit}}</p>
+    <h2>Impacts</h2>
+    <div ng-repeat="impactType in impactTypes.children">
+      <h3>{{impactType.label}}</h3>
+      <div ng-if="impactsAndFlows[impactType.uri].length == 0">This process has no impact for this impact category.</div>
+      <table class="table tmd table-nonfluid" ng-if="impactsAndFlows[impactType.uri].length > 0">
+        <tr>
+          <th>Type</th>
+          <th>Value</th>
+          <th>Unit</th>
+        </tr>
+        <tr ng-repeat="impact in impactsAndFlows[impactType.uri]">
+          <td>{{impact.label}}</td>
+          <td>{{impact.value}}</td>
+          <td>{{impact.unit}}</td>
+        </tr>
+      </table>
+    </div>
+
+    <h2>Elementary flows</h2>
+    <div ng-repeat="flowType in flowTypes.children">
+      <h3>{{flowType.label}}</h3>
+      <div ng-if="impactsAndFlows[flowType.uri].length == 0">This process has no elementary flow for this elementary flow category.</div>
+      <table class="table tmd table-nonfluid" ng-if="impactsAndFlows[flowType.uri].length > 0">
+        <tr>
+          <th>Type</th>
+          <th>Value</th>
+          <th>Unit</th>
+        </tr>
+        <tr ng-repeat="flow in impactsAndFlows[flowType.uri]">
+          <td>{{flow.label}}</td>
+          <td>{{flow.value}}</td>
+          <td>{{flow.unit}}</td>
+        </tr>
+      </table>
+    </div>
+
+    <h2>Groups containing this process</h2>
+    <ul>
+      <li><a ng-repeat="(groupId, groupLabel) in groups" ng-href="#/group/{{groupId}}">{{groupLabel}}</a></li>
+    </ul>
+
+  <h2>Relations</h2>
+	<table class="table tmd table-nonfluid">
+		<tr>
+			<th>Upsteam</th>
+			<th>Coefficient</th>
+			<th>Downstream</th>
+		</tr>
+		<tr ng-repeat="relation in relations">
+			<td ng-if="sourceRelation.source.uri != URI"><a ng-href="#/group/{{sourceRelation.source.id}}">{{sourceRelation.source.label}}</a></td>
+			<td ng-if="sourceRelation.source.uri == URI">{{sourceRelation.source.label}}</td>
+			<td ng-if="sourceRelation.coeff.uri != URI"><a ng-href="#/group/{{sourceRelation.coeff.id}}">{{sourceRelation.coeff.label}} <sup ng-if="sourceRelation.exponent == -1">-1</sup></a></td>
+			<td ng-if="sourceRelation.coeff.uri == URI">{{sourceRelation.coeff.label}} <sup ng-if="sourceRelation.exponent == -1">-1</sup></td>
+			<td ng-if="sourceRelation.destination.uri != URI"><a ng-href="#/group/{{sourceRelation.destination.id}}">{{sourceRelation.destination.label}}</a></td>
+			<td ng-if="sourceRelation.destination.uri == URI">{{sourceRelation.destination.label}}</td>
+	 	</tr>
+	</table>
+<hr />
+
+

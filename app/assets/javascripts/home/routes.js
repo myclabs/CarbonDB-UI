@@ -22,6 +22,17 @@ define(["angular", "./controllers", "common"], function(angular, controllers) {
             }
           ]}
         })
+      .when("/process/sp/:id",
+        {
+          templateUrl: "/assets/templates/home/process.html",
+          controller:controllers.ProcessCtrl,
+          resolve:{
+            'ontologyTypesData': ["ontologyTypes", function(ontologyTypes) {
+              // hack to initialize the service when the group url is requested
+              return ontologyTypes.promise;
+            }
+          ]}
+        })
       .otherwise( {templateUrl: "/assets/templates/home/notFound.html"});
   }]);
   return mod;

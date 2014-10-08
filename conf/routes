@@ -29,7 +29,8 @@ GET     /categories             controllers.Onto.getCategories()
 GET     /group/:uri             controllers.Onto.getGroup(uri: String)
 GET     /lastreport             controllers.Onto.getLastReport()
 GET     /graph             	    controllers.Onto.getGraph()
-GET     /getImpactAndFlowTypes	controllers.Onto.getImpactAndFlowTypes()
+GET     /getImpactAndFlowTypes  controllers.Onto.getImpactAndFlowTypes()
+GET     /getProcess/sp/:id     	controllers.Onto.getProcess(id: String)
 
 # Static
 # ~~~~

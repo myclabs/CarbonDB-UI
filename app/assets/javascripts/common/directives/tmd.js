@@ -16,18 +16,19 @@ define(["angular"], function(angular) {
         lineDimensions: '=',
         commonKeywords: '=',
         values: '=',
-        roundValues: '='
+        roundValues: '=',
+        uris: '='
       },
       templateUrl: 'assets/templates/tmd.html',
       link: function (scope, element, attrs) {
 
-        function createTMD(rowDimensions, lineDimensions, commonKeywords, values, roundValues) {
+        function createTMD(rowDimensions, lineDimensions, commonKeywords, values, roundValues, uris) {
           var commonKeywordsCoordinate = new Array();
           for (var i = 0; i < commonKeywords.length; i++) {
             commonKeywordsCoordinate.push(commonKeywords[i].name);
           }
           var tmd = new Array();
-          var value, span;
+          var value, span, uri;
           var rowsCoordinates = new Array();
           var repetitions = 1, numberOfRows =1, numberOfLines = 1;
           for (var i = 0; i < rowDimensions.length; i++) {
@@ -86,6 +87,7 @@ define(["angular"], function(angular) {
               var coordinate = coordinateList.sort().join("").replace(/\./g, "____");
               if (values[coordinate] == 'empty') {
                 value = '-';
+                uri = false;
               }
               else {
                 var uncertainty = Math.round(values[coordinate].uncertainty*100)/100;
@@ -95,8 +97,9 @@ define(["angular"], function(angular) {
                 else {
                   var value = values[coordinate].value;
                 }
+                uri = uris[coordinate];
               }
-              tmd[i].push({'value': value, 'uncertainty': uncertainty, 'span': 1, 'header': false, 'col': false});
+              tmd[i].push({'value': value, 'uncertainty': uncertainty, 'span': 1, 'header': false, 'col': false, 'uri': uri});
             }
           }
           //console.log(tmd);
@@ -104,9 +107,6 @@ define(["angular"], function(angular) {
         }
 
         function sigFigs(n, sig) {
-          // x = 10^{log10(n)-sig+1} * ROUND ( n / 10^{log10(n)-sig+1} )
-          // n = 1000, log10(n) = 3, sig = 2
-          // x = ROUND ( n * 10^{sig-log10(n)-1}) / 10^{sig-log10(n)-1}
           var mult = Math.pow(10, sig - Math.floor(Math.log(n) / Math.LN10) - 1);
           return Math.round(n * mult) / mult;
         }
@@ -115,7 +115,7 @@ define(["angular"], function(angular) {
             if (typeof scope.rowDimensions !== 'undefined'
                            && typeof scope.lineDimensions !== 'undefined'
                            && typeof scope.values !== 'undefined') {
-              createTMD(scope.rowDimensions, scope.lineDimensions, scope.commonKeywords, scope.values, scope.roundValues);
+              createTMD(scope.rowDimensions, scope.lineDimensions, scope.commonKeywords, scope.values, scope.roundValues, scope.uris);
             }
           }
         );

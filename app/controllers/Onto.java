@@ -270,6 +270,7 @@ public class Onto extends Controller {
         HashMap elementImpactsAndFlows;
         HashMap<String, Object> elementsImpactsAndFlows = new HashMap<>();
         HashMap<String, Object> processInfos;
+        HashMap<String, String> elementsURI = new HashMap<>();
 
         String unitLabel = unitsRepo.getUnitSymbol(group.getUnit());
 
@@ -287,17 +288,18 @@ public class Onto extends Controller {
                     if (!processes.containsKey(elementResource.getURI())) {
                         processInfos = new HashMap<>();
                         processInfos.put("keywords", element);
-                        processInfos.put("impacts", RepoFactory.getSingleElementRepo().getImpactsForProcess(elementResource));
-                        processInfos.put("flows", RepoFactory.getSingleElementRepo().getCalculatedEmissionsForProcess(elementResource));
+                        processInfos.put("impacts", transformValueHashMapURIKeys(RepoFactory.getSingleElementRepo().getImpactsForProcess(elementResource)));
+                        processInfos.put("flows", transformValueHashMapURIKeys(RepoFactory.getSingleElementRepo().getCalculatedEmissionsForProcess(elementResource)));
                         processInfos.put("unit", unitLabel);
-                        processInfos.put("unit", unitLabel);
+                        processInfos.put("uri", elementResource.getURI());
+                        processInfos.put("relations", getRelationsForElement(elementResource, model));
                         processInfos.put("groups", new HashMap<String, Object>());
                         processes.put(elementResource.getURI(), processInfos);
                     }
                     else {
                         processInfos = processes.get(elementResource.getURI());
                     }
-                    ((HashMap)processInfos.get("groups")).put(group.getURI(), group.getLabel());
+                    ((HashMap)processInfos.get("groups")).put(mongonize(group.getId()), group.getLabel());
                 }
                 else {
                     elementResource = RepoFactory.getSingleElementRepo().getCoefficientForDimension(element, group.getUnitURI());
@@ -314,6 +316,7 @@ public class Onto extends Controller {
                         elementsValue.put(joinDimensionKeywords(element), "empty");
                     }
                 }
+                elementsURI.put(joinDimensionKeywords(element), elementResource.getURI().replace(Datatype.getURI(), ""));
             }
             catch (NoElementFoundException | MultipleElementsFoundException e) {
                 if (isProcessGroup) {
@@ -326,7 +329,7 @@ public class Onto extends Controller {
         }
         output.put("URI", group.getURI());
         output.put("label", group.getLabel());
-        output.put("elementsNumber", elementsValue.size());
+        output.put("elementsURI", elementsURI);
         output.put("dimensions", group.dimSet.dimensions);
         output.put("unit", unitLabel);
         output.put("commonKeywords", group.commonKeywords.keywords);
@@ -416,9 +419,11 @@ public class Onto extends Controller {
         try {
             DB db = mongoConnect();
             DBCollection impactAndFlowTypesTreeColl = db.getCollection("impactAndFlowTypesTree");
-            String response = impactAndFlowTypesTreeColl.findOne().toString();
+            String responseTree = impactAndFlowTypesTreeColl.findOne().toString();
+            DBCollection impactAndFlowTypesColl = db.getCollection("impactAndFlowTypes");
+            String responsePlain = impactAndFlowTypesColl.findOne().toString();
             mongoClose();
-            return ok(response);
+            return ok("{\"tree\": " + responseTree + ", \"plain\": " + responsePlain + "}");
         }
         catch (Exception e) {
             return ok(e.getMessage());
@@ -493,33 +498,55 @@ public class Onto extends Controller {
         }
     }
 
-    public static void printRelationsForElement(Resource element, Model model, Resource singleType) {
-        Selector selector;
-        if (singleType == Datatype.SingleProcess) {
-            selector = new SimpleSelector(null, Datatype.hasDestinationProcess, element);
+    public static Result getProcess(String processURI) throws Exception {
+        try {
+            DB db = mongoConnect();
+            DBCollection processesColl = db.getCollection("processes");
+            BasicDBObject query = new BasicDBObject("_id", mongonize(Datatype.getURI() + processURI));
+            String response = processesColl.findOne(query).toString();
+            mongoClose();
+            return ok(response);
         }
-        else {
-            selector = new SimpleSelector(null, Datatype.hasWeightCoefficient, element);
+        catch (Exception e) {
+            throw e;
+            //return ok(e.getMessage());
         }
-        StmtIterator iter = model.listStatements( selector );
+    }
 
-        ArrayList<Resource> relations = new ArrayList<Resource>();
+    public static ArrayList<HashMap<String, Object>> getRelationsForElement(Resource element, Model model) {
+        Selector selector = new SimpleSelector(null, Datatype.hasOriginProcess, element);
+        StmtIterator iter = model.listStatements( selector );
+        System.out.println("Searching for relations for element: " + element);
+        System.out.println("iter.hasNext(): " + iter.hasNext());
+        System.out.println("whereas the repo said: " + RepoFactory.getRelationRepo().getRelationsForProcess(element).size());
+
+        ArrayList<HashMap<String, Object>> relations = new ArrayList<>();
         if (iter.hasNext()) {
             while (iter.hasNext()) {
                 Statement s = iter.nextStatement();
-                relations.add(s.getSubject());
+                Resource relationResource = s.getSubject();
+
+                HashMap<String, Object> relation = new HashMap<>();
+
+                Resource origin = relationResource.getProperty(Datatype.hasOriginProcess).getResource();
+                Dimension originKeywords = RepoFactory.getSingleElementRepo().getSingleElementKeywords(origin);
+                relation.put("originId", origin.getURI().replace(Datatype.getURI(), ""));
+                relation.put("originKeywords", originKeywords);
+
+                Resource coeff = relationResource.getProperty(Datatype.hasWeightCoefficient).getResource();
+                Dimension coeffKeywords = RepoFactory.getSingleElementRepo().getSingleElementKeywords(coeff);
+                relation.put("coeffId", coeff.getURI().replace(Datatype.getURI(), ""));
+                relation.put("coeffKeywords", coeffKeywords);
+
+                Resource dest = relationResource.getProperty(Datatype.hasDestinationProcess).getResource();
+                Dimension destKeywords = RepoFactory.getSingleElementRepo().getSingleElementKeywords(dest);
+                relation.put("destId", dest.getURI().replace(Datatype.getURI(), ""));
+                relation.put("destKeywords", destKeywords);
+
+                relations.add(relation);
             }
         }
-        System.out.println("relations for element: " + element.getURI());
-        for (Resource relation: relations) {
-            System.out.println(relation.getProperty(Datatype.hasOriginProcess).getResource().getURI()
-                               + " * "
-                               + relation.getProperty(Datatype.hasWeightCoefficient).getResource().getURI()
-                               + " (" + RepoFactory.getRelationRepo().getCoefficientValueForRelation(relation) + ")"
-                               + " -> "
-                               + relation.getProperty(Datatype.hasDestinationProcess).getResource().getURI()
-                               + " (" + relation.getURI() + ")");
-        }
+        return relations;
     }
 
     public static Result getProcessGroups() {

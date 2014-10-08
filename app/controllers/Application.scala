@@ -32,7 +32,8 @@ object Application extends Controller with Security {
         routes.javascript.Onto.getCategories,
         routes.javascript.Onto.getLastReport,
         routes.javascript.Onto.getGraph,
-        routes.javascript.Onto.getImpactAndFlowTypes
+        routes.javascript.Onto.getImpactAndFlowTypes,
+        routes.javascript.Onto.getProcess
         // TODO Add your routes here
       )
     ).as(JAVASCRIPT)
