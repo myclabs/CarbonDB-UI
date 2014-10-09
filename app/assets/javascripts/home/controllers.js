@@ -44,7 +44,7 @@ define(["angular"], function(angular) {
   HomeCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$window", "playRoutes"];
 
   var AboutCtrl = function($rootScope, $scope, $window, $location) {
-    $rootScope.pageTitle = "CarbonDB";
+    $rootScope.pageTitle = "CarbonDB: About";
     $scope.user = {'name': "toto"};
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
@@ -52,16 +52,24 @@ define(["angular"], function(angular) {
   AboutCtrl.$inject = ["$rootScope", "$scope", "$window", "$location"];
 
   var HelpCtrl = function($rootScope, $scope, $window, $location) {
-    $rootScope.pageTitle = "CarbonDB";
+    $rootScope.pageTitle = "CarbonDB: Help";
     $scope.user = {'name': "toto"};
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
   };
   HelpCtrl.$inject = ["$rootScope", "$scope", "$window", "$location"];
 
+  var WhatsNewCtrl = function($rootScope, $scope, $window, $location) {
+    $rootScope.pageTitle = "CarbonDB: What's new";
+    $scope.user = {'name': "toto"};
+    if ($location.host() != 'localhost')
+      $window.ga('send', 'pageview', { page: $location.path() });
+  };
+  WhatsNewCtrl.$inject = ["$rootScope", "$scope", "$window", "$location"];
+
   /** Controls the upload page */
   var UploadCtrl = function($scope, $rootScope, $location, helper, $http, $upload, $window, playRoutes) {
-    $rootScope.pageTitle = "CarbonDB";
+    $rootScope.pageTitle = "CarbonDB: Upload";
     $scope.fileUploading = false;
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
@@ -109,7 +117,7 @@ define(["angular"], function(angular) {
   UploadCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$upload", "$window", "playRoutes"];
 
   var GroupCtrl = function($scope, $rootScope, $location, helper, $http, $routeParams, $window, playRoutes, ontologyTypes, viewType) {
-    $rootScope.pageTitle = "CarbonDB";
+    $rootScope.pageTitle = "CarbonDB: Group view";
     $scope.groupName = $routeParams.uri;
     $scope.impactTypes = ontologyTypes.getImpactTypesTree();
     $scope.flowTypes = ontologyTypes.getFlowTypesTree();
@@ -201,7 +209,7 @@ define(["angular"], function(angular) {
   GroupCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$routeParams", "$window", "playRoutes", "ontologyTypes", "viewType"];
 
   var ProcessCtrl = function($scope, $rootScope, $location, $routeParams, $window, playRoutes, ontologyTypes) {
-    $rootScope.pageTitle = "CarbonDB";
+    $rootScope.pageTitle = "CarbonDB: Process view";
     $scope.impactTypes = ontologyTypes.getImpactTypesTree();
     $scope.flowTypes = ontologyTypes.getFlowTypesTree();
 
@@ -243,7 +251,7 @@ define(["angular"], function(angular) {
   ProcessCtrl.$inject = ["$scope", "$rootScope", "$location", "$routeParams", "$window", "playRoutes", "ontologyTypes"];
 
   var CoefficientCtrl = function($scope, $rootScope, $location, $routeParams, $window, playRoutes) {
-    $rootScope.pageTitle = "CarbonDB";
+    $rootScope.pageTitle = "CarbonDB: Coefficient view";
 
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
@@ -310,7 +318,8 @@ define(["angular"], function(angular) {
     CoefficientCtrl: CoefficientCtrl,
     UploadCtrl: UploadCtrl,
     AboutCtrl: AboutCtrl,
-    HelpCtrl: HelpCtrl
+    HelpCtrl: HelpCtrl,
+    WhatsNewCtrl: WhatsNewCtrl
   };
 
 });
