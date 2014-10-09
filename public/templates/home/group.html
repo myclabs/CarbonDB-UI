@@ -1,5 +1,4 @@
 <h1>{{label}}</h1>
-<p>
   <p ng-if="commonKeywords">
     <strong>Common keywords:</strong>
   	<span ng-repeat="keyword in commonKeywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
@@ -22,10 +21,16 @@
     </div>
   </div>
   <p><strong>Unit:</strong> {{unit}}</p>
-    <h2>Elements</h2>
-    <div tmd row-dimensions="rowDimensions" line-dimensions="lineDimensions" common-keywords="commonKeywords" values="elements" uris="elementsURI" round-values="type == 'PROCESS'" type="type"></div>
 
-    <h2>Relations</h2>
+  <div ng-if="comment">
+    <h3>Comment</h3>
+    <span ng-bind-html="comment"></span>
+  </div>
+
+  <h2>Elements</h2>
+  <div tmd row-dimensions="rowDimensions" line-dimensions="lineDimensions" common-keywords="commonKeywords" values="elements" uris="elementsURI" round-values="type == 'PROCESS'" type="type"></div>
+
+  <h2>Relations</h2>
 	<table class="table tmd table-nonfluid">
 		<tr>
 			<th>Upsteam</th>

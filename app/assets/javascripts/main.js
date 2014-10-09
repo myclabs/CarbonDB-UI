@@ -27,7 +27,7 @@ requirejs.config({
   };
 
   // Load the app. This is kept minimal so it doesn't need much updating.
-  require(["angular", "angular-cookies", "angular-route", "angular-file-upload", "angular-tree-control", "jquery", "bootstrap", "d3js", "./app"],
+  require(["angular", "angular-cookies", "angular-sanitize", "angular-route", "angular-file-upload", "angular-tree-control", "jquery", "bootstrap", "d3js", "./app"],
     function(angular) {
       angular.bootstrap(document, ["app"]);
     }

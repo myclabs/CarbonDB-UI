@@ -137,6 +137,12 @@ define(["angular"], function(angular) {
       $scope.elementsImpactsAndFlows = data.elementsImpactsAndFlows;
       $scope.type = data.type;
       $scope.elementsURI = data.elementsURI;
+      if (data.comment) {
+        $scope.comment = data.comment.replace(/\n/g, "<br>");
+      }
+      else {
+        $scope.comment = false;
+      }
 
       // setting up the line and row dimensions
       $scope.rowDimensions = new Array();

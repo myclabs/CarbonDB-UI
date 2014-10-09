@@ -13,6 +13,7 @@ requirejs.config({
     "angular": "empty:",
     "angular-cookies": "empty:",
     "angular-route": "empty:",
+    "angular-sanitize": "empty",
     "angular-file-upload": "empty:",
     "angular-tree-control": "empty:",
     "d3js": "empty:",

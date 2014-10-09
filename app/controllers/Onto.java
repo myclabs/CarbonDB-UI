@@ -358,6 +358,7 @@ public class Onto extends Controller {
         }
         output.put("URI", group.getURI());
         output.put("label", group.getLabel());
+        output.put("comment", group.getComment());
         output.put("elementsURI", elementsURI);
         output.put("dimensions", group.dimSet.dimensions);
         output.put("unit", unitLabel);
