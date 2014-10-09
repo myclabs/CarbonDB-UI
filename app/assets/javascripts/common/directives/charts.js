@@ -295,6 +295,7 @@ var zoom = d3.behavior.zoom()
         var link = svg.selectAll(".link")
           .data(links);
             link.enter().insert("line", ".node")
+            .attr("marker-end", "url(#end)")
             .attr("class", "link");
 
         svg.append("defs").selectAll("marker")
