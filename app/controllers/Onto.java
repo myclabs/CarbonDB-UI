@@ -74,6 +74,7 @@ public class Onto extends Controller {
     protected static ArrayList<String> nodesId = new ArrayList<>();
     protected static ArrayList<HashMap<String, Object>> links = new ArrayList<>();
     protected static HashMap<String, HashMap<String, Object>> processes = new HashMap<>();
+    protected static HashMap<String, HashMap<String, Object>> coefficients = new HashMap<>();
 
     protected static MongoClient mongoClient;
 
@@ -231,6 +232,17 @@ public class Onto extends Controller {
             processesColl.insert(dbObject);
         }
 
+        DBCollection coefficientsColl = db.getCollection("coefficients");
+        coefficientsColl.drop();
+
+        for(Entry<String, HashMap<String, Object>> entry : coefficients.entrySet()) {
+            String uri = entry.getKey();
+            HashMap process = entry.getValue();
+            dbObject = (BasicDBObject) JSON.parse(toJson(process).toString());
+            dbObject.append("_id", mongonize(uri));
+            coefficientsColl.insert(dbObject);
+        }
+
         DBCollection graphColl = db.getCollection("graph");
         graphColl.drop();
 
@@ -269,7 +281,7 @@ public class Onto extends Controller {
         HashMap<String, Object> elementsImpacts = new HashMap<>();
         HashMap elementImpactsAndFlows;
         HashMap<String, Object> elementsImpactsAndFlows = new HashMap<>();
-        HashMap<String, Object> processInfos;
+        HashMap<String, Object> processInfos, coeffInfos;
         HashMap<String, String> elementsURI = new HashMap<>();
 
         String unitLabel = unitsRepo.getUnitSymbol(group.getUnit());
@@ -292,6 +304,7 @@ public class Onto extends Controller {
                         processInfos.put("flows", transformValueHashMapURIKeys(RepoFactory.getSingleElementRepo().getCalculatedEmissionsForProcess(elementResource)));
                         processInfos.put("unit", unitLabel);
                         processInfos.put("uri", elementResource.getURI());
+                        processInfos.put("id", elementResource.getURI().replace(Datatype.getURI(), ""));
                         processInfos.put("relations", getRelationsForElement(elementResource, model));
                         processInfos.put("groups", new HashMap<String, Object>());
                         processes.put(elementResource.getURI(), processInfos);
@@ -304,13 +317,29 @@ public class Onto extends Controller {
                 else {
                     elementResource = RepoFactory.getSingleElementRepo().getCoefficientForDimension(element, group.getUnitURI());
                     if (elementResource.hasProperty(Datatype.value) && null != elementResource.getProperty(Datatype.value)) {
+                        Value value = new Value(
+                            elementResource.getProperty(Datatype.value).getDouble(),
+                            RepoFactory.getSingleElementRepo().getUncertainty(elementResource)
+                        );
                         elementsValue.put(
                             joinDimensionKeywords(element),
-                            new Value(
-                                elementResource.getProperty(Datatype.value).getDouble(),
-                                RepoFactory.getSingleElementRepo().getUncertainty(elementResource)
-                            )
+                            value
                         );
+                        if (!coefficients.containsKey(elementResource.getURI())) {
+                            coeffInfos = new HashMap<>();
+                            coeffInfos.put("keywords", element);
+                            coeffInfos.put("unit", unitLabel);
+                            coeffInfos.put("value", value);
+                            coeffInfos.put("uri", elementResource.getURI());
+                            coeffInfos.put("id", elementResource.getURI().replace(Datatype.getURI(), ""));
+                            coeffInfos.put("relations", getRelationsForElement(elementResource, model));
+                            coeffInfos.put("groups", new HashMap<String, Object>());
+                            coefficients.put(elementResource.getURI(), coeffInfos);
+                        }
+                        else {
+                            coeffInfos = coefficients.get(elementResource.getURI());
+                        }
+                        ((HashMap)coeffInfos.get("groups")).put(mongonize(group.getId()), group.getLabel());
                     }
                     else {
                         elementsValue.put(joinDimensionKeywords(element), "empty");
@@ -498,7 +527,7 @@ public class Onto extends Controller {
         }
     }
 
-    public static Result getProcess(String processURI) throws Exception {
+    public static Result getProcess(String processURI) {
         try {
             DB db = mongoConnect();
             DBCollection processesColl = db.getCollection("processes");
@@ -508,17 +537,27 @@ public class Onto extends Controller {
             return ok(response);
         }
         catch (Exception e) {
-            throw e;
-            //return ok(e.getMessage());
+            return ok(e.getMessage());
+        }
+    }
+
+    public static Result getCoefficient(String coeffURI) {
+        try {
+            DB db = mongoConnect();
+            DBCollection coefficientsColl = db.getCollection("coefficients");
+            BasicDBObject query = new BasicDBObject("_id", mongonize(Datatype.getURI() + coeffURI));
+            String response = coefficientsColl.findOne(query).toString();
+            mongoClose();
+            return ok(response);
+        }
+        catch (Exception e) {
+            return ok(e.getMessage());
         }
     }
 
     public static ArrayList<HashMap<String, Object>> getRelationsForElement(Resource element, Model model) {
-        Selector selector = new SimpleSelector(null, Datatype.hasOriginProcess, element);
+        Selector selector = new SimpleSelector(null, Datatype.involvesElement, element);
         StmtIterator iter = model.listStatements( selector );
-        System.out.println("Searching for relations for element: " + element);
-        System.out.println("iter.hasNext(): " + iter.hasNext());
-        System.out.println("whereas the repo said: " + RepoFactory.getRelationRepo().getRelationsForProcess(element).size());
 
         ArrayList<HashMap<String, Object>> relations = new ArrayList<>();
         if (iter.hasNext()) {
@@ -532,16 +571,27 @@ public class Onto extends Controller {
                 Dimension originKeywords = RepoFactory.getSingleElementRepo().getSingleElementKeywords(origin);
                 relation.put("originId", origin.getURI().replace(Datatype.getURI(), ""));
                 relation.put("originKeywords", originKeywords);
+                relation.put("originUnit", unitsRepo.getUnitSymbol(RepoFactory.getSingleElementRepo().getUnit(origin)));
 
                 Resource coeff = relationResource.getProperty(Datatype.hasWeightCoefficient).getResource();
                 Dimension coeffKeywords = RepoFactory.getSingleElementRepo().getSingleElementKeywords(coeff);
                 relation.put("coeffId", coeff.getURI().replace(Datatype.getURI(), ""));
                 relation.put("coeffKeywords", coeffKeywords);
+                relation.put("coeffUnit", unitsRepo.getUnitSymbol(RepoFactory.getSingleElementRepo().getUnit(coeff)));
 
                 Resource dest = relationResource.getProperty(Datatype.hasDestinationProcess).getResource();
                 Dimension destKeywords = RepoFactory.getSingleElementRepo().getSingleElementKeywords(dest);
                 relation.put("destId", dest.getURI().replace(Datatype.getURI(), ""));
                 relation.put("destKeywords", destKeywords);
+                relation.put("destUnit", unitsRepo.getUnitSymbol(RepoFactory.getSingleElementRepo().getUnit(dest)));
+
+                if (relationResource.hasProperty(Datatype.exponent) && null != relationResource.getProperty(Datatype.exponent)) {
+                    relation.put("exponent", relationResource.getProperty(Datatype.exponent).getDouble());
+                }
+                else {
+                    relation.put("exponent", 1.0);
+                }
+
 
                 relations.add(relation);
             }

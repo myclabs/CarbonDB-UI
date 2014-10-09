@@ -33,6 +33,7 @@ define(["angular", "./controllers", "common"], function(angular, controllers) {
             }
           ]}
         })
+      .when("/coefficient/sc/:id", {templateUrl: "/assets/templates/home/coefficient.html", controller:controllers.CoefficientCtrl})
       .otherwise( {templateUrl: "/assets/templates/home/notFound.html"});
   }]);
   return mod;

@@ -1,67 +1,85 @@
 <h1>
-  <span ng-repeat="keyword in keywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
+  <span ng-repeat="keyword in keywords">{{keyword.label}} <span ng-show="!$last">-</span> </span><small>[{{unit}}]</small>
 </h1>
 <p>
-  <p ng-if="commonKeywords">
-    <strong>Tag:</strong>
-  	<span ng-repeat="keyword in keywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
-  </p>
-  <p><strong>Unit:</strong> {{unit}}</p>
-    <h2>Impacts</h2>
-    <div ng-repeat="impactType in impactTypes.children">
-      <h3>{{impactType.label}}</h3>
-      <div ng-if="impactsAndFlows[impactType.uri].length == 0">This process has no impact for this impact category.</div>
-      <table class="table tmd table-nonfluid" ng-if="impactsAndFlows[impactType.uri].length > 0">
-        <tr>
-          <th>Type</th>
-          <th>Value</th>
-          <th>Unit</th>
-        </tr>
-        <tr ng-repeat="impact in impactsAndFlows[impactType.uri]">
-          <td>{{impact.label}}</td>
-          <td>{{impact.value}}</td>
-          <td>{{impact.unit}}</td>
-        </tr>
-      </table>
-    </div>
 
-    <h2>Elementary flows</h2>
-    <div ng-repeat="flowType in flowTypes.children">
-      <h3>{{flowType.label}}</h3>
-      <div ng-if="impactsAndFlows[flowType.uri].length == 0">This process has no elementary flow for this elementary flow category.</div>
-      <table class="table tmd table-nonfluid" ng-if="impactsAndFlows[flowType.uri].length > 0">
-        <tr>
-          <th>Type</th>
-          <th>Value</th>
-          <th>Unit</th>
-        </tr>
-        <tr ng-repeat="flow in impactsAndFlows[flowType.uri]">
-          <td>{{flow.label}}</td>
-          <td>{{flow.value}}</td>
-          <td>{{flow.unit}}</td>
-        </tr>
-      </table>
-    </div>
+  <h2>Impacts</h2>
+  <div ng-repeat="impactType in impactTypes.children">
+    <h3>{{impactType.label}}</h3>
+    <div ng-if="impactsAndFlows[impactType.uri].length == 0">This process has no impact for this impact category.</div>
+    <table class="table tmd table-nonfluid" ng-if="impactsAndFlows[impactType.uri].length > 0">
+      <tr>
+        <th>Type</th>
+        <th>Value</th>
+        <th>Unit</th>
+      </tr>
+      <tr ng-repeat="impact in impactsAndFlows[impactType.uri]">
+        <td>{{impact.label}}</td>
+        <td>{{impact.value}}</td>
+        <td>{{impact.unit}} / {{unit}}</td>
+      </tr>
+    </table>
+  </div>
 
-    <h2>Groups containing this process</h2>
-    <ul>
-      <li><a ng-repeat="(groupId, groupLabel) in groups" ng-href="#/group/{{groupId}}">{{groupLabel}}</a></li>
-    </ul>
+  <h2>Elementary flows</h2>
+  <div ng-repeat="flowType in flowTypes.children">
+    <h3>{{flowType.label}}</h3>
+    <div ng-if="impactsAndFlows[flowType.uri].length == 0">This process has no elementary flow for this elementary flow category.</div>
+    <table class="table tmd table-nonfluid" ng-if="impactsAndFlows[flowType.uri].length > 0">
+      <tr>
+        <th>Type</th>
+        <th>Value</th>
+        <th>Unit</th>
+      </tr>
+      <tr ng-repeat="flow in impactsAndFlows[flowType.uri]">
+        <td>{{flow.label}}</td>
+        <td>{{flow.value}}</td>
+        <td>{{flow.unit}} / {{unit}}</td>
+      </tr>
+    </table>
+  </div>
+
+  <h2>Groups containing this process</h2>
+  <ul>
+    <li><a ng-repeat="(groupId, groupLabel) in groups" ng-href="#/group/{{groupId}}">{{groupLabel}}</a></li>
+  </ul>
 
   <h2>Relations</h2>
-	<table class="table tmd table-nonfluid">
+  <div ng-if="relations.length == 0">This process has relation.</div>
+	<table class="table tmd table-nonfluid" ng-if="relations.length > 0">
 		<tr>
 			<th>Upsteam</th>
 			<th>Coefficient</th>
 			<th>Downstream</th>
 		</tr>
 		<tr ng-repeat="relation in relations">
-			<td ng-if="sourceRelation.source.uri != URI"><a ng-href="#/group/{{sourceRelation.source.id}}">{{sourceRelation.source.label}}</a></td>
-			<td ng-if="sourceRelation.source.uri == URI">{{sourceRelation.source.label}}</td>
-			<td ng-if="sourceRelation.coeff.uri != URI"><a ng-href="#/group/{{sourceRelation.coeff.id}}">{{sourceRelation.coeff.label}} <sup ng-if="sourceRelation.exponent == -1">-1</sup></a></td>
-			<td ng-if="sourceRelation.coeff.uri == URI">{{sourceRelation.coeff.label}} <sup ng-if="sourceRelation.exponent == -1">-1</sup></td>
-			<td ng-if="sourceRelation.destination.uri != URI"><a ng-href="#/group/{{sourceRelation.destination.id}}">{{sourceRelation.destination.label}}</a></td>
-			<td ng-if="sourceRelation.destination.uri == URI">{{sourceRelation.destination.label}}</td>
+			<td ng-if="relation.originId != id">
+        <a ng-href="#/process/{{relation.originId}}">
+          <span ng-repeat="keyword in relation.originKeywords.keywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
+          <small>[{{relation.originUnit}}]</small>
+        </a>
+      </td>
+      <td ng-if="relation.originId == id">
+        <span ng-repeat="keyword in relation.originKeywords.keywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
+        <small>[{{relation.originUnit}}]</small>
+      </td>
+      <td ng-if="relation.coeffId != id">
+        <a ng-href="#/coefficient/{{relation.coeffId}}">
+          <span ng-repeat="keyword in relation.coeffKeywords.keywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
+          <small>[{{relation.coeffUnit}}]</small>
+          <sup ng-if="relation.exponent == -1">-1</sup>
+        </a>
+      </td>
+      <td ng-if="relation.destId != id">
+        <a ng-href="#/process/{{relation.destId}}">
+          <span ng-repeat="keyword in relation.destKeywords.keywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
+          <small>[{{relation.destUnit}}]</small>
+        </a>
+      </td>
+      <td ng-if="relation.destId == id">
+        <span ng-repeat="keyword in relation.destKeywords.keywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
+        <small>[{{relation.destUnit}}]</small>
+      </td>
 	 	</tr>
 	</table>
 <hr />

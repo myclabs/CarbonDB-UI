@@ -129,7 +129,6 @@ define(["angular"], function(angular) {
       $scope.elementsImpactsAndFlows = data.elementsImpactsAndFlows;
       $scope.type = data.type;
       $scope.elementsURI = data.elementsURI;
-      console.log($scope.elementsURI);
 
       // setting up the line and row dimensions
       $scope.rowDimensions = new Array();
@@ -201,19 +200,17 @@ define(["angular"], function(angular) {
   };
   GroupCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$routeParams", "$window", "playRoutes", "ontologyTypes", "viewType"];
 
-  var ProcessCtrl = function($scope, $rootScope, $location, helper, $http, $routeParams, $window, playRoutes, ontologyTypes) {
+  var ProcessCtrl = function($scope, $rootScope, $location, $routeParams, $window, playRoutes, ontologyTypes) {
     $rootScope.pageTitle = "CarbonDB";
     $scope.impactTypes = ontologyTypes.getImpactTypesTree();
     $scope.flowTypes = ontologyTypes.getFlowTypesTree();
-    console.log(ontologyTypes.getImpactTypesTree());
 
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
 
     playRoutes.controllers.Onto.getProcess("sp/" + $routeParams.id).get().success(function(data) {
-      $scope.URI = data.URI;
+      $scope.id = data.id;
       $scope.label = data.label;
-      $scope.sourceRelations = data.sourceRelations;
       $scope.unit = data.unit;
       $scope.impactsAndFlows = [];
       $scope.groups = data.groups;
@@ -227,7 +224,6 @@ define(["angular"], function(angular) {
           $scope.impactsAndFlows[impactTypeCategory.uri] = new Array();
           for (var j = 0; j < impactTypeCategory.children.length; j++) {
             var impactType = impactTypeCategory.children[j];
-            console.log("looking for: " + impactType.uri);
             var impactTypeURI = impactType.uri.replace(/\./g, "____");
             if (processData[t].hasOwnProperty(impactTypeURI)) {
               var impact = {
@@ -241,16 +237,29 @@ define(["angular"], function(angular) {
           }
         }
       }
-console.log($scope.impactsAndFlows);
-      /*for (var impact in data.impacts) {
-        if (data.impacts.hasOwnProperty(impact)) {
-          $scope.impacts[impact].type = $scope.impactTypes[impact];
-        }
-      }*/
     });
 
   };
-  ProcessCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$routeParams", "$window", "playRoutes", "ontologyTypes"];
+  ProcessCtrl.$inject = ["$scope", "$rootScope", "$location", "$routeParams", "$window", "playRoutes", "ontologyTypes"];
+
+  var CoefficientCtrl = function($scope, $rootScope, $location, $routeParams, $window, playRoutes) {
+    $rootScope.pageTitle = "CarbonDB";
+
+    if ($location.host() != 'localhost')
+      $window.ga('send', 'pageview', { page: $location.path() });
+
+    playRoutes.controllers.Onto.getCoefficient("sc/" + $routeParams.id).get().success(function(data) {
+      $scope.id = data.id;
+      $scope.label = data.label;
+      $scope.unit = data.unit;
+      $scope.value = data.value;
+      $scope.groups = data.groups;
+      $scope.keywords = data.keywords.keywords.sort(sortKeywordsCompare);
+      $scope.relations = data.relations;
+    });
+
+  };
+  CoefficientCtrl.$inject = ["$scope", "$rootScope", "$location", "$routeParams", "$window", "playRoutes"];
 
   /*mod.filter('escape', function(value) {
     return encodeURIComponent(value);
@@ -298,6 +307,7 @@ console.log($scope.impactsAndFlows);
     HomeCtrl: HomeCtrl,
     GroupCtrl: GroupCtrl,
     ProcessCtrl: ProcessCtrl,
+    CoefficientCtrl: CoefficientCtrl,
     UploadCtrl: UploadCtrl,
     AboutCtrl: AboutCtrl,
     HelpCtrl: HelpCtrl

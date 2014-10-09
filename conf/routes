@@ -31,6 +31,7 @@ GET     /lastreport             controllers.Onto.getLastReport()
 GET     /graph             	    controllers.Onto.getGraph()
 GET     /getImpactAndFlowTypes  controllers.Onto.getImpactAndFlowTypes()
 GET     /getProcess/sp/:id     	controllers.Onto.getProcess(id: String)
+GET     /getCoefficient/sc/:id  controllers.Onto.getCoefficient(id: String)
 
 # Static
 # ~~~~

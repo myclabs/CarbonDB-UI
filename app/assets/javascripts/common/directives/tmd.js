@@ -17,12 +17,13 @@ define(["angular"], function(angular) {
         commonKeywords: '=',
         values: '=',
         roundValues: '=',
-        uris: '='
+        uris: '=',
+        type: '='
       },
       templateUrl: 'assets/templates/tmd.html',
       link: function (scope, element, attrs) {
 
-        function createTMD(rowDimensions, lineDimensions, commonKeywords, values, roundValues, uris) {
+        function createTMD(rowDimensions, lineDimensions, commonKeywords, values, roundValues, uris, type) {
           var commonKeywordsCoordinate = new Array();
           for (var i = 0; i < commonKeywords.length; i++) {
             commonKeywordsCoordinate.push(commonKeywords[i].name);
@@ -115,7 +116,7 @@ define(["angular"], function(angular) {
             if (typeof scope.rowDimensions !== 'undefined'
                            && typeof scope.lineDimensions !== 'undefined'
                            && typeof scope.values !== 'undefined') {
-              createTMD(scope.rowDimensions, scope.lineDimensions, scope.commonKeywords, scope.values, scope.roundValues, scope.uris);
+              createTMD(scope.rowDimensions, scope.lineDimensions, scope.commonKeywords, scope.values, scope.roundValues, scope.uris, scope.type);
             }
           }
         );
