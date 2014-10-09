@@ -45,7 +45,6 @@ define(["angular"], function(angular) {
 
   var AboutCtrl = function($rootScope, $scope, $window, $location) {
     $rootScope.pageTitle = "CarbonDB: About";
-    $scope.user = {'name': "toto"};
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
   };
@@ -53,7 +52,6 @@ define(["angular"], function(angular) {
 
   var HelpCtrl = function($rootScope, $scope, $window, $location) {
     $rootScope.pageTitle = "CarbonDB: Help";
-    $scope.user = {'name': "toto"};
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
   };
@@ -61,11 +59,17 @@ define(["angular"], function(angular) {
 
   var WhatsNewCtrl = function($rootScope, $scope, $window, $location) {
     $rootScope.pageTitle = "CarbonDB: What's new";
-    $scope.user = {'name': "toto"};
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
   };
   WhatsNewCtrl.$inject = ["$rootScope", "$scope", "$window", "$location"];
+
+  var KnownBugsCtrl = function($rootScope, $scope, $window, $location) {
+    $rootScope.pageTitle = "CarbonDB: Known bugs";
+    if ($location.host() != 'localhost')
+      $window.ga('send', 'pageview', { page: $location.path() });
+  };
+  KnownBugsCtrl.$inject = ["$rootScope", "$scope", "$window", "$location"];
 
   /** Controls the upload page */
   var UploadCtrl = function($scope, $rootScope, $location, helper, $http, $upload, $window, playRoutes) {
@@ -325,7 +329,8 @@ define(["angular"], function(angular) {
     UploadCtrl: UploadCtrl,
     AboutCtrl: AboutCtrl,
     HelpCtrl: HelpCtrl,
-    WhatsNewCtrl: WhatsNewCtrl
+    WhatsNewCtrl: WhatsNewCtrl,
+    KnownBugsCtrl: KnownBugsCtrl
   };
 
 });

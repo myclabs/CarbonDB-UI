@@ -12,6 +12,7 @@ define(["angular", "./controllers", "common"], function(angular, controllers) {
       .when("/about",  {templateUrl: "/assets/templates/home/about.html", controller:controllers.AboutCtrl})
       .when("/help",  {templateUrl: "/assets/templates/home/help.html", controller:controllers.HelpCtrl})
       .when("/whats-new",  {templateUrl: "/assets/templates/home/whats-new.html", controller:controllers.WhatsNewCtrl})
+      .when("/known-bugs",  {templateUrl: "/assets/templates/home/known-bugs.html", controller:controllers.KnownBugsCtrl})
       .when("/group/:type/:uri",
         {
           templateUrl: "/assets/templates/home/group.html",
