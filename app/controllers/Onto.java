@@ -162,12 +162,6 @@ public class Onto extends Controller {
 
         DB db = mongoConnect();
 
-        DBCollection reportColl = db.getCollection("report");
-        reportColl.drop();
-
-        dbObject = (BasicDBObject) JSON.parse(toJson(report).toString());
-        reportColl.insert(dbObject);
-
         DBCollection categoriesColl = db.getCollection("categories");
         categoriesColl.drop();
 
@@ -265,6 +259,12 @@ public class Onto extends Controller {
                                             + ",nodesId:" + toJson(nodesId).toString()
                                             + ",links:" + toJson(links).toString() + "}");
         graphColl.insert(dbObject);
+
+        DBCollection reportColl = db.getCollection("report");
+        reportColl.drop();
+
+        dbObject = (BasicDBObject) JSON.parse(toJson(report).toString());
+        reportColl.insert(dbObject);
 
         mongoClose();
     }
