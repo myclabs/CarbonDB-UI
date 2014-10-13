@@ -30,7 +30,7 @@
     <h3>References</h3>
     <ul>
       <li ng-repeat="reference in references">
-        <span ng-if="reference.creator">{{reference.creator}}, </span><span ng-if="reference.title"><em>{{reference.title}}</em></span><span ng-if="reference.publisher">, {{reference.publisher}}</span><span ng-if="reference.source">, {{reference.source}}</span><span ng-if="reference.date">, {{reference.date}}</span><span ng-if="reference.url">, <a ng-href="reference.url" href="_blank">{{reference.url}}</a></span>
+        <span ng-if="reference.creator">{{reference.creator}}, </span><span ng-if="reference.title"><em>{{reference.title}}</em></span><span ng-if="reference.publisher">, {{reference.publisher}}</span><span ng-if="reference.source">, {{reference.source}}</span><span ng-if="reference.date">, {{reference.date}}</span><span ng-if="reference.url">, <a ng-href="{{reference.url}}" href="_blank">{{reference.url}}</a></span>
       </li>
     </ul>
   </div>
