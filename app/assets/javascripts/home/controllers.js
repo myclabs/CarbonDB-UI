@@ -136,6 +136,7 @@ define(["angular"], function(angular) {
       $scope.elementsNumber = data.elementsNumber;
       $scope.sourceRelations = data.sourceRelations;
       $scope.unit = data.unit;
+      $scope.references = data.references.sort(sortReferencesCompare);
       $scope.baseUnit = data.unit;
       $scope.commonKeywords = data.commonKeywords;
       $scope.elementsImpactsAndFlows = data.elementsImpactsAndFlows;
@@ -310,6 +311,18 @@ define(["angular"], function(angular) {
     if (k1.label > k2.label)
       return 1;
     if (k1.label < k2.label)
+      return -1;
+    return 0;
+  }
+
+  var sortReferencesCompare = function (r1, r2) {
+    if (r1.creator > r2.creator)
+      return 1;
+    if (r1.creator < r2.creator)
+      return -1;
+    if (r1.date > r2.date)
+      return 1;
+    if (r1.date < r2.date)
       return -1;
     return 0;
   }

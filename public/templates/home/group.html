@@ -26,6 +26,19 @@
     <h3>Comment</h3>
     <span ng-bind-html="comment"></span>
   </div>
+  <div ng-if="references.length > 0">
+    <h3>References</h3>
+    <ul>
+      <li ng-repeat="reference in references">
+        <span ng-if="reference.creator">{{reference.creator}}, </span>
+        <span ng-if="reference.title"><em>{{reference.title}}</em></span>
+        <span ng-if="reference.publisher">, {{reference.publisher}}</span>
+        <span ng-if="reference.source">, {{reference.source}}</span>
+        <span ng-if="reference.date">, {{reference.date}}</span>
+        <a ng-href="reference.URL" ng-if="reference.URL" href="_blank">{{reference.URL}}</a>
+      </li>
+    </ul>
+  </div>
 
   <h2>Elements</h2>
   <div tmd row-dimensions="rowDimensions" line-dimensions="lineDimensions" common-keywords="commonKeywords" values="elements" uris="elementsURI" round-values="type == 'PROCESS'" type="type"></div>
