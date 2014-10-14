@@ -110,7 +110,7 @@ var zoom = d3.behavior.zoom()
     var svg = d3.select(ele[0])
       .append('svg')
       .style('width', '100%')
-      .style('height', 500)
+      .style('height', '500px')
       .append("g")
       .call(zoom)
       .append("g");
