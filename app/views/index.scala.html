@@ -47,6 +47,16 @@
           </ul>
         </div> -->
         <div data-ng-switch-when="false">
+          <ul class="nav navbar-nav pull-left">
+            <li><a href="#/tree">Tree</a></li>
+          </ul>
+        </div>
+        <div data-ng-switch-when="false">
+          <ul class="nav navbar-nav pull-left">
+            <li><a href="#/graph">Graph</a></li>
+          </ul>
+        </div>
+        <div data-ng-switch-when="false">
           <ul class="nav navbar-nav pull-right">
             <li><a href="#/upload">Upload</a></li>
           </ul>
@@ -79,9 +89,7 @@
       </div>
     </header>
     @* -- Main Content -- *@
-    <div class="container" data-ng-cloak>
-      <div data-ng-view></div>
-    </div>
+    <div data-ng-view data-ng-cloak></div>
     @*-- Footer -- *@
     <footer data-ng-controller="FooterCtrl">
     </footer>

@@ -8,6 +8,8 @@ define(["angular", "./controllers", "common"], function(angular, controllers) {
   mod.config(["$routeProvider", function($routeProvider) {
     $routeProvider
       .when("/",  {templateUrl: "/assets/templates/home/home.html", controller:controllers.HomeCtrl})
+      .when("/graph",  {templateUrl: "/assets/templates/home/graph.html", controller:controllers.GraphCtrl})
+      .when("/tree",  {templateUrl: "/assets/templates/home/tree.html", controller:controllers.TreeCtrl})
       .when("/upload",  {templateUrl: "/assets/templates/home/upload.html", controller:controllers.UploadCtrl})
       .when("/about",  {templateUrl: "/assets/templates/home/about.html", controller:controllers.AboutCtrl})
       .when("/help",  {templateUrl: "/assets/templates/home/help.html", controller:controllers.HelpCtrl})

@@ -1,0 +1,16 @@
+<div class="container">
+  <p>
+    <h2>Categories</h2>
+    <div treecontrol class="tree-light"
+     tree-model="categories"
+     options="treeOptions"
+     order-by="label">
+      <a ng-if="node.hasOwnProperty('unit')" ng-href="#/group/{{node.id}}">
+        <span ng-if="node.type == 'PROCESS'">[P]</span><span ng-if="node.type == 'COEFFICIENT'">[C]</span> {{node.label}}
+      </a>
+      <span ng-if="!node.hasOwnProperty('unit')">{{node.label}}</span>
+    </div>
+  </p>
+  <hr />
+  You can also <a href="#/graph">view the process groups graph</a>
+</div>

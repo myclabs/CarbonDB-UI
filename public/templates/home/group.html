@@ -1,59 +1,60 @@
-<h1>{{label}}</h1>
-  <p ng-if="commonKeywords">
-    <strong>Common keywords:</strong>
-  	<span ng-repeat="keyword in commonKeywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
-  </p>
-  <div class="row col-sm-12" ng-show="type == 'PROCESS'">
-    <div class="form-horizontal">
-        <label class="col-sm-2 control-label" id="labelViewType" for="viewType">Nature of displayed data:</label>
-        <div class="col-sm-4">
-            <select class="form-control col-md-4" ng-model="viewType" id="viewType">
-              <option disabled>Impacts</option>
-              <option ng-repeat-start="impactTypeCategory in impactTypes.children" disabled>&nbsp;&nbsp;{{impactTypeCategory.label}}</option>
-                <option ng-repeat="impactType in impactTypeCategory.children" value="{{impactType.uri}}">&nbsp;&nbsp;&nbsp;&nbsp;{{impactType.label}}</option>
-              <option ng-repeat-end disabled style="display: none;">------</option>
-              <option disabled>Elementary flows</option>
-              <option ng-repeat-start="flowTypeCategory in flowTypes.children" disabled>&nbsp;&nbsp;{{flowTypeCategory.label}}</option>
-                <option ng-repeat="flowType in flowTypeCategory.children" value="{{flowType.uri}}">&nbsp;&nbsp;&nbsp;&nbsp;{{flowType.label}}</option>
-              <option ng-repeat-end disabled style="display: none;">------</option>
-            </select>
-        </div>
+<div class="container">
+  <h1>{{label}}</h1>
+    <p ng-if="commonKeywords">
+      <strong>Common keywords:</strong>
+    	<span ng-repeat="keyword in commonKeywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
+    </p>
+    <div class="row col-sm-12" ng-show="type == 'PROCESS'">
+      <div class="form-horizontal">
+          <label class="col-sm-2 control-label" id="labelViewType" for="viewType">Nature of displayed data:</label>
+          <div class="col-sm-4">
+              <select class="form-control col-md-4" ng-model="viewType" id="viewType">
+                <option disabled>Impacts</option>
+                <option ng-repeat-start="impactTypeCategory in impactTypes.children" disabled>&nbsp;&nbsp;{{impactTypeCategory.label}}</option>
+                  <option ng-repeat="impactType in impactTypeCategory.children" value="{{impactType.uri}}">&nbsp;&nbsp;&nbsp;&nbsp;{{impactType.label}}</option>
+                <option ng-repeat-end disabled style="display: none;">------</option>
+                <option disabled>Elementary flows</option>
+                <option ng-repeat-start="flowTypeCategory in flowTypes.children" disabled>&nbsp;&nbsp;{{flowTypeCategory.label}}</option>
+                  <option ng-repeat="flowType in flowTypeCategory.children" value="{{flowType.uri}}">&nbsp;&nbsp;&nbsp;&nbsp;{{flowType.label}}</option>
+                <option ng-repeat-end disabled style="display: none;">------</option>
+              </select>
+          </div>
+      </div>
     </div>
-  </div>
-  <p><strong>Unit:</strong> {{unit}}</p>
+    <p><strong>Unit:</strong> {{unit}}</p>
 
-  <div ng-if="comment">
-    <h3>Comment</h3>
-    <span ng-bind-html="comment"></span>
-  </div>
-  <div ng-if="references.length > 0">
-    <h3>References</h3>
-    <ul>
-      <li ng-repeat="reference in references">
-        <span ng-if="reference.creator">{{reference.creator}}, </span><span ng-if="reference.title"><em>{{reference.title}}</em></span><span ng-if="reference.publisher">, {{reference.publisher}}</span><span ng-if="reference.source">, {{reference.source}}</span><span ng-if="reference.date">, {{reference.date}}</span><span ng-if="reference.url">, <a ng-href="{{reference.url}}" target="_blank">{{reference.url}}</a></span>
-      </li>
-    </ul>
-  </div>
+    <div ng-if="comment">
+      <h3>Comment</h3>
+      <span ng-bind-html="comment"></span>
+    </div>
+    <div ng-if="references.length > 0">
+      <h3>References</h3>
+      <ul>
+        <li ng-repeat="reference in references">
+          <span ng-if="reference.creator">{{reference.creator}}, </span><span ng-if="reference.title"><em>{{reference.title}}</em></span><span ng-if="reference.publisher">, {{reference.publisher}}</span><span ng-if="reference.source">, {{reference.source}}</span><span ng-if="reference.date">, {{reference.date}}</span><span ng-if="reference.url">, <a ng-href="{{reference.url}}" target="_blank">{{reference.url}}</a></span>.
+        </li>
+      </ul>
+    </div>
 
-  <h2>Elements</h2>
-  <div tmd row-dimensions="rowDimensions" line-dimensions="lineDimensions" common-keywords="commonKeywords" values="elements" uris="elementsURI" round-values="type == 'PROCESS'" type="type"></div>
+    <h2>Elements</h2>
+    <div tmd row-dimensions="rowDimensions" line-dimensions="lineDimensions" common-keywords="commonKeywords" values="elements" uris="elementsURI" round-values="type == 'PROCESS'" type="type"></div>
 
-  <h2>Relations</h2>
-	<table class="table tmd table-nonfluid">
-		<tr>
-			<th>Upsteam</th>
-			<th>Coefficient</th>
-			<th>Downstream</th>
-		</tr>
-		<tr ng-repeat="sourceRelation in sourceRelations">
-			<td ng-if="sourceRelation.source.uri != URI"><a ng-href="#/group/{{sourceRelation.source.id}}">{{sourceRelation.source.label}}</a></td>
-			<td ng-if="sourceRelation.source.uri == URI">{{sourceRelation.source.label}}</td>
-			<td ng-if="sourceRelation.coeff.uri != URI"><a ng-href="#/group/{{sourceRelation.coeff.id}}">{{sourceRelation.coeff.label}} <sup ng-if="sourceRelation.exponent == -1">-1</sup></a></td>
-			<td ng-if="sourceRelation.coeff.uri == URI">{{sourceRelation.coeff.label}} <sup ng-if="sourceRelation.exponent == -1">-1</sup></td>
-			<td ng-if="sourceRelation.destination.uri != URI"><a ng-href="#/group/{{sourceRelation.destination.id}}">{{sourceRelation.destination.label}}</a></td>
-			<td ng-if="sourceRelation.destination.uri == URI">{{sourceRelation.destination.label}}</td>
-	 	</tr>
-	</table>
-<hr />
-
+    <h2>Relations</h2>
+  	<table class="table tmd table-nonfluid">
+  		<tr>
+  			<th>Upsteam</th>
+  			<th>Coefficient</th>
+  			<th>Downstream</th>
+  		</tr>
+  		<tr ng-repeat="sourceRelation in sourceRelations">
+  			<td ng-if="sourceRelation.source.uri != URI"><a ng-href="#/group/{{sourceRelation.source.id}}">{{sourceRelation.source.label}}</a></td>
+  			<td ng-if="sourceRelation.source.uri == URI">{{sourceRelation.source.label}}</td>
+  			<td ng-if="sourceRelation.coeff.uri != URI"><a ng-href="#/group/{{sourceRelation.coeff.id}}">{{sourceRelation.coeff.label}} <sup ng-if="sourceRelation.exponent == -1">-1</sup></a></td>
+  			<td ng-if="sourceRelation.coeff.uri == URI">{{sourceRelation.coeff.label}} <sup ng-if="sourceRelation.exponent == -1">-1</sup></td>
+  			<td ng-if="sourceRelation.destination.uri != URI"><a ng-href="#/group/{{sourceRelation.destination.id}}">{{sourceRelation.destination.label}}</a></td>
+  			<td ng-if="sourceRelation.destination.uri == URI">{{sourceRelation.destination.label}}</td>
+  	 	</tr>
+  	</table>
+  <hr />
+</div>
 

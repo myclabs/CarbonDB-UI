@@ -16,10 +16,10 @@ mod.directive('d3Force', ['$window',
         nodes: '=',
         links: '=',
         label: '@',
-        onClick: '&'
+        onClick: '&',
+        fullPage: '='
       },
       link: function(scope, ele, attrs) {
-
 /* Utility functions */
  var maxLineChars = 26,
     wrapChars    = ' /_-.'.split('');
@@ -107,33 +107,39 @@ var zoom = d3.behavior.zoom()
     //.scaleExtent([1, 10])
     .on("zoom", zoomed);
 
-          var svg = d3.select(ele[0])
-            .append('svg')
-            .style('width', '100%')
-            .style('height', '500px')
-            .append("g")
-            .call(zoom)
-            .append("g");
+    var svg = d3.select(ele[0])
+      .append('svg')
+      .style('width', '100%')
+      .style('height', '500px')
+      .append("g")
+      .call(zoom)
+      .append("g");
+    if (scope.fullPage) {
+      $("svg").css("height", window.innerHeight - ($("svg").parent().get(0).getBoundingClientRect().top + 5));
+      $("svg").css("border", "none");
+    }
 
  function zoomed() {
   svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 }
           $window.onresize = function() {
+            if (scope.fullPage)
+              $("svg").css("height", window.innerHeight - ($("svg").parent().get(0).getBoundingClientRect().top + 5));
             scope.$apply();
           };
 
           scope.$watch(function() {
             return angular.element($window)[0].innerWidth;
           }, function() {
-            scope.render(scope.nodes, scope.links);
+            scope.render(scope.nodes, scope.links, scope.fullPage);
           });
  
           scope.$watch('nodes && links', function(newData, oldData, scope) {
             //console.log("listener for d3Force called with newData = " + newData + " scope.nodes = " + scope.nodes);
-            scope.render(scope.nodes, scope.links);
+            scope.render(scope.nodes, scope.links, scope.fullPage);
           }, true);
  
-          scope.render = function(nodes, links) {
+          scope.render = function(nodes, links, fullPage) {
             svg.selectAll('*').remove();
 
             svg.append("rect")
@@ -145,14 +151,19 @@ var zoom = d3.behavior.zoom()
             .attr("y", -250);
  
             if (!nodes || !links) {
-              console.log("no nodes or links");
               return;
             }
 
             var fill = d3.scale.category10();
 
-            var width = 1150,
+            if (fullPage) {
+              var width = window.innerWidth,
+                  height = window.innerHeight - ($("svg").parent().get(0).getBoundingClientRect().top + 5);
+            }
+            else {
+              var width = 1150,
                 height = 500;
+            }
 
             var force = d3.layout.force()
                 .nodes(nodes)

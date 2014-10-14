@@ -43,6 +43,35 @@ define(["angular"], function(angular) {
   };
   HomeCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$window", "playRoutes"];
 
+  var GraphCtrl = function($scope, $rootScope, $location, $window, playRoutes) {
+    if ($location.host() != 'localhost')
+      $window.ga('send', 'pageview', { page: $location.path() });
+    $rootScope.pageTitle = "CarbonDB: Graph";
+
+    playRoutes.controllers.Onto.getGraph().get().success(function(data) {
+      $scope.d3Nodes = [];
+      data.nodes.forEach(function (element, index) { $scope.d3Nodes.push({'name': element, 'id': data.nodesId[index]}) });
+      $scope.d3Links = data.links;
+    });
+  };
+  GraphCtrl.$inject = ["$scope", "$rootScope", "$location", "$window", "playRoutes"];
+
+  var TreeCtrl = function($scope, $rootScope, $location, $window, playRoutes) {
+    if ($location.host() != 'localhost')
+      $window.ga('send', 'pageview', { page: $location.path() });
+    $rootScope.pageTitle = "CarbonDB: Tree";
+    playRoutes.controllers.Onto.getCategories().get().success(function(data) {
+      $scope.categories = data.children;
+    });
+    $scope.treeOptions = {
+      dirSelectable: false,
+      isLeaf: function (node) {
+        return node.hasOwnProperty('unit') ? true : false;
+      }
+    };
+  };
+  TreeCtrl.$inject = ["$scope", "$rootScope", "$location", "$window", "playRoutes"];
+
   var AboutCtrl = function($rootScope, $scope, $window, $location) {
     $rootScope.pageTitle = "CarbonDB: About";
     if ($location.host() != 'localhost')
@@ -154,13 +183,13 @@ define(["angular"], function(angular) {
       $scope.lineDimensions = new Array();
       for (var i =0; i < data.dimensions.length; i++) {
         if (data.dimensions[i].orientation == 'VERTICAL')
-          $scope.lineDimensions.push(data.dimensions[i].keywords.sort(sortKeywordsCompare));
+          $scope.lineDimensions.push(sortKeywords(data.dimensions[i].keywords, data.dimensions[i].keywordsPosition));
         else if (data.dimensions[i].orientation == 'HORIZONTAL')
-          $scope.rowDimensions.push(data.dimensions[i].keywords.sort(sortKeywordsCompare));
+          $scope.rowDimensions.push(sortKeywords(data.dimensions[i].keywords, data.dimensions[i].keywordsPosition));
         else if (i % 2 == 0)
-          $scope.lineDimensions.push(data.dimensions[i].keywords.sort(sortKeywordsCompare));
+          $scope.lineDimensions.push(sortKeywords(data.dimensions[i].keywords, data.dimensions[i].keywordsPosition));
         else
-          $scope.rowDimensions.push(data.dimensions[i].keywords.sort(sortKeywordsCompare));
+          $scope.rowDimensions.push(sortKeywords(data.dimensions[i].keywords, data.dimensions[i].keywordsPosition));
       }
 
       // setting up the elements
@@ -315,6 +344,30 @@ define(["angular"], function(angular) {
     return 0;
   }
 
+  var sortKeywords = function (pKeywords, positions) {
+    var keywords = pKeywords.slice(0);
+    var sortedKeywords = [];
+    for (var position in positions) {
+      if (positions.hasOwnProperty(position)) {
+        var indexInKeywords = -1;
+        for (var i = 0; i < keywords.length; i++) {
+          if (keywords[i].name == positions[position]) {
+            indexInKeywords = i;
+            break;
+          }
+        }
+        if (indexInKeywords > -1) {
+          sortedKeywords.push(keywords[i]);
+          keywords.splice(indexInKeywords, 1);
+        }
+      }
+    }
+    if (keywords.length > 0) {
+      sortedKeywords = sortedKeywords.concat(keywords.sort(sortKeywordsCompare));
+    }
+    return sortedKeywords;
+  }
+
   var sortReferencesCompare = function (r1, r2) {
     if (r1.creator > r2.creator)
       return 1;
@@ -336,6 +389,8 @@ define(["angular"], function(angular) {
     HeaderCtrl: HeaderCtrl,
     FooterCtrl: FooterCtrl,
     HomeCtrl: HomeCtrl,
+    GraphCtrl: GraphCtrl,
+    TreeCtrl: TreeCtrl,
     GroupCtrl: GroupCtrl,
     ProcessCtrl: ProcessCtrl,
     CoefficientCtrl: CoefficientCtrl,

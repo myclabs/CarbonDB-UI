@@ -1,33 +1,35 @@
-<h1>Help</h1>
-<p>CarbonDB is based on classical life cycle assessment concepts. The basic objects involved are <strong>processes</strong>, <strong>relations</strong>, <strong>coefficients</strong>, <strong>elementary flows</strong>, <strong>impacts</strong>. </p>
+<div class="container">
+    <h1>Help</h1>
+    <p>CarbonDB is based on classical life cycle assessment concepts. The basic objects involved are <strong>processes</strong>, <strong>relations</strong>, <strong>coefficients</strong>, <strong>elementary flows</strong>, <strong>impacts</strong>. </p>
 
-<ul>
-<li><strong>Processes</strong> represent any kind of product, service, human activity, or even physical process. Processes are related by <strong>dependency relations</strong> ("economic flows") and associated to <strong>elementary flows</strong> to / from biosphere. </li>
-<li><strong>Coefficients</strong> are just scalars, they play the role of weights in dependency relations between processes (for this reason they are called "coefficients").</li>
-<li><strong>Impacts</strong> of a process are computed from its elementary flows (in general through a simple linear combination). For instance, for a given process, adding its greenhouse gas emissions weighted by global warming potentials of corresponding gases on a definite duration (say 100 years), one obtains a single figure (impact) that sums up those emissions. </li>
-</ul>
+    <ul>
+        <li><strong>Processes</strong> represent any kind of product, service, human activity, or even physical process. Processes are related by <strong>dependency relations</strong> ("economic flows") and associated to <strong>elementary flows</strong> to / from biosphere. </li>
+        <li><strong>Coefficients</strong> are just scalars, they play the role of weights in dependency relations between processes (for this reason they are called "coefficients").</li>
+        <li><strong>Impacts</strong> of a process are computed from its elementary flows (in general through a simple linear combination). For instance, for a given process, adding its greenhouse gas emissions weighted by global warming potentials of corresponding gases on a definite duration (say 100 years), one obtains a single figure (impact) that sums up those emissions. </li>
+    </ul>
 
-<p>Here are some features of the contents. </p>
+    <p>Here are some features of the contents. </p>
 
-<ul>
-<li>Processes and coefficients are grouped in <strong>groups of processes</strong> and <strong>groups of coefficients</strong>. It is those groups that appear as clickable links in the tree displayed in home page. Their names are preceded by "[P]" or "[C]" in order to distinguish between these two concepts. </li>
-<li>Dependency relations ("economic flows") are entirely displayed at a <em>"macro" level</em> between groups of processes, and weighted by groups of coefficients. On the page of any group of processes or coefficients, you will find the relations in which this group is involved. Sometimes, weights have to be used as denominators (in this case they are displayed with a "-1" <strong>exponent</strong> in this view). </li>
-<li>From these macro-relations, <em>micro-relations</em> (the usual "economic flows") are derived through an algorithm which is quite intuitive but not so easy to explain in a few words. <a href="http://link.springer.com/chapter/10.1007%2F978-3-642-32606-6_9">This paper</a> explains in details how this stuff works, but we hope its reading is not required for understanding and using the model in practice.  </li>
-<li>Elementary flows and impacts are of any kind, and can be entirely customized in the model. At this stage elementary flows and impacts deal with: <em>greenhouse gas emissions</em>, <em>primary energy extraction</em>, and <em>final energy consumption</em>, but other kinds of elementary flows and impacts could be added in the future. </li>
-<li>In the view of a process group, the default displayed value type is the total of greenhouse gas emissions, expressed in 100 years GWP CO2-equivalent. But other impacts (like total of greenhouse gas emissions expressed in 20 years GWP CO2-equivalent) and all elementary flows (like emissions of greenhouse gas for a particular gas or primary energy extraction for a particular source of primary energy) are available through a scrolling list. </li>
-<li><em>All source data are carried out by coefficients</em>. In other words, all elementary flows are calculated from a very short list of purely physical processes (like direct emissions of greenhouse gases) through dependency relations and coefficient values. All these processes are contained in category "Miscellaneous > Direct generic elementary flows". </li>
-<li>Values carry <em>no uncertainty</em> at this stage, but those will be added as soon as the values of uncertainties on source data will be chosen. </li>
-<li>In dependency relations, units should be compatible only at the physical quantity level (<a href="http://units.myc-sense.com/en/">unit conversions</a> are carried out automatically in the calculation of elementary flows). </li>
-</ul>
+    <ul>
+        <li>Processes and coefficients are grouped in <strong>groups of processes</strong> and <strong>groups of coefficients</strong>. It is those groups that appear as clickable links in the tree displayed in home page. Their names are preceded by "[P]" or "[C]" in order to distinguish between these two concepts. </li>
+        <li>Dependency relations ("economic flows") are entirely displayed at a <em>"macro" level</em> between groups of processes, and weighted by groups of coefficients. On the page of any group of processes or coefficients, you will find the relations in which this group is involved. Sometimes, weights have to be used as denominators (in this case they are displayed with a "-1" <strong>exponent</strong> in this view). </li>
+        <li>From these macro-relations, <em>micro-relations</em> (the usual "economic flows") are derived through an algorithm which is quite intuitive but not so easy to explain in a few words. <a href="http://link.springer.com/chapter/10.1007%2F978-3-642-32606-6_9">This paper</a> explains in details how this stuff works, but we hope its reading is not required for understanding and using the model in practice.  </li>
+        <li>Elementary flows and impacts are of any kind, and can be entirely customized in the model. At this stage elementary flows and impacts deal with: <em>greenhouse gas emissions</em>, <em>primary energy extraction</em>, and <em>final energy consumption</em>, but other kinds of elementary flows and impacts could be added in the future. </li>
+        <li>In the view of a process group, the default displayed value type is the total of greenhouse gas emissions, expressed in 100 years GWP CO2-equivalent. But other impacts (like total of greenhouse gas emissions expressed in 20 years GWP CO2-equivalent) and all elementary flows (like emissions of greenhouse gas for a particular gas or primary energy extraction for a particular source of primary energy) are available through a scrolling list. </li>
+        <li><em>All source data are carried out by coefficients</em>. In other words, all elementary flows are calculated from a very short list of purely physical processes (like direct emissions of greenhouse gases) through dependency relations and coefficient values. All these processes are contained in category "Miscellaneous > Direct generic elementary flows". </li>
+        <li>Values carry <em>no uncertainty</em> at this stage, but those will be added as soon as the values of uncertainties on source data will be chosen. </li>
+        <li>In dependency relations, units should be compatible only at the physical quantity level (<a href="http://units.myc-sense.com/en/">unit conversions</a> are carried out automatically in the calculation of elementary flows). </li>
+    </ul>
 
-<p>You can <em>browse</em> the data either by:
-<ul>
-<li>unfolding the categories of the tree in home page,</li>
-<li>or, accessing to groups of processes or coefficients from the macro-graph in home page,</li>
-<li>or, once you picked up a group of processes or coefficients, clicking on other groups involved in neighboring relations.</li>
-</ul>
-Have fun!</p>
+    <p>You can <em>browse</em> the data either by:
+    <ul>
+        <li>unfolding the categories of the tree in home page,</li>
+        <li>or, accessing to groups of processes or coefficients from the macro-graph in home page,</li>
+        <li>or, once you picked up a group of processes or coefficients, clicking on other groups involved in neighboring relations.</li>
+    </ul>
+    Have fun!</p>
 
-<p>A <em>roadmap</em> displaying some forthcoming features is available <a href="https://github.com/myclabs/carbonontology/wiki/Front-end-application,-forthcoming-functionnalities">here</a>.</p>
+    <p>A <em>roadmap</em> displaying some forthcoming features is available <a href="https://github.com/myclabs/carbonontology/wiki/Front-end-application,-forthcoming-functionnalities">here</a>.</p>
 
-<hr />
+    <hr />
+</div>
