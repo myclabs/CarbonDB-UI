@@ -1,24 +1,26 @@
-<h1>Ontology upload</h1>
-<p>
-  Choose a file to upload:
-  <input type="file" ng-file-select="onFileSelect($files)">
-</p>
-<hr />
-<div ng-show="!fileUploading">
-	<h2>Last report</h2>
-	{{fileUploadResult}}
-	<h3>Errors</h3>
-	<ul ng-show="errors != null && errors.length > 0">
-		<li ng-repeat="error in errors track by $index">{{error}}</li>
-	</ul>
-	<div ng-show="errors == null || errors.length == 0">No errors detected</div>
+<div class="container">
+    <h1>Ontology upload</h1>
+    <p>
+      Choose a file to upload:
+      <input type="file" ng-file-select="onFileSelect($files)">
+    </p>
+    <hr />
+    <div ng-show="!fileUploading">
+    	<h2>Last report</h2>
+    	{{fileUploadResult}}
+    	<h3>Errors</h3>
+    	<ul ng-show="errors != null && errors.length > 0">
+    		<li ng-repeat="error in errors track by $index">{{error}}</li>
+    	</ul>
+    	<div ng-show="errors == null || errors.length == 0">No errors detected</div>
 
-	<h3>Warnings</h3>
-	<ul ng-show="warnings != null && warnings.length > 0">
-		<li ng-repeat="warning in warnings track by $index">{{warning}}</li>
-	</ul>
-	<div ng-show="warnings == null || warnings.length == 0">No warnings detected</div>
-</div>
-<div ng-show="fileUploading">
-	Uploading and processing...
+    	<h3>Warnings</h3>
+    	<ul ng-show="warnings != null && warnings.length > 0">
+    		<li ng-repeat="warning in warnings track by $index">{{warning}}</li>
+    	</ul>
+    	<div ng-show="warnings == null || warnings.length == 0">No warnings detected</div>
+    </div>
+    <div ng-show="fileUploading">
+    	Uploading and processing...
+    </div>
 </div>

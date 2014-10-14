@@ -43,6 +43,35 @@ define(["angular"], function(angular) {
   };
   HomeCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$window", "playRoutes"];
 
+  var GraphCtrl = function($scope, $rootScope, $location, $window, playRoutes) {
+    if ($location.host() != 'localhost')
+      $window.ga('send', 'pageview', { page: $location.path() });
+    $rootScope.pageTitle = "CarbonDB: Graph";
+
+    playRoutes.controllers.Onto.getGraph().get().success(function(data) {
+      $scope.d3Nodes = [];
+      data.nodes.forEach(function (element, index) { $scope.d3Nodes.push({'name': element, 'id': data.nodesId[index]}) });
+      $scope.d3Links = data.links;
+    });
+  };
+  GraphCtrl.$inject = ["$scope", "$rootScope", "$location", "$window", "playRoutes"];
+
+  var TreeCtrl = function($scope, $rootScope, $location, $window, playRoutes) {
+    if ($location.host() != 'localhost')
+      $window.ga('send', 'pageview', { page: $location.path() });
+    $rootScope.pageTitle = "CarbonDB: Tree";
+    playRoutes.controllers.Onto.getCategories().get().success(function(data) {
+      $scope.categories = data.children;
+    });
+    $scope.treeOptions = {
+      dirSelectable: false,
+      isLeaf: function (node) {
+        return node.hasOwnProperty('unit') ? true : false;
+      }
+    };
+  };
+  TreeCtrl.$inject = ["$scope", "$rootScope", "$location", "$window", "playRoutes"];
+
   var AboutCtrl = function($rootScope, $scope, $window, $location) {
     $rootScope.pageTitle = "CarbonDB: About";
     if ($location.host() != 'localhost')
@@ -336,6 +365,8 @@ define(["angular"], function(angular) {
     HeaderCtrl: HeaderCtrl,
     FooterCtrl: FooterCtrl,
     HomeCtrl: HomeCtrl,
+    GraphCtrl: GraphCtrl,
+    TreeCtrl: TreeCtrl,
     GroupCtrl: GroupCtrl,
     ProcessCtrl: ProcessCtrl,
     CoefficientCtrl: CoefficientCtrl,

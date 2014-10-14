@@ -1,39 +1,41 @@
-<div class="page-header">
-  <h1>Welcome to CarbonDB <small>brought to you by My C-sense</small></h1>
-  A <a href="#/about">short presentation of the project</a> and some <a href="#/help">help about the content</a> are available.
-</div>
-<!-- <p>
-  This ontology contains the following process groups:
-  <ul>
-    <li ng-repeat="group in processGroups track by $index">
-        <a ng-href="#/group/{{group.id}}">{{group.label}}</a>
-    </li>
-  </ul>
-</p> -->
-<!-- <p>
-  And the following coefficient groups:
-  <ul>
-    <li ng-repeat="group in coefficientGroups track by $index">
-        <a ng-href="#/group/{{group.id}}">{{group.label}}</a>
-    </li>
-  </ul>
-</p>-->
-<p>
-  <h2>Categories</h2>
-  <div treecontrol class="tree-light"
-   tree-model="categories"
-   options="treeOptions"
-   order-by="label">
-    <a ng-if="node.hasOwnProperty('unit')" ng-href="#/group/{{node.id}}">
-      <span ng-if="node.type == 'PROCESS'">[P]</span><span ng-if="node.type == 'COEFFICIENT'">[C]</span> {{node.label}}
-    </a>
-    <span ng-if="!node.hasOwnProperty('unit')">{{node.label}}</span>
+<div class="container">
+  <div class="page-header">
+    <h1>Welcome to CarbonDB <small>brought to you by My C-sense</small></h1>
+    A <a href="#/about">short presentation of the project</a> and some <a href="#/help">help about the content</a> are available.
   </div>
-</p>
-<hr />
-<p>
-  <h2>Process groups graph</h2>
-  <p>Tips: use your mousewheel to zoom in/out, click and move your cursor to pan, drag and drop a group to reorganize the graph, double-click on a group to unpin it.</p>
-  <div d3-force nodes="d3Nodes" links="d3Links"></div>
-</p>
-<hr />
+  <!-- <p>
+    This ontology contains the following process groups:
+    <ul>
+      <li ng-repeat="group in processGroups track by $index">
+          <a ng-href="#/group/{{group.id}}">{{group.label}}</a>
+      </li>
+    </ul>
+  </p> -->
+  <!-- <p>
+    And the following coefficient groups:
+    <ul>
+      <li ng-repeat="group in coefficientGroups track by $index">
+          <a ng-href="#/group/{{group.id}}">{{group.label}}</a>
+      </li>
+    </ul>
+  </p>-->
+  <p>
+    <h2>Categories</h2>
+    <div treecontrol class="tree-light"
+     tree-model="categories"
+     options="treeOptions"
+     order-by="label">
+      <a ng-if="node.hasOwnProperty('unit')" ng-href="#/group/{{node.id}}">
+        <span ng-if="node.type == 'PROCESS'">[P]</span><span ng-if="node.type == 'COEFFICIENT'">[C]</span> {{node.label}}
+      </a>
+      <span ng-if="!node.hasOwnProperty('unit')">{{node.label}}</span>
+    </div>
+  </p>
+  <hr />
+  <p>
+    <h2>Process groups graph</h2>
+    <p>Tips: use your mousewheel to zoom in/out, click and move your cursor to pan, drag and drop a group to reorganize the graph, double-click on a group to unpin it.</p>
+    <div d3-force nodes="d3Nodes" links="d3Links"></div>
+  </p>
+  <hr />
+</div>
