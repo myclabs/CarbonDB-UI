@@ -183,13 +183,13 @@ define(["angular"], function(angular) {
       $scope.lineDimensions = new Array();
       for (var i =0; i < data.dimensions.length; i++) {
         if (data.dimensions[i].orientation == 'VERTICAL')
-          $scope.lineDimensions.push(data.dimensions[i].keywords.sort(sortKeywordsCompare));
+          $scope.lineDimensions.push(sortKeywords(data.dimensions[i].keywords, data.dimensions[i].keywordsPosition));
         else if (data.dimensions[i].orientation == 'HORIZONTAL')
-          $scope.rowDimensions.push(data.dimensions[i].keywords.sort(sortKeywordsCompare));
+          $scope.rowDimensions.push(sortKeywords(data.dimensions[i].keywords, data.dimensions[i].keywordsPosition));
         else if (i % 2 == 0)
-          $scope.lineDimensions.push(data.dimensions[i].keywords.sort(sortKeywordsCompare));
+          $scope.lineDimensions.push(sortKeywords(data.dimensions[i].keywords, data.dimensions[i].keywordsPosition));
         else
-          $scope.rowDimensions.push(data.dimensions[i].keywords.sort(sortKeywordsCompare));
+          $scope.rowDimensions.push(sortKeywords(data.dimensions[i].keywords, data.dimensions[i].keywordsPosition));
       }
 
       // setting up the elements
@@ -342,6 +342,30 @@ define(["angular"], function(angular) {
     if (k1.label < k2.label)
       return -1;
     return 0;
+  }
+
+  var sortKeywords = function (pKeywords, positions) {
+    var keywords = pKeywords.slice(0);
+    var sortedKeywords = [];
+    for (var position in positions) {
+      if (positions.hasOwnProperty(position)) {
+        var indexInKeywords = -1;
+        for (var i = 0; i < keywords.length; i++) {
+          if (keywords[i].name == positions[position]) {
+            indexInKeywords = i;
+            break;
+          }
+        }
+        if (indexInKeywords > -1) {
+          sortedKeywords.push(keywords[i]);
+          keywords.splice(indexInKeywords, 1);
+        }
+      }
+    }
+    if (keywords.length > 0) {
+      sortedKeywords = sortedKeywords.concat(keywords.sort(sortKeywordsCompare));
+    }
+    return sortedKeywords;
   }
 
   var sortReferencesCompare = function (r1, r2) {
