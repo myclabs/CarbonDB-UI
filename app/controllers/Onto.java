@@ -75,6 +75,8 @@ public class Onto extends Controller {
     protected static ArrayList<HashMap<String, Object>> links = new ArrayList<>();
     protected static HashMap<String, HashMap<String, Object>> processes = new HashMap<>();
     protected static HashMap<String, HashMap<String, Object>> coefficients = new HashMap<>();
+    protected static HashMap<String, Reference> references = new HashMap<>();
+    protected static HashMap<String, ArrayList<HashMap<String, String>>> referencesGroups = new HashMap<>();
 
     protected static MongoClient mongoClient;
 
@@ -237,6 +239,13 @@ public class Onto extends Controller {
             coefficientsColl.insert(dbObject);
         }
 
+        DBCollection refColl = db.getCollection("references");
+        refColl.drop();
+
+        dbObject = (BasicDBObject) JSON.parse("{references:" + toJson(references).toString()
+                                            + ", referencesGroups:" + toJson(referencesGroups).toString() + "}");
+        refColl.insert(dbObject);
+
         DBCollection graphColl = db.getCollection("graph");
         graphColl.drop();
 
@@ -283,6 +292,7 @@ public class Onto extends Controller {
         HashMap<String, Object> elementsImpactsAndFlows = new HashMap<>();
         HashMap<String, Object> processInfos, coeffInfos;
         HashMap<String, String> elementsURI = new HashMap<>();
+        HashMap<String, String> groupInfosForRef = new HashMap<>();
 
         String unitLabel = unitsRepo.getUnitSymbol(group.getUnit());
 
@@ -355,6 +365,16 @@ public class Onto extends Controller {
                     elementsValue.put(joinDimensionKeywords(element), "empty");
                 }
             }
+        }
+        for (Reference reference: group.getReferences()) {
+            if (!references.containsKey(reference.getURI())) {
+                references.put(reference.getURI(), reference);
+                referencesGroups.put(reference.getURI(), new ArrayList<HashMap<String, String>>());
+            }
+            groupInfosForRef = new HashMap<>();
+            groupInfosForRef.put("URI", group.getURI());
+            groupInfosForRef.put("label", group.getLabel());
+            referencesGroups.get(reference.getURI()).add(groupInfosForRef);
         }
         output.put("URI", group.getURI());
         output.put("label", group.getLabel());
