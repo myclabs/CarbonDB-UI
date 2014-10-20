@@ -368,13 +368,15 @@ public class Onto extends Controller {
         }
         for (Reference reference: group.getReferences()) {
             if (!references.containsKey(reference.getURI())) {
-                references.put(reference.getURI(), reference);
-                referencesGroups.put(reference.getURI(), new ArrayList<HashMap<String, String>>());
+                references.put(mongonize(reference.getURI()), reference);
+                referencesGroups.put(mongonize(reference.getURI()), new ArrayList<HashMap<String, String>>());
             }
             groupInfosForRef = new HashMap<>();
             groupInfosForRef.put("URI", group.getURI());
+            groupInfosForRef.put("id", group.getId());
+            groupInfosForRef.put("type", group.type.name());
             groupInfosForRef.put("label", group.getLabel());
-            referencesGroups.get(reference.getURI()).add(groupInfosForRef);
+            referencesGroups.get(mongonize(reference.getURI())).add(groupInfosForRef);
         }
         output.put("URI", group.getURI());
         output.put("label", group.getLabel());
@@ -428,6 +430,20 @@ public class Onto extends Controller {
         try {
             DB db = mongoConnect();
             DBCollection categoriesColl = db.getCollection("categories");
+            String response = categoriesColl.findOne().toString();
+            mongoClose();
+            return ok(response);
+        }
+        catch (Exception e) {
+            return ok(e.getMessage());
+        }
+    }
+
+    public static Result getReferences() {
+        authorizeCrossRequests();
+        try {
+            DB db = mongoConnect();
+            DBCollection categoriesColl = db.getCollection("references");
             String response = categoriesColl.findOne().toString();
             mongoClose();
             return ok(response);
