@@ -10,6 +10,7 @@ define(["angular", "./controllers", "common"], function(angular, controllers) {
       .when("/",  {templateUrl: "/assets/templates/home/home.html", controller:controllers.HomeCtrl})
       .when("/graph",  {templateUrl: "/assets/templates/home/graph.html", controller:controllers.GraphCtrl})
       .when("/tree",  {templateUrl: "/assets/templates/home/tree.html", controller:controllers.TreeCtrl})
+      .when("/references",  {templateUrl: "/assets/templates/home/references.html", controller:controllers.ReferencesCtrl})
       .when("/upload",  {templateUrl: "/assets/templates/home/upload.html", controller:controllers.UploadCtrl})
       .when("/about",  {templateUrl: "/assets/templates/home/about.html", controller:controllers.AboutCtrl})
       .when("/help",  {templateUrl: "/assets/templates/home/help.html", controller:controllers.HelpCtrl})

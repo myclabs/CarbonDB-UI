@@ -72,6 +72,17 @@ define(["angular"], function(angular) {
   };
   TreeCtrl.$inject = ["$scope", "$rootScope", "$location", "$window", "playRoutes"];
 
+  var ReferencesCtrl = function($scope, $rootScope, $location, $window, playRoutes) {
+    if ($location.host() != 'localhost')
+      $window.ga('send', 'pageview', { page: $location.path() });
+    $rootScope.pageTitle = "CarbonDB: References";
+    playRoutes.controllers.Onto.getReferences().get().success(function(data) {
+      $scope.references = data.references;
+      $scope.referencesGroups = data.referencesGroups;
+    });
+  };
+  ReferencesCtrl.$inject = ["$scope", "$rootScope", "$location", "$window", "playRoutes"];
+
   var AboutCtrl = function($rootScope, $scope, $window, $location) {
     $rootScope.pageTitle = "CarbonDB: About";
     if ($location.host() != 'localhost')
@@ -391,6 +402,7 @@ define(["angular"], function(angular) {
     HomeCtrl: HomeCtrl,
     GraphCtrl: GraphCtrl,
     TreeCtrl: TreeCtrl,
+    ReferencesCtrl: ReferencesCtrl,
     GroupCtrl: GroupCtrl,
     ProcessCtrl: ProcessCtrl,
     CoefficientCtrl: CoefficientCtrl,
