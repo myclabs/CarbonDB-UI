@@ -3,7 +3,7 @@
     <h2>References</h2>
     <ul>
       <li ng-repeat="(refURI, reference) in references">
-        <span ng-if="reference.creator">{{reference.creator}}, </span><span ng-if="reference.title"><em>{{reference.title}}</em></span><span ng-if="reference.publisher">, {{reference.publisher}}</span><span ng-if="reference.source">, {{reference.source}}</span><span ng-if="reference.date">, {{reference.date}}</span><span ng-if="reference.url">, <a ng-href="{{reference.url}}" target="_blank">{{reference.url}}</a></span>.
+        <span ng-if="reference.shortName">[{{reference.shortName}}] </span><span ng-if="reference.creator">{{reference.creator}}, </span><span ng-if="reference.title"><em>{{reference.title}}</em></span><span ng-if="reference.publisher">, {{reference.publisher}}</span><span ng-if="reference.source">, {{reference.source}}</span><span ng-if="reference.date">, {{reference.date}}</span><span ng-if="reference.url">, <a ng-href="{{reference.url}}" target="_blank">{{reference.url}}</a></span>.
         <a ng-if="referencesGroups[refURI].length > 0" data-toggle="collapse" data-target="#{{refURI.replace('http://www____myc-sense____com/ontologies/bc#ref/', '')}}" style="cursor: pointer;">Usage: {{referencesGroups[refURI].length}}</a>
         <div ng-if="referencesGroups[refURI].length > 0" class="collapse out" id="{{refURI.replace('http://www____myc-sense____com/ontologies/bc#ref/', '')}}">
           Used in:
