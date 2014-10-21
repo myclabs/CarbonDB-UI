@@ -6,10 +6,10 @@
   <td ng-if="!cell.header && !cell.col" ng-repeat="cell in line track by $index" rowspan="{{cell.span}}">{{cell.value}} ± {{cell.uncertainty}}%</td> -->
 
   <td ng-if="!cell.header && cell.col" ng-repeat="cell in line track by $index" colspan="{{cell.span}}">{{cell.value}}</td>
-  <td ng-if="!cell.header && !cell.col && !cell.uri" ng-repeat="cell in line track by $index" rowspan="{{cell.span}}">{{cell.value}}</td>
-  <td ng-if="!cell.header && !cell.col && cell.uri" ng-repeat="cell in line track by $index" rowspan="{{cell.span}}">
-  	<a ng-href="#/process/{{cell.uri}}" ng-if="type == 'PROCESS'">{{cell.value}}</a>
-  	<a ng-href="#/coefficient/{{cell.uri}}" ng-if="type == 'COEFFICIENT'">{{cell.value}}</a>
+  <td ng-if="!cell.header && !cell.col" ng-repeat="cell in line track by $index" rowspan="{{cell.span}}">
+    <a ng-href="#/process/{{cell.uri}}" ng-if="cell.uri && type == 'PROCESS'">{{cell.value}}</a>
+    <a ng-href="#/coefficient/{{cell.uri}}" ng-if="cell.uri && type == 'COEFFICIENT'">{{cell.value}}</a>
+    <span ng-if="!cell.uri">{{cell.value}}</span>
   </td>
 
  </tr>

@@ -103,7 +103,6 @@ define(["angular"], function(angular) {
               tmd[i].push({'value': value, 'uncertainty': uncertainty, 'span': 1, 'header': false, 'col': false, 'uri': uri});
             }
           }
-          //console.log(tmd);
           scope.tmd = tmd;
         }
 
