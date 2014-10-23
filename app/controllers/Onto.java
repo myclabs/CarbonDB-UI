@@ -90,6 +90,7 @@ public class Onto extends Controller {
     }
 
     public static Result upload() throws Exception {
+        System.out.println("----------------");
         System.out.println("begin processing");
         initUnitsRepo();
         MultipartFormData body = request().body().asMultipartFormData();
@@ -367,7 +368,7 @@ public class Onto extends Controller {
             }
         }
         for (Reference reference: group.getReferences()) {
-            if (!references.containsKey(reference.getURI())) {
+            if (!references.containsKey(mongonize(reference.getURI()))) {
                 references.put(mongonize(reference.getURI()), reference);
                 referencesGroups.put(mongonize(reference.getURI()), new ArrayList<HashMap<String, String>>());
             }
@@ -521,6 +522,7 @@ public class Onto extends Controller {
     protected static void initUnitsRepo() {
         if (null == unitsRepo) {
             unitsRepo = new UnitsRepoWebService();
+            ((UnitsRepoWebService) unitsRepo).setUnitsAPIURI("http://localhost/units/api");
             if (null != Cache.get("conversionFactors")) {
                 ((UnitsRepoCache)unitsRepo).setConversionFactorsCache((HashMap)Cache.get("conversionFactors"));
             }
@@ -535,6 +537,7 @@ public class Onto extends Controller {
 
     protected static Model getInferredModel() {
         Model model = ModelFactory.createDefaultModel( );
+        System.out.println("model size after init = " + model.size());
 
         InputStream in = FileManager.get().open(baseOntoFileName);
         if (in == null) {
@@ -542,11 +545,13 @@ public class Onto extends Controller {
         }
 
         model.read( in, null );
+        System.out.println("model size after reading = " + model.size());
 
         Logger.getLogger("").setLevel(Level.WARNING);
 
         Reasoner reasoner = new Reasoner(model, unitsRepo);
         reasoner.run();
+        System.out.println("model size after reasoning = " + model.size());
         report = reasoner.report;
         return reasoner.getInfModel();
     }
