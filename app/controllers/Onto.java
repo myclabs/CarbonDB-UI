@@ -254,20 +254,32 @@ public class Onto extends Controller {
         dbObject.append("_id", "nodes");
         graphColl.insert(dbObject);*/
 
-        ArrayList<Resource> sourceRelationResources = RepoFactory.getRelationRepo().getSourceRelationsResources();
-        for (Resource sourceRelationResource: sourceRelationResources) {
-            String sourceURI = sourceRelationResource.getProperty(Datatype.hasOriginProcess).getResource().getURI();
-            String targetURI = sourceRelationResource.getProperty(Datatype.hasDestinationProcess).getResource().getURI();
+        //ArrayList<Resource> sourceRelationResources = RepoFactory.getRelationRepo().getSourceRelationsResources();
+        for (SourceRelation sourceRelation: RepoFactory.getRelationRepo().getSourceRelations()) {
+            //String sourceURI = sourceRelationResource.getProperty(Datatype.hasOriginProcess).getResource().getURI();
+            //String targetURI = sourceRelationResource.getProperty(Datatype.hasDestinationProcess).getResource().getURI();
+            String sourceURI = sourceRelation.source.getURI();
+            String targetURI = sourceRelation.destination.getURI();
             HashMap<String, Object> link = new HashMap<>();
-            link.put("uri", sourceRelationResource.getURI());
+            link.put("uri", sourceRelation.getURI());
             link.put("source", nodesURI.indexOf(sourceURI));
             link.put("target", nodesURI.indexOf(targetURI));
+            if (sourceRelation.getType() != null)
+                link.put("type", mongonize(sourceRelation.getType().getURI()));
+            else
+                link.put("type", "#none");
             links.add(link);
         }
+        HashMap<String, RelationType> relationTypes = new HashMap<>();
+        for (RelationType type: RepoFactory.getRelationRepo().getRelationTypes()) {
+            relationTypes.put(mongonize(type.getURI()), type);
+        }
+
 
         dbObject = (BasicDBObject) JSON.parse("{nodes:" + toJson(nodesLabel).toString()
                                             + ",nodesId:" + toJson(nodesId).toString()
-                                            + ",links:" + toJson(links).toString() + "}");
+                                            + ",links:" + toJson(links).toString()
+                                            + ",types:" + toJson(relationTypes).toString() + "}");
         graphColl.insert(dbObject);
 
         DBCollection reportColl = db.getCollection("report");
@@ -279,7 +291,7 @@ public class Onto extends Controller {
         mongoClose();
     }
 
-    protected static String getGroupAsJSON(Group group, Model model) throws Exception {
+    protected static String getGroupAsJSON(Group group, Model model) throws Exception  {
         HashMap<String, Object> output = new HashMap<String, Object>();
 
         boolean isProcessGroup = false;
@@ -522,7 +534,7 @@ public class Onto extends Controller {
     protected static void initUnitsRepo() {
         if (null == unitsRepo) {
             unitsRepo = new UnitsRepoWebService();
-            ((UnitsRepoWebService) unitsRepo).setUnitsAPIURI("http://units.myc-sense.com/api");
+            ((UnitsRepoWebService) unitsRepo).setUnitsAPIURI("http://localhost/units/api");
             if (null != Cache.get("conversionFactors")) {
                 ((UnitsRepoCache)unitsRepo).setConversionFactorsCache((HashMap)Cache.get("conversionFactors"));
             }

@@ -15,13 +15,16 @@ mod.directive('d3Force', ['$window',
       scope: {
         nodes: '=',
         links: '=',
+        types: '=',
         label: '@',
         onClick: '&',
         fullPage: '='
       },
       link: function(scope, ele, attrs) {
-/* Utility functions */
- var maxLineChars = 26,
+/*******************
+ * Utility functions
+ *******************/
+var maxLineChars = 26,
     wrapChars    = ' /_-.'.split('');
 var wrap = function wrap(text) {
     if (text.length <= maxLineChars) {
@@ -101,7 +104,9 @@ var adaptNodeToBounds = function(node, bounds) {
     .attr('y', bounds.y2 + 7)
     .attr('width' , bounds.x2 - bounds.x1 - 10);
 };
-/* End fo utility functions */
+/**************************
+ * End fo utility functions
+ **************************/
 
 var zoom = d3.behavior.zoom()
     //.scaleExtent([1, 10])
@@ -134,12 +139,13 @@ var zoom = d3.behavior.zoom()
             scope.render(scope.nodes, scope.links, scope.fullPage);
           });
  
-          scope.$watch('nodes && links', function(newData, oldData, scope) {
+          scope.$watch('nodes && links && types', function(newData, oldData, scope) {
             //console.log("listener for d3Force called with newData = " + newData + " scope.nodes = " + scope.nodes);
-            scope.render(scope.nodes, scope.links, scope.fullPage);
+            scope.render(scope.nodes, scope.links, scope.types, scope.fullPage);
           }, true);
  
-          scope.render = function(nodes, links, fullPage) {
+          scope.render = function(nodes, links, types, fullPage) {
+            // @todo get executed twice!
             svg.selectAll('*').remove();
 
             svg.append("rect")
@@ -155,6 +161,15 @@ var zoom = d3.behavior.zoom()
             }
 
             var fill = d3.scale.category10();
+            var numberOfTypes = 0;
+            var typesEndMarkers = [{id: 'end0', color: '#aaa'}];
+            for(var type in types) {
+              if (types.hasOwnProperty(type)) {
+                types[type].color = fill(++numberOfTypes);
+                types[type].number = numberOfTypes;
+                typesEndMarkers.push({id: "end" + numberOfTypes, color: fill(numberOfTypes)});
+              }
+            }
 
             if (fullPage) {
               var width = window.innerWidth,
@@ -306,19 +321,22 @@ var zoom = d3.behavior.zoom()
         var link = svg.selectAll(".link")
           .data(links);
             link.enter().insert("line", ".node")
-            .attr("marker-end", "url(#end)")
-            .attr("class", "link");
+            .attr("marker-end", function(d) { return "url(#end" + (d.type != '#none' ? types[d.type].number : '0') + ")"; } )
+            .attr("class", "link")
+            .style("stroke", function(d) { if (d.type != '#none') return types[d.type].color; });
 
         svg.append("defs").selectAll("marker")
-            .data(["end"])
+          .data(typesEndMarkers)
           .enter().append("marker")
-            .attr("id", function(d) { return d; })
+            .attr("id", function(d) { return d.id; })
             .attr("viewBox", "0 -5 10 10")
             .attr("refX", 10)
             .attr("refY", 0)
             .attr("markerWidth", 6)
             .attr("markerHeight", 6)
             .attr("orient", "auto")
+            .style("stroke", function(d) { return d.color; })
+            .style("fill", function(d) { return d.color; })
           .append("path")
             .attr("d", "M0,-5L10,0L0,5");
 
@@ -366,6 +384,21 @@ function tick(e) {
           };
       }}
 }])
+
+mod.directive('tooltip', function(){
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs){
+            $(element).hover(function(){
+                // on mouseenter
+                $(element).tooltip('show');
+            }, function(){
+                // on mouseleave
+                $(element).tooltip('hide');
+            });
+        }
+    };
+});
 
   return mod;
 });

@@ -31,6 +31,7 @@ define(["angular"], function(angular) {
       $scope.d3Nodes = [];
       data.nodes.forEach(function (element, index) { $scope.d3Nodes.push({'name': element, 'id': data.nodesId[index]}) });
       $scope.d3Links = data.links;
+      $scope.relationTypes = data.types;
     });
 
     /*$scope.d3Nodes = [{'name': 'bidule'}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
@@ -52,6 +53,7 @@ define(["angular"], function(angular) {
       $scope.d3Nodes = [];
       data.nodes.forEach(function (element, index) { $scope.d3Nodes.push({'name': element, 'id': data.nodesId[index]}) });
       $scope.d3Links = data.links;
+      $scope.relationTypes = data.types;
     });
   };
   GraphCtrl.$inject = ["$scope", "$rootScope", "$location", "$window", "playRoutes"];
