@@ -1,0 +1,118 @@
+<div class="container">
+    <h1>Documentation</h1>
+
+    <!-- About -->
+    <h2>About</h2>
+    <p>
+        CarbonDB is a <a href="http://en.wikipedia.org/wiki/Life-cycle_assessment" target="_blank">life cycle assessment</a>
+        (LCA) <a href="http://en.wikipedia.org/wiki/Open_data" target="_blank">open dataset</a>
+        mainly centered on greenhouse gas and energy impacts.
+    </p>
+    <p>
+        It is structured as a domain
+        <a href="http://en.wikipedia.org/wiki/Ontology_(information_science)" target="_blank">ontology</a>
+        in terms of the
+        <a href="http://en.wikipedia.org/wiki/Resource_Description_Framework" target="_blank">Ressource Description Framework</a>
+        (RDF) <a href="http://www.w3.org/" target="_blank">World Wide Web Consortium</a> specification.
+    </p>
+    <p>
+    	Source data is maintained by <a href="http://www.myc-sense.com/" target="_blank">My C-Sense</a> as an
+        <a href="https://github.com/myclabs/carbonontology" target="_blank">open source project</a>,
+        from where it can be freely downloaded, consulted, and edited using any ontology editor, for instance
+        <a href="http://protege.stanford.edu/" target="_blank">Protégé</a>.
+    </p>
+    <p>
+    	Changes on ontology can be followed
+        <a href="https://github.com/myclabs/carbonontology/commits/master" target="_blank">here</a>.
+        Please feel free to contribute by submitting
+        <a href="https://github.com/myclabs/carbonontology/issues" target="_blank">issues</a> or directly
+        <a href="https://github.com/myclabs/carbonontology/pulls" target="_blank">submitting an improved version
+            of the ontology</a>.
+    </p>
+    <p>
+        Secondary data (computed data like elementary flows) are derived from source data
+        (and still expressed in RDF) by an
+        <a href="http://en.wikipedia.org/wiki/Inference_engine" target="_blank">inference engine</a>
+        maintained by <a href="http://www.myc-sense.com/" target="_blank">My C-Sense</a> as an
+        <a href="https://github.com/myclabs/carbondb" target="_blank">open source project</a>.
+    </p>
+    <p>	
+        The remaining layer is the user interface application displaying the data. Only this part of the project
+        has not been made open-source/data yet.
+    </p>
+    <p>
+        This project benefited from
+        <a href="http://www.informatik.uni-trier.de/~ley/pers/hd/b/Bertin:Benjamin.html" target="_blank">research</a>
+        jointly carried on by <a href="http://www.myc-sense.com/" target="_blank">My C-Sense</a>
+        and computer science laboratory
+        <a href="https://liris.cnrs.fr/front-page-en?set_language=en" target="_blank">LIRIS</a>
+        from <a href="http://www.universite-lyon.fr/" target="_blank">Université de Lyon</a>.
+        Its main innovative feature is the fact that dependency relations among processes can be defined at a
+        <a href="http://link.springer.com/chapter/10.1007%2F978-3-642-32606-6_9" target="_blank">macro-level</a>,
+        which makes the model easier to understand and maintain.
+    </p>
+    <hr />
+    <h3>Partners</h3>
+    <div class="row">
+        <div class="col-sm-2">
+            <a href="http://www.myc-sense.com/en" target="_blank"><img src="assets/images/myc-sense-logo.png" class="img-responsive" alt="My C-sense"></a>
+        </div>
+    </div>
+
+    <!-- Help -->
+    <h2>Help</h2>
+    <p>CarbonDB is based on classical life cycle assessment concepts. The basic objects involved are <strong>processes</strong>, <strong>relations</strong>, <strong>coefficients</strong>, <strong>elementary flows</strong>, <strong>impacts</strong>. </p>
+
+    <ul>
+        <li><strong>Processes</strong> represent any kind of product, service, human activity, or even physical process. Processes are related by <strong>dependency relations</strong> ("economic flows") and associated to <strong>elementary flows</strong> to / from biosphere. </li>
+        <li><strong>Coefficients</strong> are just scalars, they play the role of weights in dependency relations between processes (for this reason they are called "coefficients").</li>
+        <li><strong>Impacts</strong> of a process are computed from its elementary flows (in general through a simple linear combination). For instance, for a given process, adding its greenhouse gas emissions weighted by global warming potentials of corresponding gases on a definite duration (say 100 years), one obtains a single figure (impact) that sums up those emissions. </li>
+    </ul>
+
+    <p>Here are some features of the contents. </p>
+
+    <ul>
+        <li>Processes and coefficients are grouped in <strong>groups of processes</strong> and <strong>groups of coefficients</strong>. It is those groups that appear as clickable links in the tree displayed in home page. Their names are preceded by "[P]" or "[C]" in order to distinguish between these two concepts. </li>
+        <li>Dependency relations ("economic flows") are entirely displayed at a <em>"macro" level</em> between groups of processes, and weighted by groups of coefficients. On the page of any group of processes or coefficients, you will find the relations in which this group is involved. Sometimes, weights have to be used as denominators (in this case they are displayed with a "-1" <strong>exponent</strong> in this view). </li>
+        <li>From these macro-relations, <em>micro-relations</em> (the usual "economic flows") are derived through an algorithm which is quite intuitive but not so easy to explain in a few words. <a href="http://link.springer.com/chapter/10.1007%2F978-3-642-32606-6_9">This paper</a> explains in details how this stuff works, but we hope its reading is not required for understanding and using the model in practice.  </li>
+        <li>Elementary flows and impacts are of any kind, and can be entirely customized in the model. At this stage elementary flows and impacts deal with: <em>greenhouse gas emissions</em>, <em>primary energy extraction</em>, and <em>final energy consumption</em>, but other kinds of elementary flows and impacts could be added in the future. </li>
+        <li>In the view of a process group, the default displayed value type is the total of greenhouse gas emissions, expressed in 100 years GWP CO2-equivalent. But other impacts (like total of greenhouse gas emissions expressed in 20 years GWP CO2-equivalent) and all elementary flows (like emissions of greenhouse gas for a particular gas or primary energy extraction for a particular source of primary energy) are available through a scrolling list. </li>
+        <li><em>All source data are carried out by coefficients</em>. In other words, all elementary flows are calculated from a very short list of purely physical processes (like direct emissions of greenhouse gases) through dependency relations and coefficient values. All these processes are contained in category "Miscellaneous > Direct generic elementary flows". </li>
+        <li>Values carry <em>no uncertainty</em> at this stage, but those will be added as soon as the values of uncertainties on source data will be chosen. </li>
+        <li>In dependency relations, units should be compatible only at the physical quantity level (<a href="http://units.myc-sense.com/en/">unit conversions</a> are carried out automatically in the calculation of elementary flows). </li>
+    </ul>
+
+    <p>You can <em>browse</em> the data either by:
+    <ul>
+        <li>unfolding the categories of the tree in home page,</li>
+        <li>or, accessing to groups of processes or coefficients from the macro-graph in home page,</li>
+        <li>or, once you picked up a group of processes or coefficients, clicking on other groups involved in neighboring relations.</li>
+    </ul>
+    Have fun!</p>
+
+    <p>A <em>roadmap</em> displaying some forthcoming features is available <a href="https://github.com/myclabs/carbonontology/wiki/Front-end-application,-forthcoming-functionnalities">here</a>.</p>
+
+    <p>All the units used in CarbonDB are gathered from <a href="http://units.myc-sense.com" target="blank">My C-sense Units</a></p>
+
+    <hr />
+
+    <!-- Known bugs --> 
+    <h2>Known bugs and main drawbacks</h2>
+    Here are some known disturbing bugs and drawbacks, and, whenever possible, how to deal with them.
+    <h3>Unsolved yet</h3>
+    <ul>
+        <li>2014-10-15 <strong>Confusing display of global graph.</strong>
+            At this stage global graph display is confusing, since global positionning of cells is random,
+        and graph topology (arrows) is not taken into account. We will try to improve that in next future.
+        In the meantime the one and only solution is to use drag and drop to reorganize (at least locally) the graph.</li>
+        <li>2014-10-08 <strong>Missing tree and/or graph on home page.</strong>
+            Sometimes the categories tree or/and the graph displayed on home page disappear(s).
+            If this happens please just refresh the page, this should solve the problem.</li>
+    </ul>
+    <h3>Solved</h3>
+    <ul>
+        <li>2014-10-09 <strong> Missing arrows for the graph on home page, with Firefox.</strong>
+            With Firefox, arrows of edges of the graph on home page are missing. Solved on 2014-10-09.</li>
+    </ul>
+    <hr />
+</div>

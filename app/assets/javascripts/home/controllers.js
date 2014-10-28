@@ -85,19 +85,12 @@ define(["angular"], function(angular) {
   };
   ReferencesCtrl.$inject = ["$scope", "$rootScope", "$location", "$window", "playRoutes"];
 
-  var AboutCtrl = function($rootScope, $scope, $window, $location) {
-    $rootScope.pageTitle = "CarbonDB: About";
+  var DocumentationCtrl = function($rootScope, $scope, $window, $location) {
+    $rootScope.pageTitle = "CarbonDB: Documentation";
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
   };
-  AboutCtrl.$inject = ["$rootScope", "$scope", "$window", "$location"];
-
-  var HelpCtrl = function($rootScope, $scope, $window, $location) {
-    $rootScope.pageTitle = "CarbonDB: Help";
-    if ($location.host() != 'localhost')
-      $window.ga('send', 'pageview', { page: $location.path() });
-  };
-  HelpCtrl.$inject = ["$rootScope", "$scope", "$window", "$location"];
+  DocumentationCtrl.$inject = ["$rootScope", "$scope", "$window", "$location"];
 
   var WhatsNewCtrl = function($rootScope, $scope, $window, $location) {
     $rootScope.pageTitle = "CarbonDB: What's new";
@@ -105,13 +98,6 @@ define(["angular"], function(angular) {
       $window.ga('send', 'pageview', { page: $location.path() });
   };
   WhatsNewCtrl.$inject = ["$rootScope", "$scope", "$window", "$location"];
-
-  var KnownBugsCtrl = function($rootScope, $scope, $window, $location) {
-    $rootScope.pageTitle = "CarbonDB: Known bugs";
-    if ($location.host() != 'localhost')
-      $window.ga('send', 'pageview', { page: $location.path() });
-  };
-  KnownBugsCtrl.$inject = ["$rootScope", "$scope", "$window", "$location"];
 
   /** Controls the upload page */
   var UploadCtrl = function($scope, $rootScope, $location, helper, $http, $upload, $window, playRoutes) {
@@ -409,10 +395,8 @@ define(["angular"], function(angular) {
     ProcessCtrl: ProcessCtrl,
     CoefficientCtrl: CoefficientCtrl,
     UploadCtrl: UploadCtrl,
-    AboutCtrl: AboutCtrl,
-    HelpCtrl: HelpCtrl,
-    WhatsNewCtrl: WhatsNewCtrl,
-    KnownBugsCtrl: KnownBugsCtrl
+    DocumentationCtrl: DocumentationCtrl,
+    WhatsNewCtrl: WhatsNewCtrl
   };
 
 });

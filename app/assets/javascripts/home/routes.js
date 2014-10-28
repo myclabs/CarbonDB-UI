@@ -12,10 +12,8 @@ define(["angular", "./controllers", "common"], function(angular, controllers) {
       .when("/tree",  {templateUrl: "/assets/templates/home/tree.html", controller:controllers.TreeCtrl})
       .when("/references",  {templateUrl: "/assets/templates/home/references.html", controller:controllers.ReferencesCtrl})
       .when("/upload",  {templateUrl: "/assets/templates/home/upload.html", controller:controllers.UploadCtrl})
-      .when("/about",  {templateUrl: "/assets/templates/home/about.html", controller:controllers.AboutCtrl})
-      .when("/help",  {templateUrl: "/assets/templates/home/help.html", controller:controllers.HelpCtrl})
+      .when("/documentation",  {templateUrl: "/assets/templates/home/documentation.html", controller:controllers.DocumentationCtrl})
       .when("/whats-new",  {templateUrl: "/assets/templates/home/whats-new.html", controller:controllers.WhatsNewCtrl})
-      .when("/known-bugs",  {templateUrl: "/assets/templates/home/known-bugs.html", controller:controllers.KnownBugsCtrl})
       .when("/group/:type/:uri",
         {
           templateUrl: "/assets/templates/home/group.html",
