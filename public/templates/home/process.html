@@ -42,7 +42,7 @@
 
     <h2>Groups containing this process</h2>
     <ul>
-      <li><a ng-repeat="(groupId, groupLabel) in groups" ng-href="#/group/{{groupId}}">{{groupLabel}}</a></li>
+      <li ng-repeat="(groupId, groupLabel) in groups"><a ng-href="#/group/{{groupId}}">{{groupLabel}}</a></li>
     </ul>
 
     <h2>Relations</h2>
