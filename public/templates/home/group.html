@@ -5,19 +5,19 @@
     	<span ng-repeat="keyword in commonKeywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
     </p>
     <div class="row col-sm-12" ng-show="type == 'PROCESS'">
-      <div class="form-horizontal">
-          <label class="col-sm-2 control-label" id="labelViewType" for="viewType">Nature of displayed data:</label>
-          <div class="col-sm-4">
-              <select class="form-control col-md-4" ng-model="viewType" id="viewType">
-                <option disabled>Impacts</option>
-                <option ng-repeat-start="impactTypeCategory in impactTypes.children" disabled>&nbsp;&nbsp;{{impactTypeCategory.label}}</option>
-                  <option ng-repeat="impactType in impactTypeCategory.children" value="{{impactType.uri}}">&nbsp;&nbsp;&nbsp;&nbsp;{{impactType.label}}</option>
-                <option ng-repeat-end disabled style="display: none;">------</option>
-                <option disabled>Elementary flows</option>
-                <option ng-repeat-start="flowTypeCategory in flowTypes.children" disabled>&nbsp;&nbsp;{{flowTypeCategory.label}}</option>
-                  <option ng-repeat="flowType in flowTypeCategory.children" value="{{flowType.uri}}">&nbsp;&nbsp;&nbsp;&nbsp;{{flowType.label}}</option>
-                <option ng-repeat-end disabled style="display: none;">------</option>
-              </select>
+      <div class="form-inline">
+        <div class="form-group">
+          <label class="control-label" id="labelViewType" for="viewType">Nature of displayed data:</label>
+            <select class="form-control" ng-model="viewType" id="viewType">
+              <option disabled>Impacts</option>
+              <option ng-repeat-start="impactTypeCategory in impactTypes.children" disabled>&nbsp;&nbsp;{{impactTypeCategory.label}}</option>
+                <option ng-repeat="impactType in impactTypeCategory.children" value="{{impactType.uri}}">&nbsp;&nbsp;&nbsp;&nbsp;{{impactType.label}}</option>
+              <option ng-repeat-end disabled style="display: none;">------</option>
+              <option disabled>Elementary flows</option>
+              <option ng-repeat-start="flowTypeCategory in flowTypes.children" disabled>&nbsp;&nbsp;{{flowTypeCategory.label}}</option>
+                <option ng-repeat="flowType in flowTypeCategory.children" value="{{flowType.uri}}">&nbsp;&nbsp;&nbsp;&nbsp;{{flowType.label}}</option>
+              <option ng-repeat-end disabled style="display: none;">------</option>
+            </select>
           </div>
       </div>
     </div>
