@@ -534,7 +534,8 @@ public class Onto extends Controller {
     protected static void initUnitsRepo() {
         if (null == unitsRepo) {
             unitsRepo = new UnitsRepoWebService();
-            ((UnitsRepoWebService) unitsRepo).setUnitsAPIURI("http://localhost/units/api");
+            //((UnitsRepoWebService) unitsRepo).setUnitsAPIURI("http://localhost/units/api");
+            ((UnitsRepoWebService) unitsRepo).setUnitsAPIURI("http://units.myc-sense.com/api");
             if (null != Cache.get("conversionFactors")) {
                 ((UnitsRepoCache)unitsRepo).setConversionFactorsCache((HashMap)Cache.get("conversionFactors"));
             }
