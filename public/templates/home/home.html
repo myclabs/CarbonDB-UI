@@ -1,41 +1,83 @@
 <div class="container">
   <div class="page-header">
-    <h1>Welcome to CarbonDB <small>brought to you by My C-sense</small></h1>
+    <h1>CarbonDB <small>Open data life cycle analysis for energy and carbon</small></h1>
     A <a href="#/about">short presentation of the project</a> and some <a href="#/help">help about the content</a> are available.
   </div>
-  <!-- <p>
-    This ontology contains the following process groups:
-    <ul>
-      <li ng-repeat="group in processGroups track by $index">
-          <a ng-href="#/group/{{group.id}}">{{group.label}}</a>
-      </li>
-    </ul>
-  </p> -->
-  <!-- <p>
-    And the following coefficient groups:
-    <ul>
-      <li ng-repeat="group in coefficientGroups track by $index">
-          <a ng-href="#/group/{{group.id}}">{{group.label}}</a>
-      </li>
-    </ul>
-  </p>-->
-  <p>
-    <h2>Categories</h2>
-    <div treecontrol class="tree-light"
-     tree-model="categories"
-     options="treeOptions"
-     order-by="label">
-      <a ng-if="node.hasOwnProperty('unit')" ng-href="#/group/{{node.id}}">
-        <span ng-if="node.type == 'PROCESS'">[P]</span><span ng-if="node.type == 'COEFFICIENT'">[C]</span> {{node.label}}
-      </a>
-      <span ng-if="!node.hasOwnProperty('unit')">{{node.label}}</span>
+  
+  <h2>Data</h2>
+    <p>You can access the data using the three following interfaces:</p>
+    <div class="row">
+    <div class="row">
+      <div class="col-sm-3 col-sm-offset-1">
+        <a href="#tree" class="thumbnail" style="font-size: 40px; text-align: center; text-decoration: none;"><i class="icon-flow-cascade" style="font-size: 120px;"></i><br>Tree</a>
+      </div>
+      <div class="col-sm-3">
+        <a href="#graph" class="thumbnail" style="font-size: 40px; text-align: center; text-decoration: none;"><i class="icon-share" style="font-size: 120px;"></i>Graph</a>
+      </div>
+      <div class="col-sm-3">
+        <a href="#references" class="thumbnail" style="font-size: 40px; text-align: center; text-decoration: none;"><i class="icon-book" style="font-size: 120px;"></i>References</a>
+      </div>
     </div>
-  </p>
+      <!-- <div class="col-sm-3 col-sm-offset-1">
+        <a href="#tree" class="thumbnail"><img src="assets/images/preview-tree.png" class="img-responsive img-thumbnail" style="opacity: 0.5;"><div style="position: absolute; top: 90px; left: 100px; font-weight: bold; font-size: 40px; color: #555;">Tree</div></a>
+        <i class="icon-share"></i>
+      </div>
+      <div class="col-sm-3">
+        <a href="#graph" class="thumbnail" style="height: 263px;"><img src="assets/images/preview-graph.png" class="img-responsive img-thumbnail"></a>
+      </div>
+      <div class="col-sm-3">
+        <a href="#references" class="thumbnail"><img src="assets/images/preview-references.png" class="img-responsive img-thumbnail"></a>
+      </div>
+    </div> -->
   <hr />
-  <p>
-    <h2>Process groups graph</h2>
-    <p>Tips: use your mousewheel to zoom in/out, click and move your cursor to pan, drag and drop a group to reorganize the graph, double-click on a group to unpin it.</p>
-    <div d3-force nodes="d3Nodes" links="d3Links" types="relationTypes" full-page="false"></div>
-  </p>
-  <hr />
+
+    <h2>What's new</h2>
+    <p>
+        Here is a log of main changes on functionalities and data.
+        For a fully detailed log, please consult the
+        <a href="https://github.com/myclabs/carbonontology" target="_blank">data</a>
+        and <a href="https://github.com/myclabs/carbondb" target="_blank">inference engine</a> open source projects on Github
+        (user interface application project is not open source at this stage).
+    </p>
+    <ul>
+        <li><strong>2014-10-28</strong> <strong>[Functionalities]</strong>
+            In the graph view arrows are now coloured, depending on the nature of the corresponding relation.</li>
+        <li><strong>2014-10-28</strong> <strong>[Data]</strong>
+            Primary energy extraction data added for upstream of fossil fuels (and as a consequence for any downstream
+            process). You can now view the amount of primary energy (either the total or only under the form of say
+            crude oil) extracted in order to produce 1 kg of yoghurt!</li>
+        <li><strong>2014-10-28</strong> <strong>[Data]</strong>
+            Refactoring of upstream and combustion of fuels. The model for upstream of fuel now takes into account
+            various steps (production and conditioning at source, transportation to market, refining near market).
+            Most of source data are now referenced. Much still remains to be done (fuel distribution, upstream of solid
+            fossil fuels, etc). Some <a href="https://github.com/myclabs/carbonontology/issues" target="_blank">issues
+            have been created on Github</a>.</li>
+        <li><strong>2014-10-21</strong> <strong>[Functionalities]</strong>
+            List of references.</li>
+        <li><strong>2014-10-15</strong> <strong>[Functionalities]</strong>
+            Members of a dimension can be ordered at hand (they are not necessarily displayed in alphabetical order).</li>
+        <li><strong>2014-10-15</strong> <strong>[Functionalities]</strong>
+            Tree and global graph on separate pages.</li>
+        <li><strong>2014-10-13</strong> <strong>[Functionalities]</strong>
+            Display of references.</li>
+        <li><strong>2014-10-09</strong> <strong>[Functionalities]</strong>
+            Addition of single process and single coefficient views.</li>
+        <li><strong>2014-10-09</strong> <strong>[Functionalities]</strong> Display of comments on groups.
+            At this stage few comments exist among the data, but you can find one for group
+            "Mass of agricultural input used for cultivation of a unit of area".</li>
+        <li><strong>2014-10-09</strong> <strong>[Functionalities]</strong>
+            Addition of pages "What's new" and "Known bugs".</li>
+        <li><strong>2014-10-07</strong> <strong>[Functionalities]</strong>
+            In the view on a group of processes, display of values ands units for various impacts and elementary flows
+            (instead of the single "100 years global warming potential GHG" impact that was displayed up to now).</li>
+        <li><strong>2014-09-30</strong> <strong>[Data]</strong>
+            Addition of air freight transport group and jet fuel combustion and upstream.</li>
+        <li><strong>2014-08-26</strong> <strong>Online application launched!</strong>
+            Embryonic data (categories, groups, relations, in order to display functionalities).
+            Tree of categories and graph of groups of processes available on home page.
+            View of a group of processes displays the the single "100 years global warming potential GHG" impact
+            and upstream and downstream relations.</li>
+    </ul>
+
+    <hr />
 </div>
