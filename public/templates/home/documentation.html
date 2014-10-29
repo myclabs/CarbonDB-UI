@@ -1,7 +1,13 @@
 <div class="container">
     <h1>Documentation</h1>
+    <ul>
+        <li><a href="" ng-click="scrollTo('about')">About</a></li>
+        <li><a href="" ng-click="scrollTo('help')">Help</a></li>
+        <li><a href="" ng-click="scrollTo('bugs')">Known bugs</a></li>
+    </ul>
 
     <!-- About -->
+    <a class="anchor" id="about"></a>
     <h2>About</h2>
     <p>
         CarbonDB is a <a href="http://en.wikipedia.org/wiki/Life-cycle_assessment" target="_blank">life cycle assessment</a>
@@ -52,14 +58,9 @@
         which makes the model easier to understand and maintain.
     </p>
     <hr />
-    <h3>Partners</h3>
-    <div class="row">
-        <div class="col-sm-2">
-            <a href="http://www.myc-sense.com/en" target="_blank"><img src="assets/images/myc-sense-logo.png" class="img-responsive" alt="My C-sense"></a>
-        </div>
-    </div>
 
     <!-- Help -->
+    <a class="anchor" id="help"></a>
     <h2>Help</h2>
     <p>CarbonDB is based on classical life cycle assessment concepts. The basic objects involved are <strong>processes</strong>, <strong>relations</strong>, <strong>coefficients</strong>, <strong>elementary flows</strong>, <strong>impacts</strong>. </p>
 
@@ -92,11 +93,11 @@
 
     <p>A <em>roadmap</em> displaying some forthcoming features is available <a href="https://github.com/myclabs/carbonontology/wiki/Front-end-application,-forthcoming-functionnalities">here</a>.</p>
 
-    <p>All the units used in CarbonDB are gathered from <a href="http://units.myc-sense.com" target="blank">My C-sense Units</a></p>
-
+    <p>The units used in CarbonDB can be found in the <a href="http://units.myc-sense.com/en" target="_blank">My C-sense Units application</a></p>
     <hr />
 
-    <!-- Known bugs --> 
+    <!-- Bugs -->
+    <a class="anchor" id="bugs"></a>
     <h2>Known bugs and main drawbacks</h2>
     Here are some known disturbing bugs and drawbacks, and, whenever possible, how to deal with them.
     <h3>Unsolved yet</h3>

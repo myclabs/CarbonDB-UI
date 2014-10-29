@@ -13,7 +13,8 @@ define(["angular", "./controllers", "common"], function(angular, controllers) {
       .when("/references",  {templateUrl: "/assets/templates/home/references.html", controller:controllers.ReferencesCtrl})
       .when("/upload",  {templateUrl: "/assets/templates/home/upload.html", controller:controllers.UploadCtrl})
       .when("/documentation",  {templateUrl: "/assets/templates/home/documentation.html", controller:controllers.DocumentationCtrl})
-      .when("/whats-new",  {templateUrl: "/assets/templates/home/whats-new.html", controller:controllers.WhatsNewCtrl})
+      .when("/partners",  {templateUrl: "/assets/templates/home/partners.html", controller:controllers.PartnersCtrl})
+      .when("/contribute",  {templateUrl: "/assets/templates/home/contribute.html", controller:controllers.ContributeCtrl})
       .when("/group/:type/:uri",
         {
           templateUrl: "/assets/templates/home/group.html",

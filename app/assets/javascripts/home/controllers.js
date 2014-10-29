@@ -85,19 +85,31 @@ define(["angular"], function(angular) {
   };
   ReferencesCtrl.$inject = ["$scope", "$rootScope", "$location", "$window", "playRoutes"];
 
-  var DocumentationCtrl = function($rootScope, $scope, $window, $location) {
+  var DocumentationCtrl = function($rootScope, $scope, $window, $location, $anchorScroll) {
     $rootScope.pageTitle = "CarbonDB: Documentation";
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
+    $scope.scrollTo = function(id) {
+      $location.hash(id);
+      console.log($location.hash());
+      $anchorScroll();
+    }
   };
-  DocumentationCtrl.$inject = ["$rootScope", "$scope", "$window", "$location"];
+  DocumentationCtrl.$inject = ["$rootScope", "$scope", "$window", "$location", "$anchorScroll"];
 
-  var WhatsNewCtrl = function($rootScope, $scope, $window, $location) {
-    $rootScope.pageTitle = "CarbonDB: What's new";
+  var PartnersCtrl = function($rootScope, $scope, $window, $location) {
+    $rootScope.pageTitle = "CarbonDB: Partners";
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
   };
-  WhatsNewCtrl.$inject = ["$rootScope", "$scope", "$window", "$location"];
+  PartnersCtrl.$inject = ["$rootScope", "$scope", "$window", "$location"];
+
+  var ContributeCtrl = function($rootScope, $scope, $window, $location) {
+    $rootScope.pageTitle = "CarbonDB: Contribute";
+    if ($location.host() != 'localhost')
+      $window.ga('send', 'pageview', { page: $location.path() });
+  };
+  PartnersCtrl.$inject = ["$rootScope", "$scope", "$window", "$location"];
 
   /** Controls the upload page */
   var UploadCtrl = function($scope, $rootScope, $location, helper, $http, $upload, $window, playRoutes) {
@@ -396,7 +408,8 @@ define(["angular"], function(angular) {
     CoefficientCtrl: CoefficientCtrl,
     UploadCtrl: UploadCtrl,
     DocumentationCtrl: DocumentationCtrl,
-    WhatsNewCtrl: WhatsNewCtrl
+    PartnersCtrl: PartnersCtrl,
+    ContributeCtrl: ContributeCtrl
   };
 
 });
