@@ -142,11 +142,26 @@ var zoom = d3.behavior.zoom()
           scope.$watch('nodes && links && types', function(newData, oldData, scope) {
             //console.log("listener for d3Force called with newData = " + newData + " scope.nodes = " + scope.nodes);
             scope.render(scope.nodes, scope.links, scope.types, scope.fullPage);
-          }, true);
+          }, false);
  
+          // ------
+          // Render
+          // ------
           scope.render = function(nodes, links, types, fullPage) {
-            // @todo get executed twice!
+            if (!nodes || !links || !types) {
+              return;
+            }
             svg.selectAll('*').remove();
+            /*links.forEach(function (o, i) {
+              var node = nodes[o.source];
+              if(!node.hasOwnProperty("out")) {
+                node.out = [];
+              }
+              node.out.push(o.target);
+            });
+            nodes.forEach(function (node) {
+              node.moved = false;
+            });*/
 
             svg.append("rect")
             .attr("width", 2300)
@@ -156,9 +171,6 @@ var zoom = d3.behavior.zoom()
             .attr("x", -575)
             .attr("y", -250);
  
-            if (!nodes || !links) {
-              return;
-            }
 
             var fill = d3.scale.category10();
             var numberOfTypes = 0;
@@ -185,9 +197,9 @@ var zoom = d3.behavior.zoom()
                 .links(links)
                 .size([width, height])
                 .on("tick", tick)
-              .linkDistance(200)
-              .charge(-200)
-              //.gravity(.20)
+              .linkDistance(50)
+              .charge(-800)
+              .gravity(.20)
                 .start();
 
         var drag = force.drag()
@@ -300,10 +312,10 @@ var zoom = d3.behavior.zoom()
             adaptNodeToBounds(node, bounds);
 
             d.extent = {
-                left   : bounds.x1 - 10, //margin.left,
-                right  : bounds.x2 + 20, //margin.left + margin.right,
-                top    : bounds.y1 - 10, //margin.top,
-                bottom : bounds.y2 + 20 //margin.top  + margin.bottom
+                left   : bounds.x1 - 5, //margin.left,
+                right  : bounds.x2 + 5, //margin.left + margin.right,
+                top    : bounds.y1 - 5, //margin.top,
+                bottom : bounds.y2 + 5 //margin.top  + margin.bottom
             };
 
             d.edge = {
@@ -344,11 +356,26 @@ var zoom = d3.behavior.zoom()
           .transition()
             .duration(1000)
             .style("opacity", 1);
-
+var numTicks = 0;
 function tick(e) {
-    //graph.numTicks++;
+    numTicks++;
 
     preventCollisions();
+    /*nodes.forEach(function(node) {
+      node.moved = false;
+    });
+    nodes.forEach(function(node) {
+      if (node.hasOwnProperty("out")) {
+        node.out.forEach(function(outNodeIndex) {
+          var outNode = nodes[outNodeIndex];
+          if ((node.x + 50) > outNode.x) {
+            node.x -= 500 * e.alpha;
+            outNode.x += 500 * e.alpha;
+            node.moved = true;
+          }
+        });
+      }
+    });*/
 
     link
       .attr('x1', function(d) {
