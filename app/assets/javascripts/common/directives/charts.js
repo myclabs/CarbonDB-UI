@@ -152,16 +152,17 @@ var zoom = d3.behavior.zoom()
               return;
             }
             svg.selectAll('*').remove();
-            /*links.forEach(function (o, i) {
-              var node = nodes[o.source];
-              if(!node.hasOwnProperty("out")) {
-                node.out = [];
-              }
-              node.out.push(o.target);
-            });
             nodes.forEach(function (node) {
               node.moved = false;
-            });*/
+              node.out = [];
+              node.inc = [];
+            });
+            links.forEach(function (o, i) {
+              var node = nodes[o.source];
+              var outNode = nodes[o.target];
+              node.out.push(o.target);
+              outNode.inc.push(o.source);
+            });
 
             svg.append("rect")
             .attr("width", 2300)
@@ -312,10 +313,10 @@ var zoom = d3.behavior.zoom()
             adaptNodeToBounds(node, bounds);
 
             d.extent = {
-                left   : bounds.x1 - 5, //margin.left,
-                right  : bounds.x2 + 5, //margin.left + margin.right,
-                top    : bounds.y1 - 5, //margin.top,
-                bottom : bounds.y2 + 5 //margin.top  + margin.bottom
+                left   : bounds.x1 - 10, //margin.left,
+                right  : bounds.x2 + 10, //margin.left + margin.right,
+                top    : bounds.y1 - 10, //margin.top,
+                bottom : bounds.y2 + 10 //margin.top  + margin.bottom
             };
 
             d.edge = {
@@ -376,6 +377,19 @@ function tick(e) {
         });
       }
     });*/
+
+    /*nodes.forEach(function (node, i) {
+      var dx = Math.abs(1000 - node.x);
+      if (i % 2 == 0) node.x -= 100 * e.alpha;
+      else node.x += 100 * e.alpha;
+    });*/
+
+    nodes.forEach(function (node, i) {
+      if (node.inc.length == 0 && node.out.length > 0)
+        node.x -= 200 * e.alpha;
+      else if (node.out.length == 0 && node.inc.length > 0)
+        node.x += 200 * e.alpha;
+    });
 
     link
       .attr('x1', function(d) {
