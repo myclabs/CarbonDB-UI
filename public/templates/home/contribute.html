@@ -16,24 +16,25 @@
         <li><a href="https://github.com/myclabs/carbonontology/pulls" target="_blank">Submit an improved version of the ontology</a>.</li>
     </ol>
     <p>
-        The two first ways are rather simple, you will just need an account on Github, a leading platform
-        of code hosting.
+        The first two ways are rather simple, you will just need an account on Github (leading platform
+        of code hosting).
     </p>
     <p>
         In order to contribute the third way you will have to directly edit the CarbonDB source data.
-        Those take the form of domain
+        Those take the form of a domain
         <a href="http://en.wikipedia.org/wiki/Ontology_(information_science)" target="_blank">ontology</a>
         expressed in the universal
         <a href="http://en.wikipedia.org/wiki/Resource_Description_Framework" target="_blank">Ressource Description
             Framework</a> (RDF) language (a refinement of
         <a href="http://en.wikipedia.org/wiki/XML" target="_blank">XML</a> specified by
-        <a href="http://www.w3.org/" target="_blank">World Wide Web Consortium</a>). They are contained in a single file.
+        <a href="http://www.w3.org/" target="_blank">World Wide Web Consortium</a>).
     </p>
     <p>
         These source data can be
         <a href="https://github.com/myclabs/carbonontology/blob/master/carbondb.rdf" target="_blank">viewed online</a>
         and downloaded from the
         <a href="https://github.com/myclabs/carbonontology" target="_blank">project repository on Github</a>.
+        They are contained in a single file: "carbondb.rdf".
     </p>
     <p>
         Once you have downloaded the source data file, you will be able to edit them with any ontology editor,
@@ -45,7 +46,7 @@
 
     <h2>Contribute to the code</h2>
     <p>
-        Underlying code is made of two layers: an inference engine and a front-end web application.
+        Underlying code is made of two layers: an inference engine ("reasoner") and a front-end web application.
         Only the inference engine is open-source at this stage. Its main role is to compute secondary data
         (in particular elementary flows of almost all processes) from source data (coefficients).
     </p>
