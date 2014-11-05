@@ -175,6 +175,15 @@ define(["angular"], function(angular) {
       $scope.dimensionsNumber = data.dimensions.length;
       $scope.elementsNumber = data.elementsNumber;
       $scope.sourceRelations = data.sourceRelations;
+      $scope.sourceRelations.sort(function(a, b) {
+        if (a.source.uri == $scope.URI && b.source.uri != $scope.URI) {
+          return -1;
+        }
+        else if (a.destination.uri == $scope.URI && b.destination.uri != $scope.URI) {
+          return 1;
+        }
+        return 0;
+      });
       $scope.unit = data.unit;
       $scope.references = data.references.sort(sortReferencesCompare);
       $scope.baseUnit = data.unit;
@@ -275,6 +284,15 @@ define(["angular"], function(angular) {
       $scope.groups = data.groups;
       $scope.keywords = data.keywords.keywords.sort(sortKeywordsCompare);
       $scope.relations = data.relations;
+      $scope.relations.sort(function(a, b) {
+        if (a.originId == $scope.id && b.originId != $scope.id) {
+          return -1;
+        }
+        else if (a.destId == $scope.id && b.destId != $scope.id) {
+          return 1;
+        }
+        return 0;
+      });
       var types = [$scope.impactTypes, $scope.flowTypes];
       var processData = [data.impacts, data.flows];
       for (var t = 0; t < 2; t++) {
