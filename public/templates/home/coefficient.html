@@ -20,18 +20,18 @@
   		<tr ng-repeat="relation in relations">
   			<td ng-if="relation.originId != id">
           <a ng-href="#/process/{{relation.originId}}">
-            <span ng-repeat="keyword in relation.originKeywords.keywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
+            {{relation.originLabel}}
             <small>[{{relation.originUnit}}]</small>
           </a>
         </td>
         <td>
-          <span ng-repeat="keyword in relation.coeffKeywords.keywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
+          {{relation.coeffLabel}}
           <small>[{{relation.coeffUnit}}]</small>
           <sup ng-if="relation.exponent == -1">-1</sup>
         </td>
         <td ng-if="relation.destId != id">
           <a ng-href="#/process/{{relation.destId}}">
-            <span ng-repeat="keyword in relation.destKeywords.keywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
+            {{relation.destLabel}}
             <small>[{{relation.destUnit}}]</small>
           </a>
         </td>

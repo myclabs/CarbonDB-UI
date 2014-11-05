@@ -182,6 +182,26 @@ define(["angular"], function(angular) {
         else if (a.destination.uri == $scope.URI && b.destination.uri != $scope.URI) {
           return 1;
         }
+        else if (data.type == 'COEFFICIENT') {
+          if (a.source.label < b.source.label) {
+            return -1;
+          }
+          else if (a.source.label > b.source.label) {
+            return 1;
+          }
+          else if (a.destination.label < b.destination.label) {
+            return -1;
+          }
+          else if (a.destination.label > b.destination.label) {
+            return 1;
+          }
+        }
+        else if (a.coeff.label < b.coeff.label) {
+          return -1;
+        }
+        else if (a.coeff.label > b.coeff.label) {
+          return 1;
+        }
         return 0;
       });
       $scope.unit = data.unit;
@@ -284,11 +304,22 @@ define(["angular"], function(angular) {
       $scope.groups = data.groups;
       $scope.keywords = data.keywords.keywords.sort(sortKeywordsCompare);
       $scope.relations = data.relations;
+      $scope.relations.forEach(function(r) {
+        r.originLabel = r.originKeywords.keywords.map(function(k) { return k.label; }).join(' - ');
+        r.coeffLabel = r.coeffKeywords.keywords.map(function(k) { return k.label; }).join(' - ');
+        r.destLabel = r.destKeywords.keywords.map(function(k) { return k.label; }).join(' - ');
+      });
       $scope.relations.sort(function(a, b) {
         if (a.originId == $scope.id && b.originId != $scope.id) {
           return -1;
         }
         else if (a.destId == $scope.id && b.destId != $scope.id) {
+          return 1;
+        }
+        else if (a.coeffLabel < b.coeffLabel) {
+          return -1;
+        }
+        else if (a.coeffLabel > b.coeffLabel) {
           return 1;
         }
         return 0;
@@ -333,6 +364,26 @@ define(["angular"], function(angular) {
       $scope.groups = data.groups;
       $scope.keywords = data.keywords.keywords.sort(sortKeywordsCompare);
       $scope.relations = data.relations;
+      $scope.relations.forEach(function(r) {
+        r.originLabel = r.originKeywords.keywords.map(function(k) { return k.label; }).join(' - ');
+        r.coeffLabel = r.coeffKeywords.keywords.map(function(k) { return k.label; }).join(' - ');
+        r.destLabel = r.destKeywords.keywords.map(function(k) { return k.label; }).join(' - ');
+      });
+      $scope.relations.sort(function(a, b) {
+        if (a.originLabel < b.originLabel) {
+          return -1;
+        }
+        else if (a.originLabel > b.originLabel) {
+          return 1;
+        }
+        else if (a.destLabel < b.destLabel) {
+          return -1
+        }
+        else if (a.destLabel > b.destLabel) {
+          return 1;
+        }
+        return 0;
+      });
     });
 
   };
