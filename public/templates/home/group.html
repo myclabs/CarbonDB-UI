@@ -55,6 +55,15 @@
   			<td ng-if="sourceRelation.destination.uri == URI">{{sourceRelation.destination.label}}</td>
   	 	</tr>
   	</table>
+
+    <div ng-if="overlap.length > 0">
+      <h2>Groups sharing common elements</h2>
+      <ul>
+        <li ng-repeat="group in overlap">
+          <a ng-href="#/group/{{group.id}}">{{group.label}}</a>
+        </li>
+      </ul>
+    </div>
   <hr />
 </div>
 

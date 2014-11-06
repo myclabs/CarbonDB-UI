@@ -211,6 +211,10 @@ define(["angular"], function(angular) {
       $scope.elementsImpactsAndFlows = data.elementsImpactsAndFlows;
       $scope.type = data.type;
       $scope.elementsURI = data.elementsURI;
+      $scope.overlap = [];
+      angular.forEach(data.overlap, function(value, key) {
+        this.push({"id": key, "label": value});
+      }, $scope.overlap);
       if (data.comment) {
         $scope.comment = data.comment.replace(/\n/g, "<br>");
       }

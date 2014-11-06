@@ -77,6 +77,7 @@ public class Onto extends Controller {
     protected static HashMap<String, HashMap<String, Object>> coefficients = new HashMap<>();
     protected static HashMap<String, Reference> references = new HashMap<>();
     protected static HashMap<String, ArrayList<HashMap<String, String>>> referencesGroups = new HashMap<>();
+    protected static HashMap<String, HashMap<String, String>> groupOverlap = new HashMap<>();
 
     protected static MongoClient mongoClient;
 
@@ -211,10 +212,20 @@ public class Onto extends Controller {
 
         DBCollection groupsColl = db.getCollection("groups");
         groupsColl.drop();
+        HashMap<String, HashMap<String, Object>> groups = new HashMap<>();
 
         for (Group group: RepoFactory.getGroupRepo().getGroups()) {
-            dbObject = (BasicDBObject) JSON.parse(getGroupAsJSON(group, model));
-            dbObject.append("_id", group.getURI());
+            groups.put(group.getId(), getGroup(group, model));
+        }
+
+        computeGoupsOverlap();
+
+        for (Entry<String, HashMap<String, Object>> entry : groups.entrySet()) {
+            String groupId = entry.getKey();
+            HashMap<String, Object> groupInfos = entry.getValue();
+            groupInfos.put("overlap", groupOverlap.get(groupId));
+            dbObject = (BasicDBObject) JSON.parse(toJson(groupInfos).toString());
+            dbObject.append("_id", groupId);
             groupsColl.insert(dbObject);
         }
 
@@ -234,8 +245,8 @@ public class Onto extends Controller {
 
         for(Entry<String, HashMap<String, Object>> entry : coefficients.entrySet()) {
             String uri = entry.getKey();
-            HashMap process = entry.getValue();
-            dbObject = (BasicDBObject) JSON.parse(toJson(process).toString());
+            HashMap coefficient = entry.getValue();
+            dbObject = (BasicDBObject) JSON.parse(toJson(coefficient).toString());
             dbObject.append("_id", mongonize(uri));
             coefficientsColl.insert(dbObject);
         }
@@ -291,7 +302,27 @@ public class Onto extends Controller {
         mongoClose();
     }
 
-    protected static String getGroupAsJSON(Group group, Model model) throws Exception  {
+    protected static void computeGoupsOverlap() {
+        for(Entry<String, HashMap<String, Object>> entry : processes.entrySet()) {
+            String processURI = entry.getKey();
+            HashMap<String, Object> process = entry.getValue();
+            for(Entry<String, Object> subEntry : ((HashMap<String, Object>)process.get("groups")).entrySet()) {
+                String groupId = subEntry.getKey();
+                if (!groupOverlap.containsKey(groupId)) {
+                    groupOverlap.put(groupId, new HashMap<String, String>());
+                }
+                for(Entry<String, Object> subEntry2 : ((HashMap<String, Object>)process.get("groups")).entrySet()) {
+                    String groupId2 = subEntry2.getKey();
+                    String group2Label = (String) subEntry2.getValue();
+                    if (groupId2 != groupId && !groupOverlap.get(groupId).containsKey(groupId2)) {
+                        groupOverlap.get(groupId).put(groupId2, group2Label);
+                    }
+                }
+            }
+        }
+    }
+
+    protected static HashMap<String, Object> getGroup(Group group, Model model) throws Exception  {
         HashMap<String, Object> output = new HashMap<String, Object>();
 
         boolean isProcessGroup = false;
@@ -392,6 +423,7 @@ public class Onto extends Controller {
             referencesGroups.get(mongonize(reference.getURI())).add(groupInfosForRef);
         }
         output.put("URI", group.getURI());
+        output.put("id", group.getId());
         output.put("label", group.getLabel());
         output.put("comment", group.getComment());
         output.put("references", group.getReferences());
@@ -411,7 +443,7 @@ public class Onto extends Controller {
             output.put("elementsValue", elementsValue);
         }
 
-        return toJson(output).toString();
+        return output;
     }
 
     protected static HashMap<String, Value> transformValueHashMapURIKeys(HashMap<String, Value> input) {
@@ -573,7 +605,7 @@ public class Onto extends Controller {
         try {
             DB db = mongoConnect();
             DBCollection groupsColl = db.getCollection("groups");
-            BasicDBObject query = new BasicDBObject("_id", Datatype.getURI() + groupId);
+            BasicDBObject query = new BasicDBObject("_id", groupId);
             String response = groupsColl.findOne(query).toString();
             mongoClose();
             return ok(response);
