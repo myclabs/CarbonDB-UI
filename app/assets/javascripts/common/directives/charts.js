@@ -385,10 +385,12 @@ function tick(e) {
     });*/
 
     nodes.forEach(function (node, i) {
-      if (node.inc.length == 0 && node.out.length > 0)
-        node.x -= 200 * e.alpha;
-      else if (node.out.length == 0 && node.inc.length > 0)
-        node.x += 200 * e.alpha;
+      if (!node.fixed) {
+        if (node.inc.length == 0 && node.out.length > 0)
+          node.x -= 200 * e.alpha;
+        else if (node.out.length == 0 && node.inc.length > 0)
+          node.x += 200 * e.alpha;
+      }
     });
 
     link
