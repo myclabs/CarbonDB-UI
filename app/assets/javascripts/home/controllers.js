@@ -177,10 +177,10 @@ define(["angular"], function(angular) {
       $scope.sourceRelations = data.sourceRelations;
       $scope.sourceRelations.sort(function(a, b) {
         if (a.source.uri == $scope.URI && b.source.uri != $scope.URI) {
-          return -1;
+          return 1;
         }
         else if (a.destination.uri == $scope.URI && b.destination.uri != $scope.URI) {
-          return 1;
+          return -1;
         }
         else if (data.type == 'COEFFICIENT') {
           if (a.source.label < b.source.label) {
@@ -311,10 +311,10 @@ define(["angular"], function(angular) {
       });
       $scope.relations.sort(function(a, b) {
         if (a.originId == $scope.id && b.originId != $scope.id) {
-          return -1;
+          return 1;
         }
         else if (a.destId == $scope.id && b.destId != $scope.id) {
-          return 1;
+          return -1;
         }
         else if (a.coeffLabel < b.coeffLabel) {
           return -1;
