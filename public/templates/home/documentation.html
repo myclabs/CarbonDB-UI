@@ -3,8 +3,9 @@
     <ul>
         <li><a href="" ng-click="scrollTo('about')">About</a></li>
         <li><a href="" ng-click="scrollTo('help')">Help</a></li>
+        <li><a href="" ng-click="scrollTo('versions')">Source data versions</a></li>
         <li><a href="" ng-click="scrollTo('forthcoming')">Forthcoming functionalities</a></li>
-        <li><a href="" ng-click="scrollTo('bugs')">Known bugs</a></li>
+        <li><a href="" ng-click="scrollTo('bugs')">Known bugs / drawbacks</a></li>
         <li><a href="" ng-click="scrollTo('licences')">Licences</a></li>
         <li><a href="" ng-click="scrollTo('logo')">Logo</a></li>
     </ul>
@@ -134,10 +135,27 @@
 
     <hr />
 
+    <!-- Source data versions -->
+
+    <a class="anchor" id="versions"></a>
+    <h2>Source data versions</h2>
+    <p>
+        <strong><a href="https://github.com/myclabs/CarbonDB-ontology/releases/tag/v0.2.0" target="_blank">Last stable version of source data:
+        v0.2.0</a></strong>.
+    </p>
+    <p>
+        To view all source data versions (releases) and accompanying comments please follow
+        <a href="https://github.com/myclabs/CarbonDB-ontology/releases/" target="_blank">this link</a>.
+    </p>
+    <p>
+        Releases before v0.2.0 are not compatible any more with reasoner and front-end application codes.
+    </p>
+    <hr />
+
     <!-- Forthcoming functionalities -->
     <a class="anchor" id="forthcoming"></a>
     <h2>Forthcoming functionalities</h2>
-    <p>Ordered next first:</p>
+    <p>By order of release:</p>
     <ul>
         <li>Ability to consult two versions of the data, labelled as: "Last stable" and "In progress".</li>
         <li>In the page of a single process or a group of processes, view of the local dependency graph
