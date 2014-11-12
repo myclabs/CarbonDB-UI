@@ -338,13 +338,13 @@ public class Onto extends Controller {
         HashMap<String, String> elementsURI = new HashMap<>();
         HashMap<String, String> groupInfosForRef = new HashMap<>();
 
-        String unitLabel = unitsRepo.getUnitSymbol(group.getUnit());
+        String unitLabel = unitsRepo.getUnitSymbol(group.getUnit().getSymbol());
 
         for (Dimension element: group.elements.dimensions) {
             Resource elementResource;
             try {
                 if (isProcessGroup) {
-                    elementResource = RepoFactory.getSingleElementRepo().getProcessForDimension(element, group.getUnitURI());
+                    elementResource = RepoFactory.getSingleElementRepo().getProcessForDimension(element, group.getUnit().getURI());
                     elementImpactsAndFlows = new HashMap();
                     elementImpactsAndFlows.putAll(transformValueHashMapURIKeys(RepoFactory.getSingleElementRepo().getCalculatedEmissionsForProcess(elementResource)));
                     elementImpactsAndFlows.putAll(transformValueHashMapURIKeys(RepoFactory.getSingleElementRepo().getImpactsForProcess(elementResource)));
@@ -369,7 +369,7 @@ public class Onto extends Controller {
                     ((HashMap)processInfos.get("groups")).put(mongonize(group.getId()), group.getLabel());
                 }
                 else {
-                    elementResource = RepoFactory.getSingleElementRepo().getCoefficientForDimension(element, group.getUnitURI());
+                    elementResource = RepoFactory.getSingleElementRepo().getCoefficientForDimension(element, group.getUnit().getURI());
                     if (elementResource.hasProperty(Datatype.value) && null != elementResource.getProperty(Datatype.value)) {
                         Value value = new Value(
                             elementResource.getProperty(Datatype.value).getDouble(),
@@ -566,8 +566,8 @@ public class Onto extends Controller {
     protected static void initUnitsRepo() {
         if (null == unitsRepo) {
             unitsRepo = new UnitsRepoWebService();
-            //((UnitsRepoWebService) unitsRepo).setUnitsAPIURI("http://localhost/units/api");
-            ((UnitsRepoWebService) unitsRepo).setUnitsAPIURI("http://units.myc-sense.com/api");
+            ((UnitsRepoWebService) unitsRepo).setUnitsAPIURI("http://localhost/units/api");
+            //((UnitsRepoWebService) unitsRepo).setUnitsAPIURI("http://units.myc-sense.com/api");
             if (null != Cache.get("conversionFactors")) {
                 ((UnitsRepoCache)unitsRepo).setConversionFactorsCache((HashMap)Cache.get("conversionFactors"));
             }
@@ -672,6 +672,10 @@ public class Onto extends Controller {
                 relation.put("destId", dest.getURI().replace(Datatype.getURI(), ""));
                 relation.put("destKeywords", destKeywords);
                 relation.put("destUnit", unitsRepo.getUnitSymbol(RepoFactory.getSingleElementRepo().getUnit(dest)));
+
+                Resource sourceRelationResource = relationResource.getProperty(Datatype.isDerivedFrom).getResource();
+                SourceRelation sourceRelation = RepoFactory.getRelationRepo().getSourceRelation(sourceRelationResource);
+                relation.put("sourceRelation", sourceRelation);
 
                 if (relationResource.hasProperty(Datatype.exponent) && null != relationResource.getProperty(Datatype.exponent)) {
                     relation.put("exponent", relationResource.getProperty(Datatype.exponent).getDouble());

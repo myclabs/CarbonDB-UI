@@ -45,15 +45,54 @@
   			<th>Upsteam</th>
   			<th>Coefficient</th>
   			<th>Downstream</th>
+        <th></th>
   		</tr>
-  		<tr ng-repeat="sourceRelation in sourceRelations">
+  		<tr ng-repeat-start="sourceRelation in sourceRelations">
   			<td ng-if="sourceRelation.source.uri != URI"><a ng-href="#/group/{{sourceRelation.source.id}}">{{sourceRelation.source.label}}</a></td>
   			<td ng-if="sourceRelation.source.uri == URI">{{sourceRelation.source.label}}</td>
   			<td ng-if="sourceRelation.coeff.uri != URI"><a ng-href="#/group/{{sourceRelation.coeff.id}}">{{sourceRelation.coeff.label}} <sup ng-if="sourceRelation.exponent == -1">-1</sup></a></td>
   			<td ng-if="sourceRelation.coeff.uri == URI">{{sourceRelation.coeff.label}} <sup ng-if="sourceRelation.exponent == -1">-1</sup></td>
   			<td ng-if="sourceRelation.destination.uri != URI"><a ng-href="#/group/{{sourceRelation.destination.id}}">{{sourceRelation.destination.label}}</a></td>
   			<td ng-if="sourceRelation.destination.uri == URI">{{sourceRelation.destination.label}}</td>
+        <td><a data-toggle="collapse" data-target="#infos-{{$index}}" style="cursor: pointer;">Infos</a></td>
   	 	</tr>
+      <tr ng-repeat-end>
+        <td colspan="4" class="td-collapse">
+          <div class="collapse out" id="infos-{{$index}}">
+            <p>Relation type: {{sourceRelation.type.label}}</p>
+            <strong>Derived relations:</strong>
+            <div ng-if="sourceRelation.derivedRelations.length == 0">This source relation has no derived relation.</div>
+            <table class="table tmd table-nonfluid" ng-if="sourceRelation.derivedRelations.length > 0">
+              <tr>
+                <th>Upsteam</th>
+                <th>Coefficient</th>
+                <th>Downstream</th>
+              </tr>
+              <tr ng-repeat="relation in sourceRelation.derivedRelations">
+                <td>
+                  <a ng-href="#/process/{{relation.sourceURI.replace('http://www.myc-sense.com/ontologies/bc#', '')}}">
+                    {{relation.sourceLabel}}
+                    <small>[{{relation.sourceUnit.symbol}}]</small>
+                  </a>
+                </td>
+                <td>
+                  <a ng-href="#/coefficient/{{relation.coeffURI.replace('http://www.myc-sense.com/ontologies/bc#', '')}}">
+                    {{relation.coeffLabel}}
+                    <small>[{{relation.coeffUnit.symbol}}]</small>
+                    <sup ng-if="relation.exponent == -1">-1</sup>
+                  </a>
+                </td>
+                <td>
+                  <a ng-href="#/process/{{relation.destinationURI.replace('http://www.myc-sense.com/ontologies/bc#', '')}}">
+                    {{relation.destinationLabel}}
+                    <small>[{{relation.destinationUnit.symbol}}]</small>
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
   	</table>
 
     <div ng-if="overlap.length > 0">

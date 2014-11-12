@@ -52,8 +52,9 @@
   			<th>Upsteam</th>
   			<th>Coefficient</th>
   			<th>Downstream</th>
+        <th></th>
   		</tr>
-  		<tr ng-repeat="relation in relations">
+  		<tr ng-repeat-start="relation in relations">
   			<td ng-if="relation.originId != id">
           <a ng-href="#/process/{{relation.originId}}">
             {{relation.originLabel}}
@@ -81,7 +82,28 @@
           {{relation.destLabel}}
           <small>[{{relation.destUnit}}]</small>
         </td>
+        <td><a data-toggle="collapse" data-target="#infos-{{$index}}" style="cursor: pointer;">Infos</a></td>
   	 	</tr>
+      <tr ng-repeat-end>
+        <td colspan="4" class="td-collapse">
+          <div class="collapse out" id="infos-{{$index}}">
+            <p>Relation type: {{relation.sourceRelation.type.label}}</p>
+            <strong>Derived from:</strong>
+            <table class="table tmd table-nonfluid">
+              <tr>
+                <th>Upsteam</th>
+                <th>Coefficient</th>
+                <th>Downstream</th>
+              </tr>
+              <tr>
+                <td><a ng-href="#/group/{{relation.sourceRelation.source.id}}">{{relation.sourceRelation.source.label}}</a></td>
+                <td><a ng-href="#/group/{{relation.sourceRelation.coeff.id}}">{{relation.sourceRelation.coeff.label}} <sup ng-if="relation.sourceRelation.exponent == -1">-1</sup></a></td>
+                <td><a ng-href="#/group/{{relation.sourceRelation.destination.id}}">{{relation.sourceRelation.destination.label}}</a></td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
   	</table>
   <hr />
 </div>

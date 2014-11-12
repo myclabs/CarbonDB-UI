@@ -204,6 +204,13 @@ define(["angular"], function(angular) {
         }
         return 0;
       });
+      $scope.sourceRelations.forEach(function(s) {
+        s.derivedRelations.forEach(function(d) {
+          d.sourceLabel = d.source.keywords.map(function(k) { return k.label; }).join(' - ');
+          d.coeffLabel = d.coeff.keywords.map(function(k) { return k.label; }).join(' - ');
+          d.destinationLabel = d.destination.keywords.map(function(k) { return k.label; }).join(' - ');
+        });
+      });
       $scope.unit = data.unit;
       $scope.references = data.references.sort(sortReferencesCompare);
       $scope.baseUnit = data.unit;
