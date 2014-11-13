@@ -157,10 +157,37 @@ public class Onto extends Controller {
         //return ok("File uploaded");
     }
 
+    protected static Model getInferredModel() {
+        Model model = ModelFactory.createDefaultModel( );
+        System.out.println("model size after init = " + model.size());
+
+        InputStream in = FileManager.get().open(baseOntoFileName);
+        if (in == null) {
+            throw new IllegalArgumentException("File not found");
+        }
+
+        model.read( in, null );
+        System.out.println("model size after reading = " + model.size());
+
+        Logger.getLogger("").setLevel(Level.WARNING);
+
+        Reasoner reasoner = new Reasoner(model, unitsRepo);
+        reasoner.run();
+        System.out.println("model size after reasoning = " + model.size());
+        report = reasoner.report;
+        return reasoner.getInfModel();
+    }
+
     protected static void feedMongoDB(Model model) throws Exception {
         nodesLabel.clear();
         nodesURI.clear();
         nodesId.clear();
+        links.clear();
+        processes.clear();
+        coefficients.clear();
+        references.clear();
+        referencesGroups.clear();
+        groupOverlap.clear();
 
         BasicDBObject dbObject;
 
@@ -578,27 +605,6 @@ public class Onto extends Controller {
                 ((UnitsRepoCache)unitsRepo).setCompatibleUnitsCache((HashMap)Cache.get("compatibleUnits"));
             }
         }
-    }
-
-    protected static Model getInferredModel() {
-        Model model = ModelFactory.createDefaultModel( );
-        System.out.println("model size after init = " + model.size());
-
-        InputStream in = FileManager.get().open(baseOntoFileName);
-        if (in == null) {
-            throw new IllegalArgumentException("File not found");
-        }
-
-        model.read( in, null );
-        System.out.println("model size after reading = " + model.size());
-
-        Logger.getLogger("").setLevel(Level.WARNING);
-
-        Reasoner reasoner = new Reasoner(model, unitsRepo);
-        reasoner.run();
-        System.out.println("model size after reasoning = " + model.size());
-        report = reasoner.report;
-        return reasoner.getInfModel();
     }
 
     public static Result getGroup(String groupId) {
