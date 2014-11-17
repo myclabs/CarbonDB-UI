@@ -90,14 +90,17 @@ public class Onto extends Controller {
         public Link(int source, int target) { this.source = source; this.target = target; }
     }
 
-    public static Result upload() throws Exception {
+    public static Result upload(String database) throws Exception {
         System.out.println("----------------");
         System.out.println("begin processing");
         initUnitsRepo();
         MultipartFormData body = request().body().asMultipartFormData();
         FilePart filePart = body.getFile("file");
         ObjectNode result = Json.newObject();
-        if (filePart != null) {
+        if (!database.equals("latest") && !database.equals("wip")) {
+            return badRequest("Invalid slot name");
+        }
+        else if (filePart != null) {
             String fileName = filePart.getFilename();
             String contentType = filePart.getContentType(); 
             File file = filePart.getFile();
@@ -121,7 +124,7 @@ public class Onto extends Controller {
                     Cache.set("unitSymbols", ((UnitsRepoCache)unitsRepo).getSymbolsCache());
                     Model model = getInferredModel();
                     System.out.println("feeding MongoDB");
-                    feedMongoDB(model);
+                    feedMongoDB(model, database);
                 }
                 catch (Exception e) {
                     //throw e;
@@ -141,14 +144,12 @@ public class Onto extends Controller {
                 return ok(result);
             }
             catch (Exception e) {
-                throw e;
-                //result.put("result", e.toString());
-                //return ok(result);
+                e.printStackTrace(System.out);
+                return badRequest(e.toString());
             }
         }
         else {
-            result.put("result", "File missing");
-            return ok(result);
+            return badRequest("File missing");
         }
 
 
@@ -178,7 +179,7 @@ public class Onto extends Controller {
         return reasoner.getInfModel();
     }
 
-    protected static void feedMongoDB(Model model) throws Exception {
+    protected static void feedMongoDB(Model model, String database) throws Exception {
         nodesLabel.clear();
         nodesURI.clear();
         nodesId.clear();
@@ -191,7 +192,7 @@ public class Onto extends Controller {
 
         BasicDBObject dbObject;
 
-        DB db = mongoConnect();
+        DB db = mongoConnect(database);
 
         DBCollection categoriesColl = db.getCollection("categories");
         categoriesColl.drop();
@@ -488,8 +489,12 @@ public class Onto extends Controller {
     }
 
     protected static DB mongoConnect() throws Exception {
+        return mongoConnect( "carbondb" );
+    }
+
+    protected static DB mongoConnect(String database) throws Exception {
         mongoClient = new MongoClient( "localhost" , 27017 );
-        DB db = mongoClient.getDB( "carbondb" );
+        DB db = mongoClient.getDB( database );
         return db;
     }
 
@@ -497,10 +502,40 @@ public class Onto extends Controller {
         mongoClient.close();
     }
 
-    public static Result getCategories() {
+    public static Result getDatabaseInfos(String database) {
         authorizeCrossRequests();
         try {
-            DB db = mongoConnect();
+            DB db = mongoConnect(database);
+            DBCollection databaseInfosColl = db.getCollection("databaseInfos");
+            String response = databaseInfosColl.findOne().toString();
+            mongoClose();
+            return ok(response);
+        }
+        catch (Exception e) {
+            return ok(e.getMessage());
+        }
+    }
+
+    protected static String getActiveDatabase() {
+        String database = session("database");
+        if(database == null) {
+            session("database", "latest");
+        }
+        return database;
+    }
+
+    public static Result setActiveDatabase(String database) {
+        if (database != "latest" || database != "upload") {
+            return badRequest("Invalid database");
+        }
+        session("database", database);
+        return ok("Active database changed");
+    }
+
+    public static Result getCategories(String database) {
+        authorizeCrossRequests();
+        try {
+            DB db = mongoConnect(database);
             DBCollection categoriesColl = db.getCollection("categories");
             String response = categoriesColl.findOne().toString();
             mongoClose();
@@ -511,10 +546,10 @@ public class Onto extends Controller {
         }
     }
 
-    public static Result getReferences() {
+    public static Result getReferences(String database) {
         authorizeCrossRequests();
         try {
-            DB db = mongoConnect();
+            DB db = mongoConnect(database);
             DBCollection categoriesColl = db.getCollection("references");
             String response = categoriesColl.findOne().toString();
             mongoClose();
@@ -525,13 +560,16 @@ public class Onto extends Controller {
         }
     }
 
-    public static Result getGraph() {
+    public static Result getGraph(String database) {
         authorizeCrossRequests();
         try {
-            DB db = mongoConnect();
+            System.out.println("connecting to database " + database);
+            DB db = mongoConnect(database);
             DBCollection graphColl = db.getCollection("graph");
             String response = graphColl.findOne().toString();
             mongoClose();
+            System.out.println("sending response ...");
+            System.out.println(response);
             return ok(response);
         }
         catch (Exception e) {
@@ -539,10 +577,10 @@ public class Onto extends Controller {
         }
     }
 
-    public static Result getImpactAndFlowTypesPlain() {
+    public static Result getImpactAndFlowTypesPlain(String database) {
         authorizeCrossRequests();
         try {
-            DB db = mongoConnect();
+            DB db = mongoConnect(database);
             DBCollection impactAndFlowTypesColl = db.getCollection("impactAndFlowTypes");
             String response = impactAndFlowTypesColl.findOne().toString();
             mongoClose();
@@ -553,10 +591,10 @@ public class Onto extends Controller {
         }
     }
 
-    public static Result getImpactAndFlowTypes() {
+    public static Result getImpactAndFlowTypes(String database) {
         authorizeCrossRequests();
         try {
-            DB db = mongoConnect();
+            DB db = mongoConnect(database);
             DBCollection impactAndFlowTypesTreeColl = db.getCollection("impactAndFlowTypesTree");
             String responseTree = impactAndFlowTypesTreeColl.findOne().toString();
             DBCollection impactAndFlowTypesColl = db.getCollection("impactAndFlowTypes");
@@ -569,10 +607,10 @@ public class Onto extends Controller {
         }
     }
 
-    public static Result getLastReport() {
+    public static Result getLastReport(String database) {
         authorizeCrossRequests();
         try {
-            DB db = mongoConnect();
+            DB db = mongoConnect(database);
             DBCollection reportColl = db.getCollection("report");
             String response = reportColl.findOne().toString();
             mongoClose();
@@ -607,9 +645,9 @@ public class Onto extends Controller {
         }
     }
 
-    public static Result getGroup(String groupId) {
+    public static Result getGroup(String database, String groupId) {
         try {
-            DB db = mongoConnect();
+            DB db = mongoConnect(database);
             DBCollection groupsColl = db.getCollection("groups");
             BasicDBObject query = new BasicDBObject("_id", groupId);
             String response = groupsColl.findOne(query).toString();
@@ -621,9 +659,9 @@ public class Onto extends Controller {
         }
     }
 
-    public static Result getProcess(String processURI) {
+    public static Result getProcess(String database, String processURI) {
         try {
-            DB db = mongoConnect();
+            DB db = mongoConnect(database);
             DBCollection processesColl = db.getCollection("processes");
             BasicDBObject query = new BasicDBObject("_id", mongonize(Datatype.getURI() + processURI));
             String response = processesColl.findOne(query).toString();
@@ -635,9 +673,9 @@ public class Onto extends Controller {
         }
     }
 
-    public static Result getCoefficient(String coeffURI) {
+    public static Result getCoefficient(String database, String coeffURI) {
         try {
-            DB db = mongoConnect();
+            DB db = mongoConnect(database);
             DBCollection coefficientsColl = db.getCollection("coefficients");
             BasicDBObject query = new BasicDBObject("_id", mongonize(Datatype.getURI() + coeffURI));
             String response = coefficientsColl.findOne(query).toString();
@@ -649,7 +687,7 @@ public class Onto extends Controller {
         }
     }
 
-    public static ArrayList<HashMap<String, Object>> getRelationsForElement(Resource element, Model model) {
+    protected static ArrayList<HashMap<String, Object>> getRelationsForElement(Resource element, Model model) {
         Selector selector = new SimpleSelector(null, Datatype.involvesElement, element);
         StmtIterator iter = model.listStatements( selector );
 

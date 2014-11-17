@@ -1,26 +1,45 @@
 <div class="container">
     <h1>Ontology upload</h1>
+    <h2>Latest slot</h2>
     <p>
-      Choose a file to upload:
-      <input type="file" ng-file-select="onFileSelect($files)">
+      <input type="file" ng-file-select="onFileSelect($files, 'latest')">
     </p>
-    <hr />
-    <div ng-show="!fileUploading">
-    	<h2>Last report</h2>
+    <div ng-show="!latest.fileUploading">
+    	<h3>Last report for the latest slot</h3>
     	{{fileUploadResult}}
-    	<h3>Errors</h3>
-    	<ul ng-show="errors != null && errors.length > 0">
-    		<li ng-repeat="error in errors track by $index">{{error}}</li>
+    	<h4>Errors</h4>
+    	<ul ng-show="latest.errors != null && latest.errors.length > 0">
+    		<li ng-repeat="error in latest.errors track by $index">{{error}}</li>
     	</ul>
-    	<div ng-show="errors == null || errors.length == 0">No errors detected</div>
+    	<div ng-show="latest.errors == null || latest.errors.length == 0">No errors detected</div>
 
-    	<h3>Warnings</h3>
-    	<ul ng-show="warnings != null && warnings.length > 0">
-    		<li ng-repeat="warning in warnings track by $index">{{warning}}</li>
+    	<h4>Warnings</h4>
+    	<ul ng-show="latest.warnings != null && latest.warnings.length > 0">
+    		<li ng-repeat="warning in latest.warnings track by $index">{{warning}}</li>
     	</ul>
-    	<div ng-show="warnings == null || warnings.length == 0">No warnings detected</div>
+    	<div ng-show="latest.warnings == null || latest.warnings.length == 0">No warnings detected</div>
     </div>
-    <div ng-show="fileUploading">
+    <div ng-show="latest.fileUploading">
     	Uploading and processing...
+    </div>
+    <hr>
+    <h2>Work in progress slot</h2>
+    <p>
+      <input type="file" ng-file-select="onFileSelect($files, 'wip')">
+    </p>
+    <h3>Last report for the work in progress slot</h3>
+    {{wip.fileUploadResult}}
+    <div ng-show="!wip.fileUploading">
+        <h4>Errors</h4>
+        <ul ng-show="wip.errors != null && wip.errors.length > 0">
+            <li ng-repeat="error in wip.errors track by $index">{{error}}</li>
+        </ul>
+        <div ng-show="wip.errors == null || wip.errors.length == 0">No errors detected</div>
+
+        <h4>Warnings</h4>
+        <ul ng-show="wip.warnings != null && wip.warnings.length > 0">
+            <li ng-repeat="warning in wip.warnings track by $index">{{warning}}</li>
+        </ul>
+        <div ng-show="wip.warnings == null || wip.warnings.length == 0">No warnings detected</div>
     </div>
 </div>

@@ -1,4 +1,4 @@
-@()<!DOCTYPE html>
+@(activeDatabase: String)<!DOCTYPE html>
 <html>
   <head>
     <title data-ng-bind="pageTitle"></title>
@@ -16,6 +16,9 @@
     </script>
     <script data-main="@routes.Assets.at(helper.mainScriptSrc(scriptName = "main"))" src="@CdnWebJarAssets.getUrl(CdnWebJarAssets.locate("require.js"))"></script>
     <script src="@routes.Assets.at("javascripts/geometry.js")"></script>
+    <script languag="javascript">
+      var activeDatabase = "@activeDatabase";
+    </script>
 
   </head>
   <body>
@@ -50,6 +53,13 @@
             <li><a href="#/tree">Tree</a></li>
             <li><a href="#/graph">Graph</a></li>
             <li><a href="#/references">References</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">DB version: {{activeDatabase}} <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="{{latestLink}}">Switch to latest</a></li>
+                <li><a href="{{wipLink}}">Switch to work in progress</a></li>
+              </ul>
+            </li>
             <!-- <li><a href="#/login">Login</a></li> -->
           </ul>
           <ul class="nav navbar-nav pull-right" data-ng-switch-when="false">

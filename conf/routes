@@ -3,7 +3,8 @@
 # ~~~~
 
 # Home page
-GET     /                       controllers.Application.index
+GET     /                       controllers.Application.index(database = "latest")
+GET     /:database/             controllers.Application.index(database: String)
 
 # JavaScript routes object
 GET     /jsroutes.js            controllers.Application.jsRoutes()
@@ -22,17 +23,17 @@ PUT     /users/:id              controllers.Users.updateUser(id: Long)
 DELETE  /users/:id              controllers.Users.deleteUser(id: Long)
 
 # Onto
-POST    /upload	                controllers.Onto.upload()
+POST    /upload/:database	                controllers.Onto.upload(database: String)
 GET     /processgroups          controllers.Onto.getProcessGroups()
 GET     /coefficientgroups      controllers.Onto.getCoefficientGroups()
-GET     /categories             controllers.Onto.getCategories()
-GET     /group/:uri             controllers.Onto.getGroup(uri: String)
-GET     /lastreport             controllers.Onto.getLastReport()
-GET     /graph             	    controllers.Onto.getGraph()
-GET     /references             controllers.Onto.getReferences()
-GET     /getImpactAndFlowTypes  controllers.Onto.getImpactAndFlowTypes()
-GET     /getProcess/sp/:id     	controllers.Onto.getProcess(id: String)
-GET     /getCoefficient/sc/:id  controllers.Onto.getCoefficient(id: String)
+GET     /categories/:database               controllers.Onto.getCategories(database: String)
+GET     /group/:database/:uri               controllers.Onto.getGroup(database: String, uri: String)
+GET     /lastreport/:database               controllers.Onto.getLastReport(database: String)
+GET     /graph/:database                    controllers.Onto.getGraph(database: String)
+GET     /references/:database               controllers.Onto.getReferences(database: String)
+GET     /getImpactAndFlowTypes/:database    controllers.Onto.getImpactAndFlowTypes(database: String)
+GET     /getProcess/sp/:database/:id     	controllers.Onto.getProcess(database: String, id: String)
+GET     /getCoefficient/sc/:database/:id    controllers.Onto.getCoefficient(database: String, id: String)
 
 # Static
 # ~~~~
@@ -43,3 +44,5 @@ GET     /getCoefficient/sc/:id  controllers.Onto.getCoefficient(id: String)
 GET     /webjars/*file          controllers.CdnWebJarAssets.at(file)
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file           controllers.Assets.at(path="/public", file)
+GET     /latest/assets/*file           controllers.Assets.at(path="/public", file)
+GET     /wip/assets/*file           controllers.Assets.at(path="/public", file)

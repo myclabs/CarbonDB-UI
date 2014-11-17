@@ -9,7 +9,7 @@ define(["angular"], function(angular) {
     var flowTypes = new Array();
     var impactTypesTree = new Array();
     var flowTypesTree = new Array();
-    var promise = playRoutes.controllers.Onto.getImpactAndFlowTypes().get().success(function(data) {
+    var promise = playRoutes.controllers.Onto.getImpactAndFlowTypes(activeDatabase).get().success(function(data) {
       impactTypes = data.plain.impactTypes;
       flowTypes = data.plain.flowTypes;
       impactTypesTree = data.tree.impactTypesTree;

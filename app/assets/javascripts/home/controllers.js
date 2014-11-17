@@ -6,41 +6,13 @@ define(["angular"], function(angular) {
 
   /** Controls the index page */
   var HomeCtrl = function($scope, $rootScope, $location, helper, $http, $window, playRoutes) {
-    //console.log(helper.sayHi());
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
     $rootScope.pageTitle = "CarbonDB";
-    /*playRoutes.controllers.Onto.getProcessGroups().get().success(function(data) {
-      $scope.processGroups = data;
-    });
-    playRoutes.controllers.Onto.getCoefficientGroups().get().success(function(data) {
-      $scope.coefficientGroups = data;
-    });*/
-    playRoutes.controllers.Onto.getCategories().get().success(function(data) {
-      $scope.categories = data.children;
-    });
-    //$scope.categories = [{"uri":"http://www.myc-sense.com/ontologies/bc#electricity_category","label":"Electricity","children":[]},{"uri":"http://www.myc-sense.com/ontologies/bc#transport_category","label":"Transport","children":[{"uri":"http://www.myc-sense.com/ontologies/bc#rail_transport","label":"http://www.myc-sense.com/ontologies/bc#rail_transport","children":[{"uri":"http://www.myc-sense.com/ontologies/bc#rail_passenger_transport","label":"http://www.myc-sense.com/ontologies/bc#rail_passenger_transport","children":[]},{"uri":"http://www.myc-sense.com/ontologies/bc#rail_freight_transport","label":"http://www.myc-sense.com/ontologies/bc#rail_freight_transport","children":[]}]},{"uri":"http://www.myc-sense.com/ontologies/bc#road_transport","label":"Road transport","children":[{"uri":"http://www.myc-sense.com/ontologies/bc#road_passenger_transport","label":"Road passenger transport","children":[]},{"uri":"http://www.myc-sense.com/ontologies/bc#road_freight_transport","label":"Road freight transport","children":[]}]},{"uri":"http://www.myc-sense.com/ontologies/bc#air_transport","label":"Air transport","children":[{"uri":"http://www.myc-sense.com/ontologies/bc#air_freight_transport","label":"Air freight transport","children":[]},{"uri":"http://www.myc-sense.com/ontologies/bc#air_passenger_transport","label":"Air passenger transport","children":[]}]},{"uri":"http://www.myc-sense.com/ontologies/bc#ship_transport","label":"Ship transport","children":[{"uri":"http://www.myc-sense.com/ontologies/bc#ship_passenger_transport","label":"Ship passenger transport","children":[]},{"uri":"http://www.myc-sense.com/ontologies/bc#ship_freight_transport","label":"Ship freight transport","children":[]}]}]},{"uri":"http://www.myc-sense.com/ontologies/bc#fuel_category","label":"Fuels","children":[]},{"uri":"http://www.myc-sense.com/ontologies/bc#animal_husbandry_category","label":"Animal husbandry","children":[]},{"uri":"http://www.myc-sense.com/ontologies/bc#waste","label":"Waste","children":[]},{"uri":"http://www.myc-sense.com/ontologies/bc#agriculture","label":"Agriculture","children":[]},{"uri":"http://www.myc-sense.com/ontologies/bc#direct_emission_of_greenhouse_gas_category","label":"Direct emission of greenhouse gas","children":[]}];
-    $scope.treeOptions = {
-      dirSelectable: false,
-      isLeaf: function (node) {
-        return node.hasOwnProperty('unit') ? true : false;
-      }
-    };
-
-    playRoutes.controllers.Onto.getGraph().get().success(function(data) {
-      $scope.d3Nodes = [];
-      data.nodes.forEach(function (element, index) { $scope.d3Nodes.push({'name': element, 'id': data.nodesId[index]}) });
-      $scope.d3Links = data.links;
-      $scope.relationTypes = data.types;
-    });
-
-    /*$scope.d3Nodes = [{'name': 'bidule'}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
-
-    $scope.d3Links = [
-              { 'source': 0, 'target': 1 },
-              { 'source': 4, 'target': 5 }
-            ];*/
     $scope.user = {'name': "toto"};
+    $scope.switchDatabase = function(database) {
+      $window.location.pathname = "/" + database + "/";
+    };
   };
   HomeCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$window", "playRoutes"];
 
@@ -48,8 +20,8 @@ define(["angular"], function(angular) {
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
     $rootScope.pageTitle = "CarbonDB: Graph";
-
-    playRoutes.controllers.Onto.getGraph().get().success(function(data) {
+    console.log(playRoutes.controllers.Onto);
+    playRoutes.controllers.Onto.getGraph(activeDatabase).get().success(function(data) {
       $scope.d3Nodes = [];
       data.nodes.forEach(function (element, index) { $scope.d3Nodes.push({'name': element, 'id': data.nodesId[index]}) });
       $scope.d3Links = data.links;
@@ -62,7 +34,7 @@ define(["angular"], function(angular) {
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
     $rootScope.pageTitle = "CarbonDB: Tree";
-    playRoutes.controllers.Onto.getCategories().get().success(function(data) {
+    playRoutes.controllers.Onto.getCategories(activeDatabase).get().success(function(data) {
       $scope.categories = data.children;
     });
     $scope.treeOptions = {
@@ -78,7 +50,7 @@ define(["angular"], function(angular) {
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
     $rootScope.pageTitle = "CarbonDB: References";
-    playRoutes.controllers.Onto.getReferences().get().success(function(data) {
+    playRoutes.controllers.Onto.getReferences(activeDatabase).get().success(function(data) {
       $scope.references = data.references;
       $scope.referencesGroups = data.referencesGroups;
     });
@@ -114,27 +86,32 @@ define(["angular"], function(angular) {
   /** Controls the upload page */
   var UploadCtrl = function($scope, $rootScope, $location, helper, $http, $upload, $window, playRoutes) {
     $rootScope.pageTitle = "CarbonDB: Upload";
-    $scope.fileUploading = false;
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
-    playRoutes.controllers.Onto.getLastReport().get().success(function(data) {
-      $scope.errors = data.errors;
-      $scope.warnings = data.warnings;
+    $scope.latest = {fileUploading: false};
+    playRoutes.controllers.Onto.getLastReport('latest').get().success(function(data) {
+      $scope.latest.errors = data.errors;
+      $scope.latest.warnings = data.warnings;
     });
-    $scope.onFileSelect = function($files) {
-      $scope.fileUploading = true;
-      $scope.fileUploadResult = "Uploading and processing...";
-      $scope.errors = null;
-      $scope.warnings = null;
+    $scope.wip = {fileUploading: false};
+    playRoutes.controllers.Onto.getLastReport('wip').get().success(function(data) {
+      $scope.wip.errors = data.errors;
+      $scope.wip.warnings = data.warnings;
+    });
+    $scope.onFileSelect = function($files, slot) {
+      $scope[slot].fileUploading = true;
+      $scope[slot].fileUploadResult = "Uploading and processing...";
+      $scope[slot].errors = null;
+      $scope[slot].warnings = null;
       //$files: an array of files selected, each file has name, size, and type.
       for (var i = 0; i < $files.length; i++) {
         var file = $files[i];
         $scope.upload = $upload.upload({
-          url: 'upload', //upload.php script, node.js route, or servlet url
+          url: 'upload/' + slot, //upload.php script, node.js route, or servlet url
           // method: 'POST' or 'PUT',
           // headers: {'header-key': 'header-value'},
           // withCredentials: true,
-          data: {},
+          data: {slot: slot},
           file: file // or list of files: $files for html5 only
           // fileName: 'doc.jpg' or ['1.jpg', '2.jpg', ...] // to modify the name of the file
       /* customize file formData name ('Content-Desposition'), server side file variable name. 
@@ -145,13 +122,13 @@ define(["angular"], function(angular) {
         }).progress(function(evt) {
           console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total));
         }).success(function(data, status, headers, config) {
-          $scope.fileUploading = false;
-          $scope.fileUploadResult = data.result;
-          $scope.errors = data.report.errors;
-          $scope.warnings = data.report.warnings;
+          $scope[slot].fileUploading = false;
+          $scope[slot].fileUploadResult = data.result;
+          $scope[slot].errors = data.report.errors;
+          $scope[slot].warnings = data.report.warnings;
           // file is uploaded successfully
         }).error(function(data) {
-          $scope.fileUploadResult = "Sorry, something went wrong when uploading the file";
+          $scope[slot].fileUploadResult = "Something went wrong when uploading the file: " + data;
         });
         //.then(success, error, progress); 
         //.xhr(function(xhr){xhr.upload.addEventListener(...)})// access and attach any event listener to XMLHttpRequest.
@@ -169,7 +146,7 @@ define(["angular"], function(angular) {
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
 
-    playRoutes.controllers.Onto.getGroup($routeParams.type + '/' + $routeParams.uri).get().success(function(data) {
+    playRoutes.controllers.Onto.getGroup(activeDatabase, $routeParams.type + '/' + $routeParams.uri).get().success(function(data) {
       $scope.URI = data.URI;
       $scope.label = data.label;
       $scope.dimensionsNumber = data.dimensions.length;
@@ -307,7 +284,7 @@ define(["angular"], function(angular) {
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
 
-    playRoutes.controllers.Onto.getProcess("sp/" + $routeParams.id).get().success(function(data) {
+    playRoutes.controllers.Onto.getProcess(activeDatabase, "sp/" + $routeParams.id).get().success(function(data) {
       $scope.id = data.id;
       $scope.label = data.label;
       $scope.unit = data.unit;
@@ -367,7 +344,7 @@ define(["angular"], function(angular) {
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
 
-    playRoutes.controllers.Onto.getCoefficient("sc/" + $routeParams.id).get().success(function(data) {
+    playRoutes.controllers.Onto.getCoefficient(activeDatabase, "sc/" + $routeParams.id).get().success(function(data) {
       $scope.id = data.id;
       $scope.label = data.label;
       $scope.unit = data.unit;
@@ -405,7 +382,7 @@ define(["angular"], function(angular) {
   });*/
 
   /** Controls the header */
-  var HeaderCtrl = function($scope, userService, helper, $location) {
+  var HeaderCtrl = function($scope, userService, helper, $location, $window) {
     // Wrap the current user from the service in a watch expression
     $scope.$watch(function() {
       var user = userService.getUser();
@@ -419,8 +396,13 @@ define(["angular"], function(angular) {
       $scope.user = undefined;
       $location.path("/");
     };
+    $scope.activeDatabase = activeDatabase;
+    $scope.$on('$routeChangeSuccess', function(){
+      $scope.latestLink = $location.protocol() + "://" + $location.host() + ($location.port() != 80 ? ":"+$location.port() : "") + "/latest/#" + $location.path();
+      $scope.wipLink = $location.protocol() + "://" + $location.host() + ($location.port() != 80 ? ":"+$location.port() : "") + "/wip/#" + $location.path();
+    });
   };
-  HeaderCtrl.$inject = ["$scope", "userService", "helper", "$location"];
+  HeaderCtrl.$inject = ["$scope", "userService", "helper", "$location", "$window"];
 
   /** Controls the footer */
   var FooterCtrl = function(/*$scope*/) {

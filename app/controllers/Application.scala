@@ -8,8 +8,11 @@ import play.api.libs.json._
 object Application extends Controller with Security {
 
   /** Serves the index page, see views/index.scala.html */
-  def index = Action {
-    Ok(views.html.index())
+  def index(database: String) = Action {
+    if (database != "latest" && database != "wip")
+      NotFound("This ontology version is not valid")
+    else
+      Ok(views.html.index(database))
   }
 
   /**
