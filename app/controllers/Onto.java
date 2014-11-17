@@ -563,13 +563,10 @@ public class Onto extends Controller {
     public static Result getGraph(String database) {
         authorizeCrossRequests();
         try {
-            System.out.println("connecting to database " + database);
             DB db = mongoConnect(database);
             DBCollection graphColl = db.getCollection("graph");
             String response = graphColl.findOne().toString();
             mongoClose();
-            System.out.println("sending response ...");
-            System.out.println(response);
             return ok(response);
         }
         catch (Exception e) {
