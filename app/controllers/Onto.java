@@ -64,7 +64,6 @@ import views.html.*;
 
 public class Onto extends Controller {
 
-    protected static String inferredOntoFileName = "/tmp/uploaded-ontology-processed.rdf";
     protected static String baseOntoFileName = "/tmp/uploaded-ontology.rdf";
     protected static HashMap<String, String> unitsLabel = new HashMap<String, String>();
 
@@ -91,8 +90,8 @@ public class Onto extends Controller {
     }
 
     public static Result upload(String database) throws Exception {
-        System.out.println("----------------");
-        System.out.println("begin processing");
+        play.Logger.info("----------------");
+        play.Logger.info("Begin processing");
         initUnitsRepo();
         MultipartFormData body = request().body().asMultipartFormData();
         FilePart filePart = body.getFile("file");
@@ -115,15 +114,12 @@ public class Onto extends Controller {
             try {
                 PelletOptions.USE_CLASSIFICATION_MONITOR = PelletOptions.MonitorType.NONE;
 
-                // Write the inferred ontology to a file -> sloooow
-                /*Model model = ModelFactory.createDefaultModel();
-                App.runAll(baseOntoFileName, inferredOntoFileName);*/
                 try {
                     Cache.set("conversionFactors", ((UnitsRepoCache)unitsRepo).getConversionFactorsCache());
                     Cache.set("compatibleUnits", ((UnitsRepoCache)unitsRepo).getCompatibleUnitsCache());
                     Cache.set("unitSymbols", ((UnitsRepoCache)unitsRepo).getSymbolsCache());
                     Model model = getInferredModel();
-                    System.out.println("feeding MongoDB");
+                    play.Logger.info("Feeding MongoDB");
                     feedMongoDB(model, database);
                 }
                 catch (Exception e) {
@@ -140,7 +136,7 @@ public class Onto extends Controller {
                     result.put("result", "The ontology has been processed without error");
                 }
                 result.put("report", toJson(report));
-                System.out.println("processing finished");
+                play.Logger.info("Processing finished");
                 return ok(result);
             }
             catch (Exception e) {
@@ -160,7 +156,7 @@ public class Onto extends Controller {
 
     protected static Model getInferredModel() {
         Model model = ModelFactory.createDefaultModel( );
-        System.out.println("model size after init = " + model.size());
+        play.Logger.info("Model size after init = " + model.size());
 
         InputStream in = FileManager.get().open(baseOntoFileName);
         if (in == null) {
@@ -168,13 +164,13 @@ public class Onto extends Controller {
         }
 
         model.read( in, null );
-        System.out.println("model size after reading = " + model.size());
+        play.Logger.info("Model size after reading = " + model.size());
 
         Logger.getLogger("").setLevel(Level.WARNING);
 
         Reasoner reasoner = new Reasoner(model, unitsRepo);
         reasoner.run();
-        System.out.println("model size after reasoning = " + model.size());
+        play.Logger.info("Model size after reasoning = " + model.size());
         report = reasoner.report;
         return reasoner.getInfModel();
     }
@@ -628,8 +624,8 @@ public class Onto extends Controller {
     protected static void initUnitsRepo() {
         if (null == unitsRepo) {
             unitsRepo = new UnitsRepoWebService();
-            //((UnitsRepoWebService) unitsRepo).setUnitsAPIURI("http://localhost/units/api");
-            ((UnitsRepoWebService) unitsRepo).setUnitsAPIURI("http://units.myc-sense.com/api");
+            String unitAPIURL = Play.application().configuration().getString("unitAPI.url");
+            ((UnitsRepoWebService) unitsRepo).setUnitsAPIURI(unitAPIURL);
             if (null != Cache.get("conversionFactors")) {
                 ((UnitsRepoCache)unitsRepo).setConversionFactorsCache((HashMap)Cache.get("conversionFactors"));
             }
