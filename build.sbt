@@ -25,10 +25,10 @@ libraryDependencies ++= Seq(
   "org.webjars" % "d3js" % "3.4.11",
   "org.webjars" % "angularjs-nvd3-directives" % "0.0.7-1",
   // required for carbondb reasonner
-  "org.apache.jena" % "apache-jena-libs" % "2.10.0",
+  "org.apache.jena" % "apache-jena-libs" % "2.10.0" exclude("org.slf4j", "slf4j-log4j12") exclude("log4j", "log4j"),
   "org.la4j" % "la4j" % "0.4.9",
   "com.github.ansell.pellet" % "pellet-core" % "2.3.6-ansell",
-  "com.github.ansell.pellet" % "pellet-jena" % "2.3.6-ansell",
+  "com.github.ansell.pellet" % "pellet-jena" % "2.3.6-ansell" exclude("org.slf4j", "slf4j-log4j12") exclude("log4j", "log4j"),
   "org.apache.commons" % "commons-lang3" % "3.3.2",
   "org.json" % "json" % "20140107"
 )

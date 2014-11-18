@@ -166,7 +166,7 @@ public class Onto extends Controller {
         model.read( in, null );
         play.Logger.info("Model size after reading = " + model.size());
 
-        Logger.getLogger("").setLevel(Level.WARNING);
+        //Logger.getLogger("").setLevel(Level.WARNING);
 
         Reasoner reasoner = new Reasoner(model, unitsRepo);
         reasoner.run();
