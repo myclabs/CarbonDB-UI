@@ -28,8 +28,6 @@ object Application extends Controller with Security {
         routes.javascript.Users.createUser,
         routes.javascript.Users.updateUser,
         routes.javascript.Users.deleteUser,
-        routes.javascript.Onto.getProcessGroups,
-        routes.javascript.Onto.getCoefficientGroups,
         routes.javascript.Onto.upload,
         routes.javascript.Onto.getGroup,
         routes.javascript.Onto.getCategories,

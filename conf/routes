@@ -24,8 +24,6 @@ DELETE  /users/:id              controllers.Users.deleteUser(id: Long)
 
 # Onto
 POST    /upload/:database	                controllers.Onto.upload(database: String)
-GET     /processgroups          controllers.Onto.getProcessGroups()
-GET     /coefficientgroups      controllers.Onto.getCoefficientGroups()
 GET     /categories/:database               controllers.Onto.getCategories(database: String)
 GET     /group/:database/:uri               controllers.Onto.getGroup(database: String, uri: String)
 GET     /lastreport/:database               controllers.Onto.getLastReport(database: String)

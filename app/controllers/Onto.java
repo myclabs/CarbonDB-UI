@@ -80,9 +80,7 @@ public class Onto extends Controller {
 
     protected static MongoClient mongoClient;
 
-    protected static ReasonnerReport report;
-
-    protected static UnitsRepo unitsRepo;
+    protected static UnitToolsWebService unitTools;
 
     public class Link {
         public int source, target;
@@ -92,7 +90,7 @@ public class Onto extends Controller {
     public static Result upload(String database) throws Exception {
         play.Logger.info("----------------");
         play.Logger.info("Begin processing");
-        initUnitsRepo();
+        initUnitTools();
         MultipartFormData body = request().body().asMultipartFormData();
         FilePart filePart = body.getFile("file");
         ObjectNode result = Json.newObject();
@@ -115,27 +113,28 @@ public class Onto extends Controller {
                 PelletOptions.USE_CLASSIFICATION_MONITOR = PelletOptions.MonitorType.NONE;
 
                 try {
-                    Cache.set("conversionFactors", ((UnitsRepoCache)unitsRepo).getConversionFactorsCache());
-                    Cache.set("compatibleUnits", ((UnitsRepoCache)unitsRepo).getCompatibleUnitsCache());
-                    Cache.set("unitSymbols", ((UnitsRepoCache)unitsRepo).getSymbolsCache());
+                    Cache.set("conversionFactors", unitTools.getConversionFactorsCache());
+                    Cache.set("compatibleUnits", unitTools.getCompatibleUnitsCache());
+                    Cache.set("unitSymbols", unitTools.getSymbolsCache());
                     Model model = getInferredModel();
                     play.Logger.info("Feeding MongoDB");
-                    feedMongoDB(model, database);
+                    feedMongoDB(database);
                 }
                 catch (Exception e) {
                     //throw e;
                     result.put("result", e.getMessage());
-                    result.put("report", toJson(report));
+                    //result.put("report", toJson(report));
                     e.printStackTrace(System.out);
                     return ok(result);
                 }
-                if (report.errors.size() > 0) {
+                result.put("result", "The ontology has been processed without error");
+                /*if (report.errors.size() > 0) {
                     result.put("result", "The ontology has been processed and contains some errors");
                 }
                 else {
                     result.put("result", "The ontology has been processed without error");
-                }
-                result.put("report", toJson(report));
+                }*/
+                //result.put("report", toJson(report));
                 play.Logger.info("Processing finished");
                 return ok(result);
             }
@@ -168,15 +167,25 @@ public class Onto extends Controller {
 
         //Logger.getLogger("").setLevel(Level.WARNING);
 
-        Reasoner reasoner = new Reasoner(model, unitsRepo);
+        Reasoner reasoner = new Reasoner(model);
         reasoner.run();
         play.Logger.info("Model size after reasoning = " + model.size());
-        report = reasoner.report;
         return reasoner.getInfModel();
     }
 
-    protected static void feedMongoDB(Model model, String database) throws Exception {
-        nodesLabel.clear();
+    protected static void feedMongoDB(String database) throws Exception {
+        BasicDBObject dbObject;
+
+        DB db = mongoConnect(database);
+
+        CarbonOntology ontology = CarbonOntology.getInstance();
+        DBCollection categoriesColl = db.getCollection("categories");
+        categoriesColl.drop();
+
+        dbObject = (BasicDBObject) JSON.parse(toJson(RepoFactory.getCategoryRepo().getCategoriesTree()).toString());
+        categoriesColl.insert(dbObject);
+
+        /*nodesLabel.clear();
         nodesURI.clear();
         nodesId.clear();
         links.clear();
@@ -207,22 +216,6 @@ public class Onto extends Controller {
         for (Resource flowTypeResource: RepoFactory.getSingleElementRepo().getElementaryFlowTypes()) {
             flowTypes.put(mongonize(flowTypeResource.getURI()), RepoFactory.getSingleElementRepo().getLabelOrURI(flowTypeResource));
         }
-        /*
-        Variation:
-        ArrayList<HashMap<String, String>> impactTypes = new ArrayList<>();
-        for (Resource impactTypeResource: RepoFactory.getSingleElementRepo().getImpactTypes()) {
-            HashMap<String, String> impactType = new HashMap<>();
-            impactType.put("id": mongonize(impactTypeResource.getURI()));
-            impactType.put("label": RepoFactory.getSingleElementRepo().getLabelOrURI(impactTypeResource));
-            impactTypes.add(impactType);
-        }
-        HashMap<String, String> flowTypes = new HashMap<>();
-        for (Resource flowTypeResource: RepoFactory.getSingleElementRepo().getElementaryFlowTypes()) {
-            flowTypes.put("id": mongonize(flowTypeResource.getURI()));
-            flowTypes.put("label": RepoFactory.getSingleElementRepo().getLabelOrURI(flowTypeResource));
-            flowTypes.add(impactType);
-        }
-        */
         dbObject = (BasicDBObject) JSON.parse("{impactTypes:" + toJson(impactTypes).toString()
                                             + ", flowTypes:" + toJson(flowTypes).toString() + "}");
         impactAndFlowTypesColl.insert(dbObject);
@@ -285,10 +278,6 @@ public class Onto extends Controller {
         DBCollection graphColl = db.getCollection("graph");
         graphColl.drop();
 
-        /*dbObject = (BasicDBObject) JSON.parse(toJson(nodesLabel).toString());
-        dbObject.append("_id", "nodes");
-        graphColl.insert(dbObject);*/
-
         //ArrayList<Resource> sourceRelationResources = RepoFactory.getRelationRepo().getSourceRelationsResources();
         for (SourceRelation sourceRelation: RepoFactory.getRelationRepo().getSourceRelations()) {
             //String sourceURI = sourceRelationResource.getProperty(Datatype.hasOriginProcess).getResource().getURI();
@@ -323,11 +312,11 @@ public class Onto extends Controller {
         dbObject = (BasicDBObject) JSON.parse(toJson(report).toString());
         reportColl.insert(dbObject);
 
-        mongoClose();
+        mongoClose();*/
     }
 
     protected static void computeGoupsOverlap() {
-        for(Entry<String, HashMap<String, Object>> entry : processes.entrySet()) {
+        /*for(Entry<String, HashMap<String, Object>> entry : processes.entrySet()) {
             String processURI = entry.getKey();
             HashMap<String, Object> process = entry.getValue();
             for(Entry<String, Object> subEntry : ((HashMap<String, Object>)process.get("groups")).entrySet()) {
@@ -343,13 +332,13 @@ public class Onto extends Controller {
                     }
                 }
             }
-        }
+        }*/
     }
 
     protected static HashMap<String, Object> getGroup(Group group, Model model) throws Exception  {
         HashMap<String, Object> output = new HashMap<String, Object>();
 
-        boolean isProcessGroup = false;
+        /*boolean isProcessGroup = false;
         if (model.contains(ResourceFactory.createResource(group.getURI()), RDF.type, Datatype.ProcessGroup)) {
             isProcessGroup = true;
         }
@@ -465,7 +454,7 @@ public class Onto extends Controller {
         }
         else {
             output.put("elementsValue", elementsValue);
-        }
+        }*/
 
         return output;
     }
@@ -482,10 +471,6 @@ public class Onto extends Controller {
 
     protected static String mongonize(String fieldName) {
         return fieldName.replace(".", "____");
-    }
-
-    protected static DB mongoConnect() throws Exception {
-        return mongoConnect( "carbondb" );
     }
 
     protected static DB mongoConnect(String database) throws Exception {
@@ -510,22 +495,6 @@ public class Onto extends Controller {
         catch (Exception e) {
             return ok(e.getMessage());
         }
-    }
-
-    protected static String getActiveDatabase() {
-        String database = session("database");
-        if(database == null) {
-            session("database", "latest");
-        }
-        return database;
-    }
-
-    public static Result setActiveDatabase(String database) {
-        if (database != "latest" || database != "upload") {
-            return badRequest("Invalid database");
-        }
-        session("database", database);
-        return ok("Active database changed");
     }
 
     public static Result getCategories(String database) {
@@ -621,19 +590,20 @@ public class Onto extends Controller {
         response().setHeader("Access-Control-Allow-Headers", "accept, origin, Content-type, x-json, x-prototype-version, x-requested-with");
     }
 
-    protected static void initUnitsRepo() {
-        if (null == unitsRepo) {
-            unitsRepo = new UnitsRepoWebService();
+    protected static void initUnitTools() {
+        if (null == unitTools) {
+            unitTools = new UnitToolsWebService();
+            Unit.setUnitTools(unitTools);
             String unitAPIURL = Play.application().configuration().getString("unitAPI.url");
-            ((UnitsRepoWebService) unitsRepo).setUnitsAPIURI(unitAPIURL);
+            unitTools.setUnitsAPIURI(unitAPIURL);
             if (null != Cache.get("conversionFactors")) {
-                ((UnitsRepoCache)unitsRepo).setConversionFactorsCache((HashMap)Cache.get("conversionFactors"));
+                unitTools.setConversionFactorsCache((HashMap)Cache.get("conversionFactors"));
             }
             if (null != Cache.get("unitSymbols")) {
-                ((UnitsRepoCache)unitsRepo).setSymbolsCache((HashMap)Cache.get("unitSymbols"));
+                unitTools.setSymbolsCache((HashMap)Cache.get("unitSymbols"));
             }
             if (null != Cache.get("compatibleUnits")) {
-                ((UnitsRepoCache)unitsRepo).setCompatibleUnitsCache((HashMap)Cache.get("compatibleUnits"));
+                unitTools.setCompatibleUnitsCache((HashMap)Cache.get("compatibleUnits"));
             }
         }
     }
@@ -681,10 +651,11 @@ public class Onto extends Controller {
     }
 
     protected static ArrayList<HashMap<String, Object>> getRelationsForElement(Resource element, Model model) {
-        Selector selector = new SimpleSelector(null, Datatype.involvesElement, element);
+        ArrayList<HashMap<String, Object>> relations = new ArrayList<>();
+
+        /*Selector selector = new SimpleSelector(null, Datatype.involvesElement, element);
         StmtIterator iter = model.listStatements( selector );
 
-        ArrayList<HashMap<String, Object>> relations = new ArrayList<>();
         if (iter.hasNext()) {
             while (iter.hasNext()) {
                 Statement s = iter.nextStatement();
@@ -724,22 +695,8 @@ public class Onto extends Controller {
 
                 relations.add(relation);
             }
-        }
+        }*/
         return relations;
-    }
-
-    public static Result getProcessGroups() {
-        Model model = getInferredModel();
-
-        authorizeCrossRequests();
-    	return ok(toJson(RepoFactory.getGroupRepo().getProcessGroups()));
-    }
-
-    public static Result getCoefficientGroups() {
-        Model model = getInferredModel();
-
-        authorizeCrossRequests();
-        return ok(toJson(RepoFactory.getGroupRepo().getCoefficientGroups()));
     }
 
     /**
@@ -750,7 +707,7 @@ public class Onto extends Controller {
         String[] keywords = new String[dimension.keywords.size()];
         int i = 0;
         for (Keyword keyword: dimension.keywords) {
-            keywords[i] = keyword.getName();
+            keywords[i] = keyword.getId();
             i++;
         }
         Arrays.sort(keywords);
