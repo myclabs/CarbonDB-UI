@@ -40,7 +40,7 @@ define(["angular"], function(angular) {
     $scope.treeOptions = {
       dirSelectable: false,
       isLeaf: function (node) {
-        return node.hasOwnProperty('unit') ? true : false;
+        return node.hasOwnProperty('type') ? true : false;
       }
     };
   };
@@ -189,6 +189,7 @@ define(["angular"], function(angular) {
         });
       });
       $scope.unit = data.unit;
+      data.references = [];
       $scope.references = data.references.sort(sortReferencesCompare);
       $scope.baseUnit = data.unit;
       $scope.commonKeywords = data.commonKeywords;

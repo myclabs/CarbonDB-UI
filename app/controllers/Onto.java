@@ -1,9 +1,12 @@
 package controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import models.CategorySerializer;
+import models.GroupSerializer;
+import models.TypeSerializer;
 import play.*;
 import play.mvc.*;
-import java.util.List;
-import static play.libs.Json.toJson;
 import play.libs.Json;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import play.mvc.Http.MultipartFormData;
@@ -12,8 +15,6 @@ import play.cache.Cache;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map.Entry;
-import java.util.HashSet;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
@@ -23,7 +24,6 @@ import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 
 import com.hp.hpl.jena.rdf.model.*;
-import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.util.FileManager;
 import org.mindswap.pellet.PelletOptions;
 
@@ -31,36 +31,11 @@ import com.mycsense.carbondb.*;
 import com.mycsense.carbondb.architecture.*;
 import com.mycsense.carbondb.domain.*;
 
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
-import java.util.logging.Level;
-import java.util.Enumeration;
-
-import org.glassfish.jersey.client.ClientConfig;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.MediaType;
-
-import org.json.JSONObject;
-
 import com.mongodb.BasicDBObject;
-import com.mongodb.BulkWriteOperation;
-import com.mongodb.BulkWriteResult;
-import com.mongodb.Cursor;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
-import com.mongodb.ParallelScanOptions;
 import com.mongodb.util.JSON;
-
-import java.util.Set;
-
-import views.html.*;
 
 public class Onto extends Controller {
 
@@ -127,6 +102,9 @@ public class Onto extends Controller {
                     e.printStackTrace(System.out);
                     return ok(result);
                 }
+                finally {
+                    CarbonOntology.getInstance().clear();
+                }
                 result.put("result", "The ontology has been processed without error");
                 /*if (report.errors.size() > 0) {
                     result.put("result", "The ontology has been processed and contains some errors");
@@ -182,8 +160,50 @@ public class Onto extends Controller {
         DBCollection categoriesColl = db.getCollection("categories");
         categoriesColl.drop();
 
-        dbObject = (BasicDBObject) JSON.parse(toJson(RepoFactory.getCategoryRepo().getCategoriesTree()).toString());
+        ObjectMapper mapper = new ObjectMapper();
+
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(Category.class, new CategorySerializer());
+        module.addSerializer(ImpactType.class, new TypeSerializer());
+        module.addSerializer(ElementaryFlowType.class, new TypeSerializer());
+        module.addSerializer(Group.class, new GroupSerializer());
+        mapper.registerModule(module);
+
+        String serialized = mapper.writeValueAsString(ontology.getCategoryTree());
+        dbObject = (BasicDBObject) JSON.parse(serialized);
+
         categoriesColl.insert(dbObject);
+
+
+        DBCollection impactAndFlowTypesColl = db.getCollection("impactAndFlowTypes");
+        impactAndFlowTypesColl.drop();
+
+        String impactTypesSerialized = mapper.writeValueAsString(ontology.getImpactTypes());
+        String elementaryFlowTypesSerialized = mapper.writeValueAsString(ontology.getElementaryFlowTypes());
+
+        dbObject = (BasicDBObject) JSON.parse("{impactTypes:" + impactTypesSerialized
+                + ", flowTypes:" + elementaryFlowTypesSerialized + "}");
+        impactAndFlowTypesColl.insert(dbObject);
+
+        DBCollection impactAndFlowTypesTreeColl = db.getCollection("impactAndFlowTypesTree");
+        impactAndFlowTypesTreeColl.drop();
+        String impactTypesTreeSerialized = mapper.writeValueAsString(ontology.getImpactTypesTree());
+        String elementaryFlowTypesTreeSerialized = mapper.writeValueAsString(ontology.getElementaryFlowTypesTree());
+        dbObject = (BasicDBObject) JSON.parse("{impactTypesTree:" + impactTypesTreeSerialized
+                + ", flowTypesTree:" + elementaryFlowTypesTreeSerialized + "}");
+        impactAndFlowTypesTreeColl.insert(dbObject);
+
+
+        DBCollection groupsColl = db.getCollection("groups");
+        groupsColl.drop();
+        HashMap<String, HashMap<String, Object>> groups = new HashMap<>();
+
+        for (Group group: ontology.getGroups().values()) {
+            String serializedGroup = mapper.writeValueAsString(group);
+            dbObject = (BasicDBObject) JSON.parse(serializedGroup);
+            dbObject.append("_id", group.getId());
+            groupsColl.insert(dbObject);
+        }
 
         /*nodesLabel.clear();
         nodesURI.clear();

@@ -86,7 +86,7 @@ define(["angular"], function(angular) {
                 coordinateList = coordinateList.concat(rowsCoordinates[j]);
               }
               var coordinate = coordinateList.sort().join("").replace(/\./g, "____");
-              if (values[coordinate] == 'empty') {
+              if (!(coordinate in values)) {
                 value = '-';
                 uri = false;
               }

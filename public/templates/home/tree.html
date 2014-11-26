@@ -4,10 +4,10 @@
      tree-model="categories"
      options="treeOptions"
      order-by="label">
-      <a ng-if="node.hasOwnProperty('unit')" ng-href="#/group/{{node.id}}">
+      <a ng-if="node.hasOwnProperty('type')" ng-href="#/group/{{node.id}}">
         <span ng-if="node.type == 'PROCESS'">[P]</span><span ng-if="node.type == 'COEFFICIENT'">[C]</span> {{node.label}}
       </a>
-      <span ng-if="!node.hasOwnProperty('unit')">{{node.label}}</span>
+      <span ng-if="!node.hasOwnProperty('type')">{{node.label}}</span>
     </div>
   <hr />
 </div>
