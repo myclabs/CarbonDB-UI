@@ -12,6 +12,7 @@ public class TypeSerializer extends JsonSerializer<Type> {
     public void serialize(Type type, JsonGenerator jgen, SerializerProvider provider)
             throws IOException {
         jgen.writeStartObject();
+        jgen.writeStringField("id", type.getId());
         jgen.writeStringField("label", type.getLabel());
         jgen.writeFieldName("unit");
         jgen.writeObject(type.getUnit());

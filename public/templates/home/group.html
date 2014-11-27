@@ -11,11 +11,11 @@
             <select class="form-control" ng-model="viewType" id="viewType">
               <option disabled>Impacts</option>
               <option ng-repeat-start="impactTypeCategory in impactTypes.children" disabled>&nbsp;&nbsp;{{impactTypeCategory.label}}</option>
-                <option ng-repeat="impactType in impactTypeCategory.children" value="{{impactType.uri}}">&nbsp;&nbsp;&nbsp;&nbsp;{{impactType.label}}</option>
+                <option ng-repeat="impactType in impactTypeCategory.children" value="{{impactType.id}}">&nbsp;&nbsp;&nbsp;&nbsp;{{impactType.label}}</option>
               <option ng-repeat-end disabled style="display: none;">------</option>
               <option disabled>Elementary flows</option>
               <option ng-repeat-start="flowTypeCategory in flowTypes.children" disabled>&nbsp;&nbsp;{{flowTypeCategory.label}}</option>
-                <option ng-repeat="flowType in flowTypeCategory.children" value="{{flowType.uri}}">&nbsp;&nbsp;&nbsp;&nbsp;{{flowType.label}}</option>
+                <option ng-repeat="flowType in flowTypeCategory.children" value="{{flowType.id}}">&nbsp;&nbsp;&nbsp;&nbsp;{{flowType.label}}</option>
               <option ng-repeat-end disabled style="display: none;">------</option>
             </select>
           </div>
@@ -37,7 +37,16 @@
     </div>
 
     <h2>Elements</h2>
-    <div tmd row-dimensions="rowDimensions" line-dimensions="lineDimensions" common-keywords="commonKeywords" values="elements" uris="elementsURI" round-values="type == 'PROCESS'" type="type"></div>
+    <div tmd
+         row-dimensions="rowDimensions"
+         line-dimensions="lineDimensions"
+         common-keywords="commonKeywords"
+         values="elements"
+         uris="elementsURI"
+         round-values="type == 'PROCESS'"
+         type="type"
+         unit="tmdUnit">
+     </div>
 
     <h2>Relations</h2>
   	<table class="table tmd table-nonfluid">
@@ -48,12 +57,12 @@
         <th></th>
   		</tr>
   		<tr ng-repeat-start="sourceRelation in sourceRelations">
-  			<td ng-if="sourceRelation.source.uri != URI"><a ng-href="#/group/{{sourceRelation.source.id}}">{{sourceRelation.source.label}}</a></td>
-  			<td ng-if="sourceRelation.source.uri == URI">{{sourceRelation.source.label}}</td>
-  			<td ng-if="sourceRelation.coeff.uri != URI"><a ng-href="#/group/{{sourceRelation.coeff.id}}">{{sourceRelation.coeff.label}} <sup ng-if="sourceRelation.exponent == -1">-1</sup></a></td>
-  			<td ng-if="sourceRelation.coeff.uri == URI">{{sourceRelation.coeff.label}} <sup ng-if="sourceRelation.exponent == -1">-1</sup></td>
-  			<td ng-if="sourceRelation.destination.uri != URI"><a ng-href="#/group/{{sourceRelation.destination.id}}">{{sourceRelation.destination.label}}</a></td>
-  			<td ng-if="sourceRelation.destination.uri == URI">{{sourceRelation.destination.label}}</td>
+  			<td ng-if="sourceRelation.source.id != id"><a ng-href="#/group/{{sourceRelation.source.id}}">{{sourceRelation.source.label}}</a></td>
+  			<td ng-if="sourceRelation.source.id == id">{{sourceRelation.source.label}}</td>
+  			<td ng-if="sourceRelation.coeff.id != id"><a ng-href="#/group/{{sourceRelation.coeff.id}}">{{sourceRelation.coeff.label}} <sup ng-if="sourceRelation.exponent == -1">-1</sup></a></td>
+  			<td ng-if="sourceRelation.coeff.id == id">{{sourceRelation.coeff.label}} <sup ng-if="sourceRelation.exponent == -1">-1</sup></td>
+  			<td ng-if="sourceRelation.destination.id != id"><a ng-href="#/group/{{sourceRelation.destination.id}}">{{sourceRelation.destination.label}}</a></td>
+  			<td ng-if="sourceRelation.destination.id == id">{{sourceRelation.destination.label}}</td>
         <td><a data-toggle="collapse" data-target="#infos-{{$index}}" style="cursor: pointer;">Infos</a></td>
   	 	</tr>
       <tr ng-repeat-end>
@@ -70,20 +79,20 @@
               </tr>
               <tr ng-repeat="relation in sourceRelation.derivedRelations">
                 <td>
-                  <a ng-href="#/process/{{relation.sourceURI.replace('http://www.myc-sense.com/ontologies/bc#', '')}}">
+                  <a ng-href="#/process/{{relation.sourceId}}">
                     {{relation.sourceLabel}}
                     <small>[{{relation.sourceUnit.symbol}}]</small>
                   </a>
                 </td>
                 <td>
-                  <a ng-href="#/coefficient/{{relation.coeffURI.replace('http://www.myc-sense.com/ontologies/bc#', '')}}">
+                  <a ng-href="#/coefficient/{{relation.coeffId}}">
                     {{relation.coeffLabel}}
                     <small>[{{relation.coeffUnit.symbol}}]</small>
                     <sup ng-if="relation.exponent == -1">-1</sup>
                   </a>
                 </td>
                 <td>
-                  <a ng-href="#/process/{{relation.destinationURI.replace('http://www.myc-sense.com/ontologies/bc#', '')}}">
+                  <a ng-href="#/process/{{relation.destinationId}}">
                     {{relation.destinationLabel}}
                     <small>[{{relation.destinationUnit.symbol}}]</small>
                   </a>

@@ -52,7 +52,6 @@ define(["angular"], function(angular) {
     $rootScope.pageTitle = "CarbonDB: References";
     playRoutes.controllers.Onto.getReferences(activeDatabase).get().success(function(data) {
       $scope.references = data.references;
-      $scope.referencesGroups = data.referencesGroups;
     });
   };
   ReferencesCtrl.$inject = ["$scope", "$rootScope", "$location", "$window", "playRoutes"];
@@ -63,7 +62,6 @@ define(["angular"], function(angular) {
       $window.ga('send', 'pageview', { page: $location.path() });
     $scope.scrollTo = function(id) {
       $location.hash(id);
-      console.log($location.hash());
       $anchorScroll();
     }
   };
@@ -147,7 +145,7 @@ define(["angular"], function(angular) {
       $window.ga('send', 'pageview', { page: $location.path() });
 
     playRoutes.controllers.Onto.getGroup(activeDatabase, $routeParams.type + '/' + $routeParams.uri).get().success(function(data) {
-      $scope.URI = data.URI;
+      $scope.id = data.id;
       $scope.label = data.label;
       $scope.dimensionsNumber = data.dimensions.length;
       $scope.elementsNumber = data.elementsNumber;
@@ -188,18 +186,14 @@ define(["angular"], function(angular) {
           d.destinationLabel = d.destination.keywords.map(function(k) { return k.label; }).join(' - ');
         });
       });
-      $scope.unit = data.unit;
-      data.references = [];
+      $scope.unit = data.unit.symbol;
       $scope.references = data.references.sort(sortReferencesCompare);
-      $scope.baseUnit = data.unit;
+      $scope.tmdUnit = data.unit;
       $scope.commonKeywords = data.commonKeywords;
       $scope.elementsImpactsAndFlows = data.elementsImpactsAndFlows;
       $scope.type = data.type;
       $scope.elementsURI = data.elementsURI;
-      $scope.overlap = [];
-      angular.forEach(data.overlap, function(value, key) {
-        this.push({"id": key, "label": value});
-      }, $scope.overlap);
+      $scope.overlap = data.overlap;
       if (data.comment) {
         $scope.comment = data.comment.replace(/\n/g, "<br>");
       }
@@ -232,12 +226,9 @@ define(["angular"], function(angular) {
 
               var elements = data.elementsImpactsAndFlows;
               for (var element in elements) {
-                if (elements[element] == 'empty') {
-                  $scope.elements[element] = elements[element];
-                }
-                else if (elements.hasOwnProperty(element)) {
-                    if (elements[element].hasOwnProperty($scope.viewType.replace(/\./g, "____"))) {
-                      $scope.elements[element] = elements[element][$scope.viewType.replace(/\./g, "____")];
+                if (elements.hasOwnProperty(element)) {
+                    if (elements[element].hasOwnProperty($scope.viewType)) {
+                      $scope.elements[element] = elements[element][$scope.viewType];
                     }
                     else {
                       $scope.elements[element] = {'value': 0.0, 'uncertainty': 0.0};
@@ -249,15 +240,15 @@ define(["angular"], function(angular) {
               for (var t = 0; t < 2; t++) {
                 for (var i = 0; i < types[t].children.length; i++) {
                   for (var j = 0; j < types[t].children[i].children.length; j++) {
-                    if (types[t].children[i].children[j].uri == $scope.viewType) {
+                    if (types[t].children[i].children[j].id == $scope.viewType) {
                       $("#viewType option:selected").text((t == 0 ? "[I]" : "[EF]") + " "
                         + types[t].children[i].label
                         + " - "
                         + types[t].children[i].children[j].label);
-                      $scope.unit = types[t].children[i].children[j].unit + " / " + data.unit;
+                      $scope.unit = types[t].children[i].children[j].unit.symbol + " / " + data.unit.symbol;
                     }
                     else {
-                      $("#viewType option[value='" + types[t].children[i].children[j].uri + "']")
+                      $("#viewType option[value='" + types[t].children[i].children[j].id + "']")
                         .html("&nbsp;&nbsp;&nbsp;&nbsp;" + types[t].children[i].children[j].label);
                     }
                   }
@@ -266,7 +257,7 @@ define(["angular"], function(angular) {
             }
           );
           if (!viewType.selection) {
-            $scope.viewType = "http://www.myc-sense.com/ontologies/bc#it/ghg_emission_measured_using_gwp_over_100_years";
+            $scope.viewType = "it/ghg_emission_measured_using_gwp_over_100_years";
           }
           else {
             $scope.viewType = viewType.selection;
@@ -294,9 +285,9 @@ define(["angular"], function(angular) {
       $scope.keywords = data.keywords.keywords.sort(sortKeywordsCompare);
       $scope.relations = data.relations;
       $scope.relations.forEach(function(r) {
-        r.originLabel = r.originKeywords.keywords.map(function(k) { return k.label; }).join(' - ');
-        r.coeffLabel = r.coeffKeywords.keywords.map(function(k) { return k.label; }).join(' - ');
-        r.destLabel = r.destKeywords.keywords.map(function(k) { return k.label; }).join(' - ');
+        r.sourceLabel = r.source.keywords.map(function(k) { return k.label; }).join(' - ');
+        r.coeffLabel = r.coeff.keywords.map(function(k) { return k.label; }).join(' - ');
+        r.destinationLabel = r.destination.keywords.map(function(k) { return k.label; }).join(' - ');
       });
       $scope.relations.sort(function(a, b) {
         if (a.originId == $scope.id && b.originId != $scope.id) {
@@ -318,18 +309,17 @@ define(["angular"], function(angular) {
       for (var t = 0; t < 2; t++) {
         for (var i = 0; i < types[t].children.length; i++) {
           var impactTypeCategory = types[t].children[i];
-          $scope.impactsAndFlows[impactTypeCategory.uri] = new Array();
+          $scope.impactsAndFlows[impactTypeCategory.id] = new Array();
           for (var j = 0; j < impactTypeCategory.children.length; j++) {
             var impactType = impactTypeCategory.children[j];
-            var impactTypeURI = impactType.uri.replace(/\./g, "____");
-            if (processData[t].hasOwnProperty(impactTypeURI)) {
+            if (processData[t].hasOwnProperty(impactType.id)) {
               var impact = {
                 label: impactType.label,
-                value: sigFigs(processData[t][impactTypeURI].value, 3),
-                uncertainty: processData[t][impactTypeURI].uncertainty,
+                value: sigFigs(processData[t][impactType.id].value, 3),
+                uncertainty: processData[t][impactType.id].uncertainty,
                 unit: impactType.unit
               }
-              $scope.impactsAndFlows[impactTypeCategory.uri].push(impact);
+              $scope.impactsAndFlows[impactTypeCategory.id].push(impact);
             }
           }
         }
@@ -354,21 +344,21 @@ define(["angular"], function(angular) {
       $scope.keywords = data.keywords.keywords.sort(sortKeywordsCompare);
       $scope.relations = data.relations;
       $scope.relations.forEach(function(r) {
-        r.originLabel = r.originKeywords.keywords.map(function(k) { return k.label; }).join(' - ');
-        r.coeffLabel = r.coeffKeywords.keywords.map(function(k) { return k.label; }).join(' - ');
-        r.destLabel = r.destKeywords.keywords.map(function(k) { return k.label; }).join(' - ');
+        r.sourceLabel = r.source.keywords.map(function(k) { return k.label; }).join(' - ');
+        r.coeffLabel = r.coeff.keywords.map(function(k) { return k.label; }).join(' - ');
+        r.destinationLabel = r.destination.keywords.map(function(k) { return k.label; }).join(' - ');
       });
       $scope.relations.sort(function(a, b) {
-        if (a.originLabel < b.originLabel) {
+        if (a.sourceLabel < b.sourceLabel) {
           return -1;
         }
-        else if (a.originLabel > b.originLabel) {
+        else if (a.sourceLabel > b.sourceLabel) {
           return 1;
         }
-        else if (a.destLabel < b.destLabel) {
+        else if (a.destinationLabel < b.destinationLabel) {
           return -1
         }
-        else if (a.destLabel > b.destLabel) {
+        else if (a.destinationLabel > b.destinationLabel) {
           return 1;
         }
         return 0;

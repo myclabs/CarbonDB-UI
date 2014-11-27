@@ -1,23 +1,23 @@
 <div class="container">
   <h1>
-    <span ng-repeat="keyword in keywords">{{keyword.label}} <span ng-show="!$last">-</span> </span><small>[{{unit}}]</small>
+    <span ng-repeat="keyword in keywords">{{keyword.label}} <span ng-show="!$last">-</span> </span><small>[{{unit.symbol}}]</small>
   </h1>
   <p>
 
     <h2>Impacts</h2>
     <div ng-repeat="impactType in impactTypes.children">
       <h3>{{impactType.label}}</h3>
-      <div ng-if="impactsAndFlows[impactType.uri].length == 0">This process has no impact for this impact category.</div>
-      <table class="table tmd table-nonfluid" ng-if="impactsAndFlows[impactType.uri].length > 0">
+      <div ng-if="impactsAndFlows[impactType.id].length == 0">This process has no impact for this impact category.</div>
+      <table class="table tmd table-nonfluid" ng-if="impactsAndFlows[impactType.id].length > 0">
         <tr>
           <th>Type</th>
           <th>Value</th>
           <th>Unit</th>
         </tr>
-        <tr ng-repeat="impact in impactsAndFlows[impactType.uri]">
+        <tr ng-repeat="impact in impactsAndFlows[impactType.id]">
           <td>{{impact.label}}</td>
           <td>{{impact.value}}</td>
-          <td>{{impact.unit}} / {{unit}}</td>
+          <td>{{impact.unit.symbol}} / {{unit.symbol}}</td>
         </tr>
       </table>
     </div>
@@ -25,24 +25,24 @@
     <h2>Elementary flows</h2>
     <div ng-repeat="flowType in flowTypes.children">
       <h3>{{flowType.label}}</h3>
-      <div ng-if="impactsAndFlows[flowType.uri].length == 0">This process has no elementary flow for this elementary flow category.</div>
-      <table class="table tmd table-nonfluid" ng-if="impactsAndFlows[flowType.uri].length > 0">
+      <div ng-if="impactsAndFlows[flowType.id].length == 0">This process has no elementary flow for this elementary flow category.</div>
+      <table class="table tmd table-nonfluid" ng-if="impactsAndFlows[flowType.id].length > 0">
         <tr>
           <th>Type</th>
           <th>Value</th>
           <th>Unit</th>
         </tr>
-        <tr ng-repeat="flow in impactsAndFlows[flowType.uri]">
+        <tr ng-repeat="flow in impactsAndFlows[flowType.id]">
           <td>{{flow.label}}</td>
           <td>{{flow.value}}</td>
-          <td>{{flow.unit}} / {{unit}}</td>
+          <td>{{flow.unit.symbol}} / {{unit.symbol}}</td>
         </tr>
       </table>
     </div>
 
     <h2>Groups containing this process</h2>
     <ul>
-      <li ng-repeat="(groupId, groupLabel) in groups"><a ng-href="#/group/{{groupId}}">{{groupLabel}}</a></li>
+      <li ng-repeat="group in groups"><a ng-href="#/group/{{group.id}}">{{group.label}}</a></li>
     </ul>
 
     <h2>Relations</h2>
@@ -55,32 +55,32 @@
         <th></th>
   		</tr>
   		<tr ng-repeat-start="relation in relations">
-  			<td ng-if="relation.originId != id">
-          <a ng-href="#/process/{{relation.originId}}">
-            {{relation.originLabel}}
-            <small>[{{relation.originUnit}}]</small>
+  			<td ng-if="relation.sourceId != id">
+          <a ng-href="#/process/{{relation.sourceId}}">
+            {{relation.sourceLabel}}
+            <small>[{{relation.sourceUnit.symbol}}]</small>
           </a>
         </td>
-        <td ng-if="relation.originId == id">
-          {{relation.originLabel}}
-          <small>[{{relation.originUnit}}]</small>
+        <td ng-if="relation.sourceId == id">
+          {{relation.sourceLabel}}
+          <small>[{{relation.sourceUnit.symbol}}]</small>
         </td>
         <td ng-if="relation.coeffId != id">
           <a ng-href="#/coefficient/{{relation.coeffId}}">
             {{relation.coeffLabel}}
-            <small>[{{relation.coeffUnit}}]</small>
+            <small>[{{relation.coeffUnit.symbol}}]</small>
             <sup ng-if="relation.exponent == -1">-1</sup>
           </a>
         </td>
-        <td ng-if="relation.destId != id">
-          <a ng-href="#/process/{{relation.destId}}">
-            {{relation.destLabel}}
-            <small>[{{relation.destUnit}}]</small>
+        <td ng-if="relation.destinationId != id">
+          <a ng-href="#/process/{{relation.destinationId}}">
+            {{relation.destinationLabel}}
+            <small>[{{relation.destinationUnit.symbol}}]</small>
           </a>
         </td>
-        <td ng-if="relation.destId == id">
-          {{relation.destLabel}}
-          <small>[{{relation.destUnit}}]</small>
+        <td ng-if="relation.destinationId == id">
+          {{relation.destinationLabel}}
+          <small>[{{relation.destinationUnit.symbol}}]</small>
         </td>
         <td><a data-toggle="collapse" data-target="#infos-{{$index}}" style="cursor: pointer;">Infos</a></td>
   	 	</tr>

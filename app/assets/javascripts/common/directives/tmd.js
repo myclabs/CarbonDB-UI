@@ -18,15 +18,16 @@ define(["angular"], function(angular) {
         values: '=',
         roundValues: '=',
         uris: '=',
-        type: '='
+        type: '=',
+        unit: '='
       },
       templateUrl: 'assets/templates/tmd.html',
       link: function (scope, element, attrs) {
 
-        function createTMD(rowDimensions, lineDimensions, commonKeywords, values, roundValues, uris, type) {
+        function createTMD(rowDimensions, lineDimensions, commonKeywords, values, roundValues, uris, type, unit) {
           var commonKeywordsCoordinate = new Array();
           for (var i = 0; i < commonKeywords.length; i++) {
-            commonKeywordsCoordinate.push(commonKeywords[i].name);
+            commonKeywordsCoordinate.push(commonKeywords[i].id);
           }
           var tmd = new Array();
           var value, span, uri;
@@ -51,7 +52,7 @@ define(["angular"], function(angular) {
                 if (!(k in rowsCoordinates)) {
                   rowsCoordinates[k] = new Array();
                 }
-                rowsCoordinates[k].push(value.name);
+                rowsCoordinates[k].push(value.id);
               }
             }
             repetitions *= rowDimensions[i].length;
@@ -75,7 +76,7 @@ define(["angular"], function(angular) {
                 span *= lineDimensions[k].length;
               }
               value = lineDimensions[j][parseInt(currentLine / span) % lineDimensions[j].length];
-              lineCoordinate.push(value.name);
+              lineCoordinate.push(value.id);
               if ((currentLine % span) == 0) {
                 tmd[i].push({'value': value.label, 'span': span, 'header': true, 'col': false});
               }
@@ -85,7 +86,7 @@ define(["angular"], function(angular) {
               if (rowDimensions.length > 0) {
                 coordinateList = coordinateList.concat(rowsCoordinates[j]);
               }
-              var coordinate = coordinateList.sort().join("").replace(/\./g, "____");
+              var coordinate = coordinateList.sort().join("+") + "+" + unit.id;
               if (!(coordinate in values)) {
                 value = '-';
                 uri = false;
@@ -115,7 +116,7 @@ define(["angular"], function(angular) {
             if (typeof scope.rowDimensions !== 'undefined'
                            && typeof scope.lineDimensions !== 'undefined'
                            && typeof scope.values !== 'undefined') {
-              createTMD(scope.rowDimensions, scope.lineDimensions, scope.commonKeywords, scope.values, scope.roundValues, scope.uris, scope.type);
+              createTMD(scope.rowDimensions, scope.lineDimensions, scope.commonKeywords, scope.values, scope.roundValues, scope.uris, scope.type, scope.unit);
             }
           }
         );

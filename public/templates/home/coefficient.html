@@ -3,10 +3,10 @@
     <span ng-repeat="keyword in keywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
   </h1>
   <p>
-    <h3>Value: {{value.value}} {{unit}}</h3>
+    <h3>Value: {{value.value}} {{unit.symbol}}</h3>
     <h2>Groups containing this coefficient</h2>
     <ul>
-      <li ng-repeat="(groupId, groupLabel) in groups"><a ng-href="#/group/{{groupId}}">{{groupLabel}}</a></li>
+      <li ng-repeat="group in groups"><a ng-href="#/group/{{group.id}}">{{group.label}}</a></li>
     </ul>
 
     <h2>Relations</h2>
@@ -19,21 +19,21 @@
         <th></th>
   		</tr>
   		<tr ng-repeat-start="relation in relations">
-  			<td ng-if="relation.originId != id">
-          <a ng-href="#/process/{{relation.originId}}">
-            {{relation.originLabel}}
-            <small>[{{relation.originUnit}}]</small>
+  			<td>
+          <a ng-href="#/process/{{relation.sourceId}}">
+            {{relation.sourceLabel}}
+            <small>[{{relation.sourceUnit.symbol}}]</small>
           </a>
         </td>
         <td>
           {{relation.coeffLabel}}
-          <small>[{{relation.coeffUnit}}]</small>
+          <small>[{{relation.coeffUnit.symbol}}]</small>
           <sup ng-if="relation.exponent == -1">-1</sup>
         </td>
-        <td ng-if="relation.destId != id">
-          <a ng-href="#/process/{{relation.destId}}">
-            {{relation.destLabel}}
-            <small>[{{relation.destUnit}}]</small>
+        <td>
+          <a ng-href="#/process/{{relation.destinationId}}">
+            {{relation.destinationLabel}}
+            <small>[{{relation.destinationUnit.symbol}}]</small>
           </a>
         </td>
         <td><a data-toggle="collapse" data-target="#infos-{{$index}}" style="cursor: pointer;">Infos</a></td>

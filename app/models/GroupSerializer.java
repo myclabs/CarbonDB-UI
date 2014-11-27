@@ -14,6 +14,7 @@ import com.mycsense.carbondb.domain.SingleElement;
 import com.mycsense.carbondb.domain.SourceRelation;
 import com.mycsense.carbondb.domain.group.Type;
 import com.mycsense.carbondb.domain.Process;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -26,7 +27,8 @@ public class GroupSerializer  extends JsonSerializer<Group> {
         jgen.writeStringField("id", group.getId());
         jgen.writeStringField("comment", group.getComment());
         jgen.writeStringField("label", group.getLabel());
-        jgen.writeStringField("unit", group.getUnit().getSymbol());
+        jgen.writeFieldName("unit");
+        jgen.writeObject(group.getUnit());
         jgen.writeFieldName("type");
         jgen.writeObject(group.getType());
 
@@ -44,7 +46,8 @@ public class GroupSerializer  extends JsonSerializer<Group> {
         jgen.writeStartArray();
         for (Group otherGroup : group.getOverlappingGroups()) {
             jgen.writeStartObject();
-            jgen.writeStringField(otherGroup.getId(), otherGroup.getLabel());
+            jgen.writeStringField("id", otherGroup.getId());
+            jgen.writeStringField("label", otherGroup.getLabel());
             jgen.writeEndObject();
         }
         jgen.writeEndArray();
@@ -59,19 +62,14 @@ public class GroupSerializer  extends JsonSerializer<Group> {
         jgen.writeFieldName("sourceRelations");
         jgen.writeStartArray();
         for (SourceRelation sourceRelation : group.getSourceRelations()) {
-            jgen.writeStartObject();
             jgen.writeObject(sourceRelation);
-            jgen.writeEndObject();
         }
         jgen.writeEndArray();
 
         jgen.writeFieldName("elementsURI");
         jgen.writeStartObject();
-        if (group.getId().equals("gp/direct_emission_of_greenhouse_gas")) {
-            System.out.println("number of elements = " + group.getElements().size());
-        }
         for (SingleElement element : group.getElements()) {
-            jgen.writeStringField(joinDimensionKeywords(element.getKeywords()), element.getId());
+            jgen.writeStringField(StringUtils.join(element.getKeywords().keywords, "+") + "+" + element.getUnit().getId(), element.getId());
         }
         jgen.writeEndObject();
 
@@ -80,7 +78,7 @@ public class GroupSerializer  extends JsonSerializer<Group> {
             jgen.writeStartObject();
             for (SingleElement element : group.getElements()) {
                 Coefficient coeff = (Coefficient) element;
-                jgen.writeFieldName(coeff.getId());
+                jgen.writeFieldName(StringUtils.join(element.getKeywords().keywords, "+") + "+" + element.getUnit().getId());
                 jgen.writeStartObject();
                 jgen.writeNumberField("value", coeff.getValue().value);
                 jgen.writeNumberField("uncertainty", coeff.getValue().uncertainty);
@@ -93,7 +91,7 @@ public class GroupSerializer  extends JsonSerializer<Group> {
             jgen.writeStartObject();
             for (SingleElement element : group.getElements()) {
                 Process process = (Process) element;
-                jgen.writeFieldName(process.getId());
+                jgen.writeFieldName(StringUtils.join(element.getKeywords().keywords, "+") + "+" + element.getUnit().getId());
                 jgen.writeStartObject();
                 for (ElementaryFlow flow : process.getCalculatedFlows().values()) {
                     jgen.writeFieldName(flow.getType().getId());
