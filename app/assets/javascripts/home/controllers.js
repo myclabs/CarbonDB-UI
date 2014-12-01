@@ -152,10 +152,10 @@ define(["angular"], function(angular) {
       $scope.elementsNumber = data.elementsNumber;
       $scope.sourceRelations = data.sourceRelations;
       $scope.sourceRelations.sort(function(a, b) {
-        if (a.source.uri == $scope.URI && b.source.uri != $scope.URI) {
+        if (a.source.id == $scope.id && b.source.id != $scope.id) {
           return 1;
         }
-        else if (a.destination.uri == $scope.URI && b.destination.uri != $scope.URI) {
+        else if (a.destination.id == $scope.id && b.destination.id != $scope.id) {
           return -1;
         }
         else if (data.type == 'COEFFICIENT') {
