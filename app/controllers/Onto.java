@@ -102,11 +102,8 @@ public class Onto extends Controller {
                         play.Logger.info("Feeding MongoDB");
                         feedMongoDB(database);
                     } catch (Exception e) {
-                        //throw e;
-                        result.put("result", e.getMessage());
-                        //result.put("report", toJson(report));
                         e.printStackTrace(System.out);
-                        return ok(result);
+                        return badRequest(e.getMessage());
                     } finally {
                         play.Logger.info("Clearing the ontology");
                         CarbonOntology.getInstance().clear();
