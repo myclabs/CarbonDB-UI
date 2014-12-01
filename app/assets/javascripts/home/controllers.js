@@ -126,6 +126,7 @@ define(["angular"], function(angular) {
           $scope[slot].warnings = data.report.warnings;
           // file is uploaded successfully
         }).error(function(data) {
+          $scope[slot].fileUploading = false;
           $scope[slot].fileUploadResult = "Something went wrong when uploading the file: " + data;
         });
         //.then(success, error, progress); 
@@ -415,7 +416,7 @@ define(["angular"], function(angular) {
       if (positions.hasOwnProperty(position)) {
         var indexInKeywords = -1;
         for (var i = 0; i < keywords.length; i++) {
-          if (keywords[i].name == positions[position]) {
+          if (keywords[i].id == positions[position]) {
             indexInKeywords = i;
             break;
           }

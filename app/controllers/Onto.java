@@ -77,52 +77,54 @@ public class Onto extends Controller {
         }
         else if (filePart != null) {
             String fileName = filePart.getFilename();
-            String contentType = filePart.getContentType(); 
-            File file = filePart.getFile();
-            File newFile = new File(baseOntoFileName);
-            try {
-               FileUtils.copyFile(file, newFile);
+            String contentType = filePart.getContentType();
+            if (!contentType.equals("application/rdf+xml")) {
+                play.Logger.error("Aborting: content type not supported");
+                return badRequest("Content type not supported");
             }
-            catch (IOException e) {
-                result.put("result", e.getMessage());
-                return ok(result);
-            }
-            try {
-                PelletOptions.USE_CLASSIFICATION_MONITOR = PelletOptions.MonitorType.NONE;
-
+            else {
+                File file = filePart.getFile();
+                File newFile = new File(baseOntoFileName);
                 try {
-                    Cache.set("conversionFactors", unitTools.getConversionFactorsCache());
-                    Cache.set("compatibleUnits", unitTools.getCompatibleUnitsCache());
-                    Cache.set("unitSymbols", unitTools.getSymbolsCache());
-                    Model model = getInferredModel();
-                    play.Logger.info("Feeding MongoDB");
-                    feedMongoDB(database);
-                }
-                catch (Exception e) {
-                    //throw e;
+                    FileUtils.copyFile(file, newFile);
+                } catch (IOException e) {
                     result.put("result", e.getMessage());
-                    //result.put("report", toJson(report));
-                    e.printStackTrace(System.out);
                     return ok(result);
                 }
-                finally {
-                    play.Logger.info("Clearing the ontology");
-                    CarbonOntology.getInstance().clear();
-                }
-                result.put("result", "The ontology has been processed without error");
+                try {
+                    PelletOptions.USE_CLASSIFICATION_MONITOR = PelletOptions.MonitorType.NONE;
+
+                    try {
+                        Cache.set("conversionFactors", unitTools.getConversionFactorsCache());
+                        Cache.set("compatibleUnits", unitTools.getCompatibleUnitsCache());
+                        Cache.set("unitSymbols", unitTools.getSymbolsCache());
+                        Model model = getInferredModel();
+                        play.Logger.info("Feeding MongoDB");
+                        feedMongoDB(database);
+                    } catch (Exception e) {
+                        //throw e;
+                        result.put("result", e.getMessage());
+                        //result.put("report", toJson(report));
+                        e.printStackTrace(System.out);
+                        return ok(result);
+                    } finally {
+                        play.Logger.info("Clearing the ontology");
+                        CarbonOntology.getInstance().clear();
+                    }
+                    result.put("result", "The ontology has been processed without error");
                 /*if (report.errors.size() > 0) {
                     result.put("result", "The ontology has been processed and contains some errors");
                 }
                 else {
                     result.put("result", "The ontology has been processed without error");
                 }*/
-                //result.put("report", toJson(report));
-                play.Logger.info("Processing finished");
-                return ok(result);
-            }
-            catch (Exception e) {
-                e.printStackTrace(System.out);
-                return badRequest(e.toString());
+                    //result.put("report", toJson(report));
+                    play.Logger.info("Processing finished");
+                    return ok(result);
+                } catch (Exception e) {
+                    e.printStackTrace(System.out);
+                    return badRequest(e.toString());
+                }
             }
         }
         else {
@@ -287,8 +289,7 @@ public class Onto extends Controller {
 
     protected static DB mongoConnect(String database) throws Exception {
         mongoClient = new MongoClient( "localhost" , 27017 );
-        DB db = mongoClient.getDB( database );
-        return db;
+        return mongoClient.getDB( database );
     }
 
     protected static void mongoClose() {
@@ -406,11 +407,11 @@ public class Onto extends Controller {
         }
     }
 
-    public static Result getProcess(String database, String processURI) {
+    public static Result getProcess(String database, String processId) {
         try {
             DB db = mongoConnect(database);
             DBCollection processesColl = db.getCollection("processes");
-            BasicDBObject query = new BasicDBObject("_id", processURI);
+            BasicDBObject query = new BasicDBObject("_id", processId);
             String response = processesColl.findOne(query).toString();
             mongoClose();
             return ok(response);
@@ -420,11 +421,11 @@ public class Onto extends Controller {
         }
     }
 
-    public static Result getCoefficient(String database, String coeffURI) {
+    public static Result getCoefficient(String database, String coeffId) {
         try {
             DB db = mongoConnect(database);
             DBCollection coefficientsColl = db.getCollection("coefficients");
-            BasicDBObject query = new BasicDBObject("_id", coeffURI);
+            BasicDBObject query = new BasicDBObject("_id", coeffId);
             String response = coefficientsColl.findOne(query).toString();
             mongoClose();
             return ok(response);
