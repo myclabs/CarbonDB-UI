@@ -16,19 +16,20 @@ define(["angular"], function(angular) {
   };
   HomeCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$window", "playRoutes"];
 
-  var GraphCtrl = function($scope, $rootScope, $location, $window, playRoutes) {
+  var GraphCtrl = function($scope, $rootScope, $location, $window, playRoutes, graph) {
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
     $rootScope.pageTitle = "CarbonDB: Graph";
-    console.log(playRoutes.controllers.Onto);
-    playRoutes.controllers.Onto.getGraph(activeDatabase).get().success(function(data) {
+    graph.promise.success(function() {
+      var data = graph.getLocalGraph("gp/direct_emission_of_greenhouse_gas", 2);
+      //var data = graph.getGraph();
       $scope.d3Nodes = [];
-      data.nodes.forEach(function (element, index) { $scope.d3Nodes.push({'name': element, 'id': data.nodesId[index]}) });
+      data.nodes.forEach(function (element, index) { $scope.d3Nodes[index] = {'name': element.label, 'id': element.id} });
       $scope.d3Links = data.links;
       $scope.relationTypes = data.types;
     });
   };
-  GraphCtrl.$inject = ["$scope", "$rootScope", "$location", "$window", "playRoutes"];
+  GraphCtrl.$inject = ["$scope", "$rootScope", "$location", "$window", "playRoutes", "graph"];
 
   var TreeCtrl = function($scope, $rootScope, $location, $window, playRoutes) {
     if ($location.host() != 'localhost')

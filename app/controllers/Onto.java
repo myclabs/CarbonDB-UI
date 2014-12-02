@@ -155,7 +155,7 @@ public class Onto extends Controller {
     }
 
     protected static void feedMongoDB(String database) throws Exception {
-        ArrayList<String> nodesLabel = new ArrayList<>();
+        ArrayList<HashMap<String, String>> nodes = new ArrayList<>();
         ArrayList<String> nodesId = new ArrayList<>();
         ArrayList<HashMap<String, Object>> links = new ArrayList<>();
 
@@ -216,8 +216,11 @@ public class Onto extends Controller {
             groupsColl.insert(dbObject);
 
             if (group.getType() == Type.PROCESS) {
+                HashMap<String, String> node = new HashMap<>();
+                node.put("id", group.getId());
+                node.put("label", group.getLabel());
+                nodes.add(node);
                 nodesId.add(group.getId());
-                nodesLabel.add(group.getLabel());
             }
         }
 
@@ -270,8 +273,7 @@ public class Onto extends Controller {
             relationTypes.put(type.getId(), type);
         }
 
-        dbObject = (BasicDBObject) JSON.parse("{nodes:" + toJson(nodesLabel).toString()
-                + ",nodesId:" + toJson(nodesId).toString()
+        dbObject = (BasicDBObject) JSON.parse("{nodes:" + toJson(nodes).toString()
                 + ",links:" + toJson(links).toString()
                 + ",types:" + toJson(relationTypes).toString() + "}");
         graphColl.insert(dbObject);
