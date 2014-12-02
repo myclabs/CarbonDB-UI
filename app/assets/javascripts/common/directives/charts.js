@@ -154,6 +154,10 @@ var zoom = d3.behavior.zoom()
             svg.selectAll('*').remove();
             nodes.forEach(function (node) {
               node.moved = false;
+              if (node.id == "gp/direct_emission_of_greenhouse_gas") {
+                node.fixed = true;
+                console.log(node);
+              }
               node.out = [];
               node.inc = [];
             });
@@ -208,10 +212,13 @@ var zoom = d3.behavior.zoom()
 
         function dragstart(d) {
           d3.select(this).classed("fixed", d.fixed = true);
+          d3.select(this).classed("moved", d.moved = true);
+          d3.event.sourceEvent.stopPropagation();
         }
         function dblclick(d) {
           d3.event.stopPropagation();
           d3.select(this).classed("fixed", d.fixed = false);
+          console.log("dblclick");
           force.start();
         }
 
@@ -221,6 +228,7 @@ var zoom = d3.behavior.zoom()
             .attr("class", "node")
             .call(drag)
             .on("dblclick", dblclick)
+            .on("click", function(d) { if (d3.event.defaultPrevented) return; console.log(d.id); scope.selectedNode = d.id; })
             .on("mousedown", function() { d3.event.stopPropagation(); });
             node.exit().remove();
             
@@ -246,7 +254,6 @@ var zoom = d3.behavior.zoom()
                     dy += ddy;
                 });
             });
-
 
         var rect = node.append('rect')
           .attr('width', 80)
@@ -277,6 +284,7 @@ var zoom = d3.behavior.zoom()
               .style("opacity",0);
         });
 
+        // bounding boxes calculation
         node.each(function(d) {
             var node   = d3.select(this),
                 text   = node.selectAll('.nodeText'),
@@ -390,6 +398,11 @@ function tick(e) {
           node.x -= 200 * e.alpha;
         else if (node.out.length == 0 && node.inc.length > 0)
           node.x += 200 * e.alpha;
+      }
+      if (node.id == "gp/direct_emission_of_greenhouse_gas" && !node.moved) {
+        node.x = 500;
+        node.y = 200;
+        //console.log(node);
       }
     });
 
