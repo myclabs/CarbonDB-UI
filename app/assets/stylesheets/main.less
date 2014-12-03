@@ -55,9 +55,19 @@ a.anchor {
 #partners {
   .thumbnail {
     height: 110px;
+    white-space: nowrap;
+    text-align: center;
     img {
       max-height: 100px;
+      vertical-align: middle;
+      display: inline-block;
     }
+  }
+  :before {
+    content: "";
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
   }
 }
 
