@@ -9,9 +9,10 @@ define(["angular"], function(angular) {
     var links = new Array();
     var types;
     var promise = playRoutes.controllers.Onto.getGraph(activeDatabase).get().success(function(data) {
-      nodes = data.nodes;
-      links = data.links;
-      types = data.types;
+        console.log("success");
+        nodes = data.nodes;
+        links = data.links;
+        types = data.types;
     });
     var filteredLinks = new Array();
     var filteredNodes = new Array();
@@ -25,16 +26,20 @@ define(["angular"], function(angular) {
             filterNodesAndLinks(nodeIndex, depth, "target", false);
         }
         else if (recursion) {
-            filteredNodes.push(nodes[nodeIndex]);
+            console.log("inserting node " + nodeIndex + " (" + nodes[nodeIndex].label + ") into the filteredNodes array");
+            // we copy the node so d3js does not store the node status
+            var newNode = {id: nodes[nodeIndex].id, label: nodes[nodeIndex].label};
+            filteredNodes.push(newNode);
         }
         if (depth > 0) {
             var invDirection = "source";
             if (direction == "source")
                 invDirection = "target";
+            var filteredNodeIndex = filteredNodes.length-1;
             for (var i = 0; i < links.length; i++) {
                 if (links[i][direction] == nodeIndex) {
                     var link = {type: links[i].type};
-                    link[direction] = recursion ? filteredNodes.length-1 : 0;
+                    link[direction] = recursion ? filteredNodeIndex : 0;
                     link[invDirection] = filteredNodes.length;
                     filteredLinks.push(link);
                     filterNodesAndLinks(links[i][invDirection], depth-1, direction, true);
@@ -52,6 +57,17 @@ define(["angular"], function(angular) {
     return {
       promise: promise,
       getGraph: function () {
+        // preparing the data structure for the graph view
+        nodes.forEach(function (node) {
+            node.out = [];
+            node.inc = [];
+        });
+        links.forEach(function (link) {
+            var node = nodes[link.source];
+            var outNode = nodes[link.target];
+            node.out.push(link.target);
+            outNode.inc.push(link.source);
+        });
         return {
             nodes: nodes,
             links: links,
@@ -60,6 +76,19 @@ define(["angular"], function(angular) {
       },
       getLocalGraph: function(nodeId, depth) {
         filterNodesAndLinks(nodeId, depth);
+        // preparing the data structure for the graph view
+        filteredNodes.forEach(function (node) {
+            node.out = [];
+            node.inc = [];
+        });
+        filteredLinks.forEach(function (link) {
+            var node = filteredNodes[link.source];
+            var outNode = filteredNodes[link.target];
+            node.out.push(link.target);
+            outNode.inc.push(link.source);
+        });
+        console.log(filteredLinks);
+        console.log(filteredNodes);
         return {
             nodes: filteredNodes,
             links: filteredLinks,

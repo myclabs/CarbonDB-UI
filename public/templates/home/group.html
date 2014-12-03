@@ -23,6 +23,11 @@
     </div>
     <p><strong>Unit:</strong> {{unit}}</p>
 
+    <div ng-if="type == 'PROCESS'">
+        <h3>Graph</h3>
+        <div d3-force nodes="d3Nodes" links="d3Links" types="relationTypes" full-page="false" id="graph" local="true" node-id="nodeId"></div>
+    </div>
+
     <div ng-if="comment">
       <h3>Comment</h3>
       <span ng-bind-html="comment"></span>

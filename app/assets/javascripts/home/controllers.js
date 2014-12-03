@@ -21,10 +21,8 @@ define(["angular"], function(angular) {
       $window.ga('send', 'pageview', { page: $location.path() });
     $rootScope.pageTitle = "CarbonDB: Graph";
     graph.promise.success(function() {
-      var data = graph.getLocalGraph("gp/direct_emission_of_greenhouse_gas", 2);
-      //var data = graph.getGraph();
-      $scope.d3Nodes = [];
-      data.nodes.forEach(function (element, index) { $scope.d3Nodes[index] = {'name': element.label, 'id': element.id} });
+      var data = graph.getGraph();
+      $scope.d3Nodes = data.nodes;
       $scope.d3Links = data.links;
       $scope.relationTypes = data.types;
     });
@@ -137,7 +135,7 @@ define(["angular"], function(angular) {
   };
   UploadCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$upload", "$window", "playRoutes"];
 
-  var GroupCtrl = function($scope, $rootScope, $location, helper, $http, $routeParams, $window, playRoutes, ontologyTypes, viewType) {
+  var GroupCtrl = function($scope, $rootScope, $location, helper, $http, $routeParams, $window, playRoutes, ontologyTypes, viewType, graph) {
     $rootScope.pageTitle = "CarbonDB: Group view";
     $scope.groupName = $routeParams.uri;
     $scope.impactTypes = ontologyTypes.getImpactTypesTree();
@@ -267,8 +265,16 @@ define(["angular"], function(angular) {
       }
     });
 
+    graph.promise.success(function() {
+      var data = graph.getLocalGraph($routeParams.type + '/' + $routeParams.uri, 2);
+      $scope.nodeId = $routeParams.type + '/' + $routeParams.uri;
+      $scope.d3Nodes = data.nodes;
+      $scope.d3Links = data.links;
+      $scope.relationTypes = data.types;
+    });
+
   };
-  GroupCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$routeParams", "$window", "playRoutes", "ontologyTypes", "viewType"];
+  GroupCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$routeParams", "$window", "playRoutes", "ontologyTypes", "viewType", "graph"];
 
   var ProcessCtrl = function($scope, $rootScope, $location, $routeParams, $window, playRoutes, ontologyTypes) {
     $rootScope.pageTitle = "CarbonDB: Process view";
