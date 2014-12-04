@@ -1,5 +1,18 @@
 <div class="container">
   <h1>{{label}}</h1>
+    <h2>Local graph <small><a data-toggle="collapse" data-target="#localGraph" style="cursor: pointer;">show/hide the local graph</a></small></h2>
+    <div ng-if="type == 'PROCESS'" class="collapse out" id="localGraph">
+        <label class="control-label">Number of upstream groups</label>
+        <div class="btn-group">
+            <buton class="btn btn-primary btn-xs" ng-class="{active: ($index + 1)==$parent.$parent.upstreamDepth}" ng-click="$parent.$parent.upstreamDepth = ($index + 1)" ng-repeat="n in [1, 2, 3] track by $index">{{n}}</buton>
+        </div>
+        <label class="control-label">Number of downstream groups</label>
+        <div class="btn-group">
+            <buton class="btn btn-primary btn-xs" ng-class="{active: ($index + 1)==$parent.$parent.downstreamDepth}" ng-click="$parent.$parent.downstreamDepth = ($index + 1)" ng-repeat="n in [1, 2, 3] track by $index">{{n}}</buton>
+        </div>
+        <div d3-force nodes="d3Nodes" links="d3Links" types="relationTypes" full-page="false" id="graph" local="true" node-id="nodeId"></div>
+    </div>
+
     <p ng-if="commonKeywords">
       <strong>Common keywords:</strong>
     	<span ng-repeat="keyword in commonKeywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
@@ -22,11 +35,6 @@
       </div>
     </div>
     <p><strong>Unit:</strong> {{unit}}</p>
-
-    <div ng-if="type == 'PROCESS'">
-        <h3>Graph</h3>
-        <div d3-force nodes="d3Nodes" links="d3Links" types="relationTypes" full-page="false" id="graph" local="true" node-id="nodeId"></div>
-    </div>
 
     <div ng-if="comment">
       <h3>Comment</h3>

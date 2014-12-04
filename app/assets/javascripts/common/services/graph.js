@@ -8,8 +8,9 @@ define(["angular"], function(angular) {
     var nodes = new Array();
     var links = new Array();
     var types;
+    var upstreamDepth = 2;
+    var downstreamDepth = 2;
     var promise = playRoutes.controllers.Onto.getGraph(activeDatabase).get().success(function(data) {
-        console.log("success");
         nodes = data.nodes;
         links = data.links;
         types = data.types;
@@ -21,12 +22,12 @@ define(["angular"], function(angular) {
             filteredLinks = new Array();
             filteredNodes = new Array();
             nodeIndex = findIndex(nodeIndex);
-            filteredNodes.push(nodes[nodeIndex]);
-            filterNodesAndLinks(nodeIndex, depth, "source", false);
-            filterNodesAndLinks(nodeIndex, depth, "target", false);
+            var newNode = {id: nodes[nodeIndex].id, label: nodes[nodeIndex].label, fixed: true};
+            filteredNodes.push(newNode);
+            filterNodesAndLinks(nodeIndex, downstreamDepth, "source", false);
+            filterNodesAndLinks(nodeIndex, upstreamDepth, "target", false);
         }
         else if (recursion) {
-            console.log("inserting node " + nodeIndex + " (" + nodes[nodeIndex].label + ") into the filteredNodes array");
             // we copy the node so d3js does not store the node status
             var newNode = {id: nodes[nodeIndex].id, label: nodes[nodeIndex].label};
             filteredNodes.push(newNode);
@@ -74,8 +75,8 @@ define(["angular"], function(angular) {
             types: types
         };
       },
-      getLocalGraph: function(nodeId, depth) {
-        filterNodesAndLinks(nodeId, depth);
+      getLocalGraph: function(nodeId) {
+        filterNodesAndLinks(nodeId, 0);
         // preparing the data structure for the graph view
         filteredNodes.forEach(function (node) {
             node.out = [];
@@ -87,13 +88,23 @@ define(["angular"], function(angular) {
             node.out.push(link.target);
             outNode.inc.push(link.source);
         });
-        console.log(filteredLinks);
-        console.log(filteredNodes);
         return {
             nodes: filteredNodes,
             links: filteredLinks,
             types: types
         };
+      },
+      setUpstreamDepth: function(pUpstreamDepth) {
+        upstreamDepth = pUpstreamDepth;
+      },
+      getUpstreamDepth: function () {
+        return upstreamDepth;
+      },
+      setDownstreamDepth: function(pDownstreamDepth) {
+        downstreamDepth = pDownstreamDepth;
+      },
+      getDownstreamDepth: function () {
+        return downstreamDepth;
       }
     };
   }]);

@@ -100,6 +100,57 @@ var preventCollisions = function() {
         });}
     }
 }
+
+var setBoudingBox = function(d) {
+    var node   = d3.select(this),
+        text   = node.selectAll('.nodeText'),
+        bounds = {},
+        first  = true;
+
+    text.each(function() {
+        var box = this.getBBox();
+        if (first || box.x < bounds.x1) {
+            bounds.x1 = box.x;
+        }
+        if (first || box.y < bounds.y1) {
+            bounds.y1 = box.y;
+        }
+        if (first || box.x + box.width > bounds.x2) {
+            bounds.x2 = box.x + box.width;
+        }
+        if (first || box.y + box.height > bounds.y2) {
+            bounds.y2 = box.y + box.height;
+        }
+        first = false;
+    }).attr('text-anchor', 'middle');
+
+    var oldWidth = bounds.x2 - bounds.x1;
+
+    bounds.x1 -= oldWidth / 2;
+    bounds.x2 -= oldWidth / 2;
+
+    bounds.x1 -= 5; //padding.left;
+    bounds.y1 -= 5; //padding.top;
+    bounds.x2 += 5; //padding.left + padding.right;
+    bounds.y2 += 5; //padding.top  + padding.bottom;
+
+    adaptNodeToBounds(node, bounds);
+
+    d.extent = {
+        left   : bounds.x1 - 10, //margin.left,
+        right  : bounds.x2 + 10, //margin.left + margin.right,
+        top    : bounds.y1 - 10, //margin.top,
+        bottom : bounds.y2 + 10 //margin.top  + margin.bottom
+    };
+
+    d.edge = {
+        left   : new geo.LineSegment(bounds.x1, bounds.y1, bounds.x1, bounds.y2),
+        right  : new geo.LineSegment(bounds.x2, bounds.y1, bounds.x2, bounds.y2),
+        top    : new geo.LineSegment(bounds.x1, bounds.y1, bounds.x2, bounds.y1),
+        bottom : new geo.LineSegment(bounds.x1, bounds.y2, bounds.x2, bounds.y2)
+    };
+}
+
 var adaptNodeToBounds = function(node, bounds) {
   node.select('.nodeRect')
     .attr('x', bounds.x1)
@@ -116,32 +167,28 @@ var adaptNodeToBounds = function(node, bounds) {
     .attr('y', bounds.y2 + 7)
     .attr('width' , bounds.x2 - bounds.x1 - 10);
 };
+
+var dragstart = function(d) {
+    d3.select(this).classed("fixed", d.fixed = true);
+    d3.select(this).classed("moved", d.moved = true);
+    d3.event.sourceEvent.stopPropagation();
+}
+
+var dblclick = function(d) {
+    d3.event.stopPropagation();
+    d3.select(this).classed("fixed", d.fixed = false);
+    //force.start();
+}
 /**************************
  * End fo utility functions
  **************************/
 
-
-$window.onresize = function() {
-    if (scope.fullPage) {
-        $("svg").css("height", window.innerHeight - ($("svg").parent().get(0).getBoundingClientRect().top + 5));
-    }
-    //scope.$apply();
-    scope.render(scope.nodes, scope.links, scope.types, scope.fullPage, scope.local, scope.nodeId);
-};
-
-/*scope.$watch(function() {
-    return angular.element($window)[0].innerWidth;
-}, function() {
-    scope.render(nodes, links, types, fullPage, local, nodeId);
-});*/
-
-scope.$watch('nodes && links && types', function(newData, oldData, scope) {
-    console.log("watch expression fired - " + scope.preRendered);
+scope.$watch('nodes', function(newData, oldData, scope) {
     if (scope.nodes || scope.links || scope.types) {
         scope.render(scope.nodes, scope.links, scope.types, scope.fullPage, scope.local, scope.nodeId);
     }
 });
- 
+
 // ------
 // Render
 // ------
@@ -151,44 +198,39 @@ scope.render = function(nodes, links, types, fullPage, local, nodeId) {
         //.scaleExtent([1, 10])
         .on("zoom", zoomed);
 
+    // create the svg
+    //console.log(angular.element(ele)[0].offsetWidth);
     d3.select(ele[0]).selectAll('*').remove();
     var svg = d3.select(ele[0])
         .append('svg')
-        .style('width', '100%')
-        .style('height', '500px')
-        .append("g")
+        .attr('width', $(".container").offsetWidth);
+    var gZoom = svg.append("g")
         .call(zoom)
         .append("g");
-    if (scope.fullPage) {
-        $("svg").css("height", window.innerHeight - ($("svg").parent().get(0).getBoundingClientRect().top + 5));
+    if (fullPage) {
+        svg.attr("height", window.innerHeight - ($("svg").parent().get(0).getBoundingClientRect().top + 5));
         $("svg").css("border", "none");
     }
+    else {
+        svg.attr('height', '500');
+    }
+
+    $("svg").on("resize", function() { console.log("resize"); });
 
     function zoomed() {
-        svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+        gZoom.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
     }
-    nodes.forEach(function (node) {
-        node.moved = false;
-        if (local && node.id == nodeId) {
-            node.fixed = true;
-            console.log("nodeid found");
-            console.log(node);
-            console.log(d3.select(node));
-        }
-        else {
-            node.fixed = false;
-        }
-    });
 
-    svg.append("rect")
-        .attr("width", 2300)
-        .attr("height", 1000)
+    // this rectangle is here for the pan and should cover all svg area
+    gZoom.append("rect")
+        .attr("width", 100000)
+        .attr("height", 100000)
         .attr("opacity", 0)
-        .style("style", "gray")
         .attr("x", -575)
         .attr("y", -250);
- 
 
+    // setting the arrows heads color based on the relation types
+    // fill is also used for the edges line color
     var fill = d3.scale.category10();
     var numberOfTypes = 0;
     var typesEndMarkers = [{id: 'end0', color: '#aaa'}];
@@ -200,63 +242,51 @@ scope.render = function(nodes, links, types, fullPage, local, nodeId) {
         }
     }
 
-    if (fullPage) {
-        var width = window.innerWidth,
-            height = window.innerHeight - ($("svg").parent().get(0).getBoundingClientRect().top + 5);
-    }
-    else {
-        var width = 1150,
-            height = 500;
-    }
-
+    // set the force layout parameters
     var force = d3.layout.force()
         .nodes(nodes)
         .links(links)
-        .size([width, height])
+        .size([svg.attr("width"), svg.attr("height")])
         .on("tick", tick)
         .linkDistance(50)
-        .charge(-800)
+        .charge(local ? -2000 : -800)
         .gravity(.20);
 
     var drag = force.drag()
                .on("dragstart", dragstart);
 
-    function dragstart(d) {
-        console.log("dragstart");
-        console.log(this);
-        console.log(d3.select(this));
-        d3.select(this).classed("fixed", d.fixed = true);
-        d3.select(this).classed("moved", d.moved = true);
-        d3.event.sourceEvent.stopPropagation();
-    }
-    function dblclick(d) {
-        d3.event.stopPropagation();
-        d3.select(this).classed("fixed", d.fixed = false);
-        console.log("dblclick");
-        force.start();
-    }
-
-    var node = svg.selectAll(".node")
-                  .data(nodes);
+    // set the nodes properties
+    var node = gZoom.selectAll(".node").data(nodes);
     node.enter().append("g")
         .attr("class", "node")
         .classed("fixed", function (n) { return n.fixed })
         .call(drag)
         .on("dblclick", dblclick)
-        .on("click", function(d) { if (d3.event.defaultPrevented) return; console.log(d.id); scope.selectedNode = d.id; })
-        .on("mousedown", function() { d3.event.stopPropagation(); });
-    node.exit().remove();
-
-    node.append('rect')
+        .on("click", function(d) { if (d3.event.defaultPrevented) return; scope.selectedNode = d.id; })
+        .on("mousedown", function() { d3.event.stopPropagation(); })
+        .append('rect')
         .attr('rx', 5)
         .attr('ry', 5)
         .attr('width' , 90)
         .attr('height', 20)
-        .attr('class', 'nodeRect');
+        .attr('class', 'nodeRect')
+    // node group link rectangle
+    node.append('rect')
+        .attr('width', 80)
+        .attr('height', 10)
+        .attr('class', 'linkRect');
+    // node group link
+    node.append('a')
+        .attr('xlink:href', function(d) { return '#/group/' + d.id; } )
+        .append('text')
+        .attr('text-anchor', 'middle')
+        .text('View group')
+        .attr('class', 'linkText');
+    node.exit().remove();
 
+    // add the nodes multiline label
     node.each(function(d) {
         var node  = d3.select(this),
-            rect  = node.select('.nodeRect'),
             lines = wrap(d.label),
             ddy   = 1.1,
             dy    = -ddy * lines.length / 2 + .5;
@@ -270,18 +300,8 @@ scope.render = function(nodes, links, types, fullPage, local, nodeId) {
         });
     });
 
-    var rect = node.append('rect')
-                   .attr('width', 80)
-                   .attr('height', 10)
-                   .attr('class', 'linkRect');
-    node.append('a')
-        .attr('xlink:href', function(d) { return '#/group/' + d.id; } )
-        .append('text')
-        .attr('text-anchor', 'middle')
-        .text('View group')
-        .attr('class', 'linkText');
 
-    var mouseoutTimeout; // @todo use timeout
+    // add mouseover event to show the group link
     node.on('mouseover', function(d) {
         d3.select(this).select('.linkRect')
           .transition(300)
@@ -300,68 +320,48 @@ scope.render = function(nodes, links, types, fullPage, local, nodeId) {
     });
 
     // bounding boxes calculation
-    node.each(function(d) {
-        var node   = d3.select(this),
-            text   = node.selectAll('.nodeText'),
-            bounds = {},
-            first  = true;
-
-        text.each(function() {
-            var box = this.getBBox();
-            if (first || box.x < bounds.x1) {
-                bounds.x1 = box.x;
-            }
-            if (first || box.y < bounds.y1) {
-                bounds.y1 = box.y;
-            }
-            if (first || box.x + box.width > bounds.x2) {
-                bounds.x2 = box.x + box.width;
-            }
-            if (first || box.y + box.height > bounds.y2) {
-                bounds.y2 = box.y + box.height;
-            }
-            first = false;
-        }).attr('text-anchor', 'middle');
-
-        var oldWidth = bounds.x2 - bounds.x1;
-
-        bounds.x1 -= oldWidth / 2;
-        bounds.x2 -= oldWidth / 2;
-
-        bounds.x1 -= 5; //padding.left;
-        bounds.y1 -= 5; //padding.top;
-        bounds.x2 += 5; //padding.left + padding.right;
-        bounds.y2 += 5; //padding.top  + padding.bottom;
-
-        adaptNodeToBounds(node, bounds);
-
-        d.extent = {
-            left   : bounds.x1 - 10, //margin.left,
-            right  : bounds.x2 + 10, //margin.left + margin.right,
-            top    : bounds.y1 - 10, //margin.top,
-            bottom : bounds.y2 + 10 //margin.top  + margin.bottom
-        };
-
-        d.edge = {
-            left   : new geo.LineSegment(bounds.x1, bounds.y1, bounds.x1, bounds.y2),
-            right  : new geo.LineSegment(bounds.x2, bounds.y1, bounds.x2, bounds.y2),
-            top    : new geo.LineSegment(bounds.x1, bounds.y1, bounds.x2, bounds.y1),
-            bottom : new geo.LineSegment(bounds.x1, bounds.y2, bounds.x2, bounds.y2)
-        };
-    });
+    node.each(setBoudingBox);
 
     force.start();
-    var circle = svg.selectAll(".circle");
-    var text = svg.selectAll(".label");
 
-    var link = svg.selectAll(".link")
+    d3.select(window).on("resize", resize);
+    resize(true);
+
+    function resize(init) {
+        var width = $(".container").width();
+        var height = svg.attr("height");
+        if (fullPage) {
+            width = window.innerWidth;
+            height = window.innerHeight - ($("svg").parent().get(0).getBoundingClientRect().top + 5);
+        }
+        if (init || !local || width != svg.attr("width") || height != svg.attr("height")) {
+            node.each(function (node) {
+                if (local && node.fixed && node.id == nodeId) {
+                    node.px = (width / 2) + node.extent.left / 2;
+                    node.py = (height / 2) + node.extent.top / 2;
+                }
+                else if (node.fixed) {
+                    node.px += (width - svg.attr("width")) / 2;
+                    node.py += (height - svg.attr("height")) / 2;
+                }
+            });
+            svg.attr("height", height)
+               .attr("width", width);
+            force.size([width, height]).resume();
+        }
+        init = false;
+    }
+
+    // add the edges
+    var link = gZoom.selectAll(".link")
                   .data(links);
     link.enter().insert("line", ".node")
         .attr("marker-end", function(d) { return "url(#end" + (d.type != '#none' ? types[d.type].number : '0') + ")"; } )
         .attr("class", "link")
         .style("stroke", function(d) { if (d.type != '#none') return types[d.type].color; });
 
-    svg.append("defs").selectAll("marker")
+    // add the edges arrow head
+    gZoom.append("defs").selectAll("marker")
         .data(typesEndMarkers)
         .enter().append("marker")
         .attr("id", function(d) { return d.id; })
@@ -369,6 +369,7 @@ scope.render = function(nodes, links, types, fullPage, local, nodeId) {
         .attr("refX", 10)
         .attr("refY", 0)
         .attr("markerWidth", 6)
+
         .attr("markerHeight", 6)
         .attr("orient", "auto")
         .style("stroke", function(d) { return d.color; })
@@ -376,15 +377,16 @@ scope.render = function(nodes, links, types, fullPage, local, nodeId) {
         .append("path")
         .attr("d", "M0,-5L10,0L0,5");
 
-    svg.style("opacity", 1e-6)
+    // set the svg opacity in order to hide the beginning of force process
+    gZoom.style("opacity", 1e-6)
         .transition()
         .duration(1000)
         .style("opacity", 1);
 
-    var numTicks = 0;
     function tick(e) {
-        numTicks++;
         preventCollisions();
+        // move the nodes without upstream node to the left
+        // and those without downstream nodes to the right
         nodes.forEach(function (node, i) {
             if (!node.fixed) {
                 if (node.inc.length == 0 && node.out.length > 0) {
@@ -393,12 +395,9 @@ scope.render = function(nodes, links, types, fullPage, local, nodeId) {
                 else if (node.out.length == 0 && node.inc.length > 0)
                     node.x += 200 * e.alpha;
             }
-            if (local && node.id == nodeId && !node.moved) {
-                node.x = (parseInt($("svg").css("width")) / 2) + node.extent.left;
-                node.y = (parseInt($("svg").css("height")) / 2) + node.extent.top / 2;
-            }
         });
 
+        // move the links according to their nodes position
         link
           .attr('x1', function(d) {
             return d.source.x;
@@ -425,6 +424,7 @@ scope.render = function(nodes, links, types, fullPage, local, nodeId) {
               .attr('y2', y);
           });
 
+        // move the nodes according to their new position
         node
           .attr('transform', function(d) {
               return 'translate(' + d.x + ',' + d.y + ')';

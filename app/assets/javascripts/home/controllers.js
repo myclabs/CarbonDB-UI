@@ -265,14 +265,26 @@ define(["angular"], function(angular) {
       }
     });
 
-    graph.promise.success(function() {
-      var data = graph.getLocalGraph($routeParams.type + '/' + $routeParams.uri, 2);
-      $scope.nodeId = $routeParams.type + '/' + $routeParams.uri;
-      $scope.d3Nodes = data.nodes;
-      $scope.d3Links = data.links;
-      $scope.relationTypes = data.types;
-    });
+    $scope.loadGraphData = function() {
+        graph.promise.success(function() {
+          var data = graph.getLocalGraph($routeParams.type + '/' + $routeParams.uri, $scope.depth);
+          $scope.nodeId = $routeParams.type + '/' + $routeParams.uri;
+          $scope.d3Nodes = data.nodes;
+          $scope.d3Links = data.links;
+          $scope.relationTypes = data.types;
+        });
+    }
 
+    $scope.upstreamDepth = graph.getUpstreamDepth();
+    $scope.$watch("upstreamDepth", function(newData, oldData) {
+        graph.setUpstreamDepth(newData);
+        $scope.loadGraphData();
+    });
+    $scope.downstreamDepth = graph.getDownstreamDepth();
+    $scope.$watch("downstreamDepth", function(newData, oldData) {
+        graph.setDownstreamDepth(newData);
+        $scope.loadGraphData();
+    });
   };
   GroupCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$routeParams", "$window", "playRoutes", "ontologyTypes", "viewType", "graph"];
 
