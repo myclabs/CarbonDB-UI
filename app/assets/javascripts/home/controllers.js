@@ -20,11 +20,13 @@ define(["angular"], function(angular) {
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
     $rootScope.pageTitle = "CarbonDB: Graph";
+    $scope.test = function() {$scope.count++;};
     graph.promise.success(function() {
       var data = graph.getGraph();
       $scope.d3Nodes = data.nodes;
       $scope.d3Links = data.links;
       $scope.relationTypes = data.types;
+      $scope.showLocalGraph = graph.isShown();
     });
   };
   GraphCtrl.$inject = ["$scope", "$rootScope", "$location", "$window", "playRoutes", "graph"];
@@ -272,6 +274,14 @@ define(["angular"], function(angular) {
           $scope.d3Nodes = data.nodes;
           $scope.d3Links = data.links;
           $scope.relationTypes = data.types;
+          $scope.showLocalGraph = graph.isShown();// ? 'in' : 'out';
+          $scope.toggleLabel = graph.isShown() ? 'hide' : 'show';
+
+          $scope.toggleShown = function() {
+            graph.toggleShown();
+            $scope.toggleLabel = graph.isShown() ? 'hide' : 'show';
+          }
+
         });
     }
 

@@ -10,6 +10,7 @@ define(["angular"], function(angular) {
     var types;
     var upstreamDepth = 2;
     var downstreamDepth = 2;
+    var shown = false;
     var promise = playRoutes.controllers.Onto.getGraph(activeDatabase).get().success(function(data) {
         nodes = data.nodes;
         links = data.links;
@@ -105,6 +106,12 @@ define(["angular"], function(angular) {
       },
       getDownstreamDepth: function () {
         return downstreamDepth;
+      },
+      toggleShown: function() {
+        shown = !shown;
+      },
+      isShown: function() {
+        return shown;
       }
     };
   }]);
