@@ -18,29 +18,6 @@
         <div d3-force nodes="d3Nodes" links="d3Links" types="relationTypes" full-page="false" id="graph" local="true" node-id="nodeId"></div>
     </div>
 
-    <p ng-if="commonKeywords">
-      <strong>Common keywords:</strong>
-    	<span ng-repeat="keyword in commonKeywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
-    </p>
-    <div class="row col-sm-12" ng-show="type == 'PROCESS'">
-      <div class="form-inline">
-        <div class="form-group">
-          <label class="control-label" id="labelViewType" for="viewType">Nature of displayed data:</label>
-            <select class="form-control" ng-model="viewType" id="viewType">
-              <option disabled>Impacts</option>
-              <option ng-repeat-start="impactTypeCategory in impactTypes.children" disabled>&nbsp;&nbsp;{{impactTypeCategory.label}}</option>
-                <option ng-repeat="impactType in impactTypeCategory.children" value="{{impactType.id}}">&nbsp;&nbsp;&nbsp;&nbsp;{{impactType.label}}</option>
-              <option ng-repeat-end disabled style="display: none;">------</option>
-              <option disabled>Elementary flows</option>
-              <option ng-repeat-start="flowTypeCategory in flowTypes.children" disabled>&nbsp;&nbsp;{{flowTypeCategory.label}}</option>
-                <option ng-repeat="flowType in flowTypeCategory.children" value="{{flowType.id}}">&nbsp;&nbsp;&nbsp;&nbsp;{{flowType.label}}</option>
-              <option ng-repeat-end disabled style="display: none;">------</option>
-            </select>
-          </div>
-      </div>
-    </div>
-    <p><strong>Unit:</strong> {{unit}}</p>
-
     <div ng-if="comment">
       <h3>Comment</h3>
       <span ng-bind-html="comment"></span>
@@ -54,7 +31,29 @@
       </ul>
     </div>
 
-    <h2>Elements</h2>
+    <h2>Data</h2>
+    <p ng-if="commonKeywords">
+        <strong>Common keywords:</strong>
+        <span ng-repeat="keyword in commonKeywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
+    </p>
+    <div class="row col-sm-12" ng-show="type == 'PROCESS'">
+        <div class="form-inline">
+            <div class="form-group">
+                <label class="control-label" id="labelViewType" for="viewType">Nature of displayed data:</label>
+                <select class="form-control" ng-model="viewType" id="viewType">
+                    <option disabled>Impacts</option>
+                    <option ng-repeat-start="impactTypeCategory in impactTypes.children" disabled>&nbsp;&nbsp;{{impactTypeCategory.label}}</option>
+                    <option ng-repeat="impactType in impactTypeCategory.children" value="{{impactType.id}}">&nbsp;&nbsp;&nbsp;&nbsp;{{impactType.label}}</option>
+                    <option ng-repeat-end disabled style="display: none;">------</option>
+                    <option disabled>Elementary flows</option>
+                    <option ng-repeat-start="flowTypeCategory in flowTypes.children" disabled>&nbsp;&nbsp;{{flowTypeCategory.label}}</option>
+                    <option ng-repeat="flowType in flowTypeCategory.children" value="{{flowType.id}}">&nbsp;&nbsp;&nbsp;&nbsp;{{flowType.label}}</option>
+                    <option ng-repeat-end disabled style="display: none;">------</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <p><strong>Unit:</strong> {{unit}}</p>
     <div tmd
          row-dimensions="rowDimensions"
          line-dimensions="lineDimensions"
