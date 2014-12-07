@@ -59,20 +59,26 @@ define(["angular"], function(angular) {
     return {
       promise: promise,
       getGraph: function () {
+        var nodesCopy = [];
         // preparing the data structure for the graph view
         nodes.forEach(function (node) {
-            node.out = [];
-            node.inc = [];
+            var newNode = {id: node.id, label: node.label};
+            newNode.out = [];
+            newNode.inc = [];
+            nodesCopy.push(newNode);
         });
+        var linksCopy = [];
         links.forEach(function (link) {
-            var node = nodes[link.source];
-            var outNode = nodes[link.target];
+            var node = nodesCopy[link.source];
+            var outNode = nodesCopy[link.target];
             node.out.push(link.target);
             outNode.inc.push(link.source);
+            var newLink = {type: link.type, source: link.source, target: link.target};
+            linksCopy.push(newLink);
         });
         return {
-            nodes: nodes,
-            links: links,
+            nodes: nodesCopy,
+            links: linksCopy,
             types: types
         };
       },
