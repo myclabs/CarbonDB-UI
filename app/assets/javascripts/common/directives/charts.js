@@ -262,7 +262,6 @@ scope.render = function(nodes, links, types, fullPage, local, nodeId) {
         .classed("fixed", function (n) { return n.fixed })
         .call(drag)
         .on("dblclick", dblclick)
-        .on("click", function(d) { if (d3.event.defaultPrevented) return; scope.selectedNode = d.id; })
         .on("mousedown", function() { d3.event.stopPropagation(); })
         .append('rect')
         .attr('rx', 5)
