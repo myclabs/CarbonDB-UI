@@ -293,7 +293,7 @@ scope.render = function(nodes, links, types, fullPage, local, nodeId) {
         lines.forEach(function(line) {
             var text = node.append('text')
                 .text(line)
-                .attr('class', 'nodeText')
+                .classed({'nodeText' : true, 'nodeTextLocal' : local})
                 .attr('dy', dy + 'em');
             dy += ddy;
         });
