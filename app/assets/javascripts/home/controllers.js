@@ -53,6 +53,13 @@ define(["angular"], function(angular) {
     $rootScope.pageTitle = "CarbonDB: References";
     playRoutes.controllers.Onto.getReferences(activeDatabase).get().success(function(data) {
       $scope.references = data.references;
+      $scope.references.sort(function(r1, r2) {
+        if (r1.shortName < r2.shortName)
+            return -1;
+        else if (r1.shortName > r2.shortName)
+            return 1;
+        return 0;
+      });
     });
   };
   ReferencesCtrl.$inject = ["$scope", "$rootScope", "$location", "$window", "playRoutes"];
