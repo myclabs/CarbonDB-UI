@@ -46,9 +46,6 @@ marker#end {
     cursor: default;
 }
 
-.node > .nodeTextGlobal {
-   font-size: 6px;
-}
 .node > .nodeTextLocal {
    font-size: 10px;
 }
@@ -58,6 +55,11 @@ marker#end {
     fill: @nodeColor;
     cursor: pointer;
     opacity: 0;
+}
+
+.node .linkTextLocal {
+    font-size: 10px;
+    top: 10px;
 }
 
 // this hack is a workaround to get the graph working
@@ -71,6 +73,17 @@ marker#end {
 }
 
 #groupView .collapse.in {
+   position: relative;
+   left: 0px;
+}
+
+#processView .collapse {
+   position: absolute;
+   left: -10000px;
+   display: block;
+}
+
+#processView .collapse.in {
    position: relative;
    left: 0px;
 }

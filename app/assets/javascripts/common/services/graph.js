@@ -7,49 +7,57 @@ define(["angular"], function(angular) {
   mod.factory('graph', ['playRoutes', function (playRoutes) {
     var nodes = new Array();
     var links = new Array();
+    var derivedNodes = new Array();
+    var derivedLinks = new Array();
     var types;
     var upstreamDepth = 2;
     var downstreamDepth = 2;
+    var derivedUpstreamDepth = 2;
+    var derivedDownstreamDepth = 2;
     var shown = false;
+    var derivedShown = false;
     var promise = playRoutes.controllers.Onto.getGraph(activeDatabase).get().success(function(data) {
         nodes = data.nodes;
         links = data.links;
         types = data.types;
     });
+    var derivedPromise = playRoutes.controllers.Onto.getDerivedGraph(activeDatabase).get().success(function(data) {
+        derivedNodes = data.nodes;
+        derivedLinks = data.links;
+        types = data.types;
+    });
     var filteredLinks = new Array();
     var filteredNodes = new Array();
-    var filterNodesAndLinks = function(nodeIndex, depth, direction, recursion) {
-        if (typeof recursion === 'undefined') {
-            filteredLinks = new Array();
-            filteredNodes = new Array();
-            nodeIndex = findIndex(nodeIndex);
-            var newNode = {id: nodes[nodeIndex].id, label: nodes[nodeIndex].label, fixed: true};
-            filteredNodes.push(newNode);
-            filterNodesAndLinks(nodeIndex, downstreamDepth, "source", false);
-            filterNodesAndLinks(nodeIndex, upstreamDepth, "target", false);
-        }
-        else if (recursion) {
-            // we copy the node so d3js does not store the node status
-            var newNode = {id: nodes[nodeIndex].id, label: nodes[nodeIndex].label};
-            filteredNodes.push(newNode);
-        }
+    var filterNodesAndLinks = function(nodes, links, nodeIndex, upstreamDepth, downstreamDepth) {
+        filteredLinks = new Array();
+        filteredNodes = new Array();
+        nodeIndex = findIndex(nodes, nodeIndex);
+        var newNode = {id: nodes[nodeIndex].id, label: nodes[nodeIndex].label, fixed: true};
+        filteredNodes.push(newNode);
+        filterSubNodesAndLinks(nodes, links, nodeIndex, downstreamDepth, "source", 0);
+        filterSubNodesAndLinks(nodes, links, nodeIndex, upstreamDepth, "target", 0);
+    }
+    // private
+    var filterSubNodesAndLinks = function(nodes, links, nodeIndex, depth, direction, filteredNodeIndex) {
         if (depth > 0) {
             var invDirection = "source";
             if (direction == "source")
                 invDirection = "target";
-            var filteredNodeIndex = filteredNodes.length-1;
             for (var i = 0; i < links.length; i++) {
                 if (links[i][direction] == nodeIndex) {
+                    // we copy the node so d3js does not store the node status
+                    var newNode = {id: nodes[links[i][invDirection]].id, label: nodes[links[i][invDirection]].label};
+                    filteredNodes.push(newNode);
                     var link = {type: links[i].type};
-                    link[direction] = recursion ? filteredNodeIndex : 0;
-                    link[invDirection] = filteredNodes.length;
+                    link[direction] = filteredNodeIndex;
+                    link[invDirection] = filteredNodes.length-1;
                     filteredLinks.push(link);
-                    filterNodesAndLinks(links[i][invDirection], depth-1, direction, true);
+                    filterSubNodesAndLinks(nodes, links, links[i][invDirection], depth-1, direction, filteredNodes.length-1);
                 }
             }
         }
     }
-    function findIndex(nodeId) {
+    function findIndex(nodes, nodeId) {
         var foundIndex = -1;
         nodes.forEach(function (node, index) {
             if (node.id == nodeId) foundIndex = index;
@@ -58,6 +66,7 @@ define(["angular"], function(angular) {
     }
     return {
       promise: promise,
+      derivedPromise: derivedPromise,
       getGraph: function () {
         var nodesCopy = [];
         // preparing the data structure for the graph view
@@ -83,7 +92,26 @@ define(["angular"], function(angular) {
         };
       },
       getLocalGraph: function(nodeId) {
-        filterNodesAndLinks(nodeId, 0);
+        filterNodesAndLinks(nodes, links, nodeId, upstreamDepth, downstreamDepth);
+        // preparing the data structure for the graph view
+        filteredNodes.forEach(function (node) {
+            node.out = [];
+            node.inc = [];
+        });
+        filteredLinks.forEach(function (link) {
+            var node = filteredNodes[link.source];
+            var outNode = filteredNodes[link.target];
+            node.out.push(link.target);
+            outNode.inc.push(link.source);
+        });
+        return {
+            nodes: filteredNodes,
+            links: filteredLinks,
+            types: types
+        };
+      },
+      getLocalDerivedGraph: function(nodeId) {
+        filterNodesAndLinks(derivedNodes, derivedLinks, nodeId, derivedUpstreamDepth, derivedDownstreamDepth);
         // preparing the data structure for the graph view
         filteredNodes.forEach(function (node) {
             node.out = [];
@@ -118,6 +146,24 @@ define(["angular"], function(angular) {
       },
       isShown: function() {
         return shown;
+      },
+      setDerivedUpstreamDepth: function(pDerivedUpstreamDepth) {
+        derivedUpstreamDepth = pDerivedUpstreamDepth;
+      },
+      getDerivedUpstreamDepth: function () {
+        return derivedUpstreamDepth;
+      },
+      setDerivedDownstreamDepth: function(pDerivedDownstreamDepth) {
+        derivedDownstreamDepth = pDerivedDownstreamDepth;
+      },
+      getDerivedDownstreamDepth: function () {
+        return derivedDownstreamDepth;
+      },
+      toggleDerivedShown: function() {
+        derivedShown = !derivedShown;
+      },
+      isDerivedShown: function() {
+        return derivedShown;
       }
     };
   }]);

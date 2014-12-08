@@ -1,7 +1,25 @@
-<div class="container">
+<div class="container" id="processView">
   <h1>
     <span ng-repeat="keyword in keywords">{{keyword.label}} <span ng-show="!$last">-</span> </span><small>[{{unit.symbol}}]</small>
   </h1>
+
+    <h2>Local graph <small><a data-toggle="collapse" data-target="#localGraph" style="cursor: pointer;" ng-click="toggleShown();">{{toggleLabel}} the local graph</a></small></h2>
+    <div class="collapse" ng-class="{in : showLocalGraph}" id="localGraph">
+        <p>Tips: use your mousewheel to zoom in/out, click and move your cursor to pan, drag and drop a group to reorganize the graph, double-click on a group to unpin it.</p>
+        Legend - type of relations:
+            <span ng-repeat="type in relationTypes" style="color: {{type.color}}" data-toggle="tooltip" data-placement="top" title="{{type.comment}}" tooltip>{{type.label}} <span class="glyphicon glyphicon-question-sign"></span><span ng-if="!$last"> | </span>
+        </span>
+        </p>
+        <label class="control-label">Upstream depth:</label>
+        <div class="btn-group">
+            <button class="btn btn-primary btn-xs" ng-class="{active: ($index + 1)==$parent.upstreamDepth}" ng-click="$parent.upstreamDepth = ($index + 1)" ng-repeat="n in [1, 2, 3] track by $index">{{n}}</button>
+        </div>
+        <label class="control-label">Downstream depth:</label>
+        <div class="btn-group">
+            <button class="btn btn-primary btn-xs" ng-class="{active: ($index + 1)==$parent.downstreamDepth}" ng-click="$parent.downstreamDepth = ($index + 1)" ng-repeat="n in [1, 2, 3] track by $index">{{n}}</button>
+        </div>
+        <div d3-force nodes="d3Nodes" links="d3Links" types="relationTypes" full-page="false" id="graph" local="true" derived="true" node-id="nodeId"></div>
+    </div>
   <p>
 
     <h2>Impacts</h2>

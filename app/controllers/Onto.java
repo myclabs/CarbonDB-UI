@@ -2,20 +2,11 @@ package controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.mongodb.*;
 import com.mycsense.carbondb.Reasoner;
 import com.mycsense.carbondb.architecture.UnitToolsWebService;
-import com.mycsense.carbondb.domain.CarbonOntology;
-import com.mycsense.carbondb.domain.Category;
-import com.mycsense.carbondb.domain.Coefficient;
-import com.mycsense.carbondb.domain.DerivedRelation;
-import com.mycsense.carbondb.domain.ElementaryFlowType;
-import com.mycsense.carbondb.domain.Group;
-import com.mycsense.carbondb.domain.ImpactType;
+import com.mycsense.carbondb.domain.*;
 import com.mycsense.carbondb.domain.Process;
-import com.mycsense.carbondb.domain.Reference;
-import com.mycsense.carbondb.domain.RelationType;
-import com.mycsense.carbondb.domain.SourceRelation;
-import com.mycsense.carbondb.domain.Unit;
 import com.mycsense.carbondb.domain.group.Type;
 import models.CategorySerializer;
 import models.CoefficientSerializer;
@@ -44,10 +35,6 @@ import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.util.FileManager;
 import org.mindswap.pellet.PelletOptions;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
 
 import static play.libs.Json.toJson;
@@ -155,9 +142,13 @@ public class Onto extends Controller {
     }
 
     protected static void feedMongoDB(String database) throws Exception {
+        ArrayList<String> processGroupsId = new ArrayList<>();
         ArrayList<HashMap<String, String>> nodes = new ArrayList<>();
-        ArrayList<String> nodesId = new ArrayList<>();
         ArrayList<HashMap<String, Object>> links = new ArrayList<>();
+
+        ArrayList<String> processesId = new ArrayList<>();
+        ArrayList<HashMap<String, String>> derivedNodes = new ArrayList<>();
+        ArrayList<HashMap<String, Object>> derivedLinks = new ArrayList<>();
 
         BasicDBObject dbObject;
 
@@ -220,7 +211,7 @@ public class Onto extends Controller {
                 node.put("id", group.getId());
                 node.put("label", group.getLabel());
                 nodes.add(node);
-                nodesId.add(group.getId());
+                processGroupsId.add(group.getId());
             }
         }
 
@@ -232,6 +223,18 @@ public class Onto extends Controller {
             dbObject = (BasicDBObject) JSON.parse(serializedProcess);
             dbObject.append("_id", process.getId());
             processesColl.insert(dbObject);
+
+            processesId.add(process.getId());
+            HashMap<String, String> node = new HashMap<>();
+            node.put("id", process.getId());
+            String label = "";
+            for (Keyword keyword : process.getKeywords().keywords) {
+                label += keyword.getLabel() + " - ";
+            }
+            label = label.substring(0, label.length() - 3);
+            label += " [" + process.getUnit().getSymbol() + "]";
+            node.put("label", label);
+            derivedNodes.add(node);
         }
 
         DBCollection coefficientsColl = db.getCollection("coefficients");
@@ -254,14 +257,13 @@ public class Onto extends Controller {
         DBCollection graphColl = db.getCollection("graph");
         graphColl.drop();
 
-
         for (SourceRelation sourceRelation : ontology.getSourceRelations().values()) {
             String sourceId = sourceRelation.getSource().getId();
             String destinationId = sourceRelation.getDestination().getId();
             HashMap<String, Object> link = new HashMap<>();
             link.put("id", sourceRelation.getId());
-            link.put("source", nodesId.indexOf(sourceId));
-            link.put("target", nodesId.indexOf(destinationId));
+            link.put("source", processGroupsId.indexOf(sourceId));
+            link.put("target", processGroupsId.indexOf(destinationId));
             if (sourceRelation.getType() != null)
                 link.put("type", sourceRelation.getType().getId());
             else
@@ -277,6 +279,27 @@ public class Onto extends Controller {
                 + ",links:" + toJson(links).toString()
                 + ",types:" + toJson(relationTypes).toString() + "}");
         graphColl.insert(dbObject);
+
+        DBCollection derivedGraphColl = db.getCollection("derivedGraph");
+        derivedGraphColl.drop();
+
+        for (DerivedRelation relation : ontology.getDerivedRelations()) {
+            String sourceId = relation.getSource().getId();
+            String destinationId = relation.getDestination().getId();
+            HashMap<String, Object> link = new HashMap<>();
+            link.put("source", processesId.indexOf(sourceId));
+            link.put("target", processesId.indexOf(destinationId));
+            if (relation.getType() != null)
+                link.put("type", relation.getType().getId());
+            else
+                link.put("type", "#none");
+            derivedLinks.add(link);
+        }
+
+        dbObject = (BasicDBObject) JSON.parse("{nodes:" + toJson(derivedNodes).toString()
+                + ",links:" + toJson(derivedLinks).toString()
+                + ",types:" + toJson(relationTypes).toString() + "}");
+        derivedGraphColl.insert(dbObject);
 
         mongoClose();
         /*DBCollection reportColl = db.getCollection("report");
@@ -328,6 +351,20 @@ public class Onto extends Controller {
         try {
             DB db = mongoConnect(database);
             DBCollection graphColl = db.getCollection("graph");
+            String response = graphColl.findOne().toString();
+            mongoClose();
+            return ok(response);
+        }
+        catch (Exception e) {
+            return ok(e.getMessage());
+        }
+    }
+
+    public static Result getDerivedGraph(String database) {
+        authorizeCrossRequests();
+        try {
+            DB db = mongoConnect(database);
+            DBCollection graphColl = db.getCollection("derivedGraph");
             String response = graphColl.findOne().toString();
             mongoClose();
             return ok(response);
@@ -397,11 +434,18 @@ public class Onto extends Controller {
             DB db = mongoConnect(database);
             DBCollection groupsColl = db.getCollection("groups");
             BasicDBObject query = new BasicDBObject("_id", groupId);
-            String response = groupsColl.findOne(query).toString();
-            mongoClose();
-            return ok(response);
+            DBObject result = groupsColl.findOne(query);
+            if (null == result) {
+                mongoClose();
+                return notFound("The group " + groupId + " could not be found");
+            }
+            else {
+                mongoClose();
+                return ok(result.toString());
+            }
         }
         catch (Exception e) {
+            mongoClose();
             return ok(e.getMessage());
         }
     }

@@ -28,6 +28,7 @@ GET     /categories/:database               controllers.Onto.getCategories(datab
 GET     /group/:database/:uri               controllers.Onto.getGroup(database: String, uri: String)
 GET     /lastreport/:database               controllers.Onto.getLastReport(database: String)
 GET     /graph/:database                    controllers.Onto.getGraph(database: String)
+GET     /derivedgraph/:database             controllers.Onto.getDerivedGraph(database: String)
 GET     /references/:database               controllers.Onto.getReferences(database: String)
 GET     /getImpactAndFlowTypes/:database    controllers.Onto.getImpactAndFlowTypes(database: String)
 GET     /getProcess/sp/:database/:id     	controllers.Onto.getProcess(database: String, id: String)

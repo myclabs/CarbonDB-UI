@@ -305,7 +305,7 @@ define(["angular"], function(angular) {
   };
   GroupCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$routeParams", "$window", "playRoutes", "ontologyTypes", "viewType", "graph"];
 
-  var ProcessCtrl = function($scope, $rootScope, $location, $routeParams, $window, playRoutes, ontologyTypes) {
+  var ProcessCtrl = function($scope, $rootScope, $location, $routeParams, $window, playRoutes, ontologyTypes, graph) {
     $rootScope.pageTitle = "CarbonDB: Process view";
     $scope.impactTypes = ontologyTypes.getImpactTypesTree();
     $scope.flowTypes = ontologyTypes.getFlowTypesTree();
@@ -363,8 +363,37 @@ define(["angular"], function(angular) {
       }
     });
 
+    $scope.loadGraphData = function() {
+        graph.derivedPromise.success(function() {
+          var data = graph.getLocalDerivedGraph("sp/" + $routeParams.id, $scope.depth);
+          $scope.nodeId = "sp/" + $routeParams.id;
+          $scope.d3Nodes = data.nodes;
+          $scope.d3Links = data.links;
+          $scope.relationTypes = data.types;
+          $scope.showLocalGraph = graph.isDerivedShown();
+          $scope.toggleLabel = graph.isDerivedShown() ? 'hide' : 'show';
+
+          $scope.toggleShown = function() {
+            graph.toggleDerivedShown();
+            $scope.toggleLabel = graph.isDerivedShown() ? 'hide' : 'show';
+          }
+
+        });
+    }
+
+    $scope.upstreamDepth = graph.getDerivedUpstreamDepth();
+    $scope.$watch("upstreamDepth", function(newData, oldData) {
+        graph.setDerivedUpstreamDepth(newData);
+        $scope.loadGraphData();
+    });
+    $scope.downstreamDepth = graph.getDerivedDownstreamDepth();
+    $scope.$watch("downstreamDepth", function(newData, oldData) {
+        graph.setDerivedDownstreamDepth(newData);
+        $scope.loadGraphData();
+    });
+
   };
-  ProcessCtrl.$inject = ["$scope", "$rootScope", "$location", "$routeParams", "$window", "playRoutes", "ontologyTypes"];
+  ProcessCtrl.$inject = ["$scope", "$rootScope", "$location", "$routeParams", "$window", "playRoutes", "ontologyTypes", "graph"];
 
   var CoefficientCtrl = function($scope, $rootScope, $location, $routeParams, $window, playRoutes) {
     $rootScope.pageTitle = "CarbonDB: Coefficient view";

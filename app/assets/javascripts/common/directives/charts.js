@@ -21,7 +21,7 @@ mod.directive('d3Force', ['$window',
         fullPage: '=',
         local: '=',
         nodeId: '=nodeId',
-        truc: '='
+        derived: '='
       },
       link: function(scope, ele, attrs) {
 /*******************
@@ -185,14 +185,14 @@ var dblclick = function(d) {
 
 scope.$watch('nodes', function(newData, oldData, scope) {
     if (scope.nodes || scope.links || scope.types) {
-        scope.render(scope.nodes, scope.links, scope.types, scope.fullPage, scope.local, scope.nodeId);
+        scope.render(scope.nodes, scope.links, scope.types, scope.fullPage, scope.local, scope.derived, scope.nodeId);
     }
 });
 
 // ------
 // Render
 // ------
-scope.render = function(nodes, links, types, fullPage, local, nodeId) {
+scope.render = function(nodes, links, types, fullPage, local, derived, nodeId) {
 
     var zoom = d3.behavior.zoom()
         //.scaleExtent([1, 10])
@@ -272,15 +272,16 @@ scope.render = function(nodes, links, types, fullPage, local, nodeId) {
     // node group link rectangle
     node.append('rect')
         .attr('width', 80)
-        .attr('height', 10)
+        .attr('height', function() { return local ? 14 : 10} )
         .attr('class', 'linkRect');
     // node group link
     node.append('a')
-        .attr('xlink:href', function(d) { return '#/group/' + d.id; } )
+        .attr('xlink:href', function(d) { return derived ? '#/process/' + d.id : '#/group/' + d.id; } )
         .append('text')
         .attr('text-anchor', 'middle')
-        .text('View group')
-        .attr('class', 'linkText');
+        .text(function() { return derived ? 'View process' : 'View group'; })
+        .attr('dy', function() { return local ? 3 : 0; } )
+        .classed({'linkText' : true, 'linkTextLocal' : local});
     node.exit().remove();
 
     // add the nodes multiline label
