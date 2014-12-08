@@ -7,11 +7,11 @@
             <span ng-repeat="type in $parent.relationTypes" style="color: {{type.color}}" data-toggle="tooltip" data-placement="top" title="{{type.comment}}" tooltip>{{type.label}} <span class="glyphicon glyphicon-question-sign"></span><span ng-if="!$last"> | </span>
         </span>
         </p>
-        <label class="control-label">Number of upstream groups:</label>
+        <label class="control-label">Upstream depth:</label>
         <div class="btn-group">
             <button class="btn btn-primary btn-xs" ng-class="{active: ($index + 1)==$parent.$parent.upstreamDepth}" ng-click="$parent.$parent.upstreamDepth = ($index + 1)" ng-repeat="n in [1, 2, 3] track by $index">{{n}}</button>
         </div>
-        <label class="control-label">Number of downstream groups:</label>
+        <label class="control-label">Downstream depth:</label>
         <div class="btn-group">
             <button class="btn btn-primary btn-xs" ng-class="{active: ($index + 1)==$parent.$parent.downstreamDepth}" ng-click="$parent.$parent.downstreamDepth = ($index + 1)" ng-repeat="n in [1, 2, 3] track by $index">{{n}}</button>
         </div>
