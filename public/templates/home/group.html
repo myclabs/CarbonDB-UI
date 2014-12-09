@@ -86,7 +86,7 @@
   			<td ng-if="sourceRelation.coeff.id == id">{{sourceRelation.coeff.label}} <sup ng-if="sourceRelation.exponent == -1">-1</sup></td>
   			<td ng-if="sourceRelation.destination.id != id"><a ng-href="#/group/{{sourceRelation.destination.id}}">{{sourceRelation.destination.label}}</a></td>
   			<td ng-if="sourceRelation.destination.id == id">{{sourceRelation.destination.label}}</td>
-        <td><a data-toggle="collapse" data-target="#infos-{{$index}}" style="cursor: pointer;">Infos</a></td>
+            <td><a data-toggle="collapse" data-target="#infos-{{$index}}" style="cursor: pointer;">Infos</a></td>
   	 	</tr>
       <tr ng-repeat-end>
         <td colspan="4" class="td-collapse">

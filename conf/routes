@@ -33,6 +33,7 @@ GET     /references/:database               controllers.Onto.getReferences(datab
 GET     /getOntologyTypes/:database         controllers.Onto.getOntologyTypes(database: String)
 GET     /getProcess/sp/:database/:id     	controllers.Onto.getProcess(database: String, id: String)
 GET     /getCoefficient/sc/:database/:id    controllers.Onto.getCoefficient(database: String, id: String)
+GET     /getOntologyStats/:database         controllers.Onto.getOntologyStats(database: String)
 
 # Static
 # ~~~~

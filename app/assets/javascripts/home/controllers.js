@@ -63,16 +63,19 @@ define(["angular"], function(angular) {
   };
   ReferencesCtrl.$inject = ["$scope", "$rootScope", "$location", "$window", "playRoutes"];
 
-  var DocumentationCtrl = function($rootScope, $scope, $window, $location, $anchorScroll) {
+  var DocumentationCtrl = function($rootScope, $scope, $window, $location, $anchorScroll, playRoutes) {
     $rootScope.pageTitle = "CarbonDB: Documentation";
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
+    playRoutes.controllers.Onto.getOntologyStats(activeDatabase).get().success(function(data) {
+      $scope.stats = data;
+    });
     $scope.scrollTo = function(id) {
       $location.hash(id);
       $anchorScroll();
     }
   };
-  DocumentationCtrl.$inject = ["$rootScope", "$scope", "$window", "$location", "$anchorScroll"];
+  DocumentationCtrl.$inject = ["$rootScope", "$scope", "$window", "$location", "$anchorScroll", "playRoutes"];
 
   var PartnersCtrl = function($rootScope, $scope, $window, $location) {
     $rootScope.pageTitle = "CarbonDB: Partners";

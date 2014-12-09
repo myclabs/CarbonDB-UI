@@ -302,6 +302,32 @@ public class Onto extends Controller {
                 + ",links:" + toJson(derivedLinks).toString() + "}");
         derivedGraphColl.insert(dbObject);
 
+        DBCollection statsColl = db.getCollection("ontologyStats");
+        statsColl.drop();
+
+        HashMap<String, Integer> stats = new HashMap<>();
+        stats.put("coefficientGroups", ontology.getCoefficientGroups().size());
+        stats.put("processGroups", ontology.getProcessGroups().size());
+        stats.put("coefficients", ontology.getCoefficients().size());
+        stats.put("processes", ontology.getProcesses().size());
+        Integer numberOfInputElementaryFlow = 0;
+        Integer numberOfCalculatedElementaryFlow = 0;
+        Integer numberOfImpact = 0;
+        for (Process process : ontology.getProcesses()) {
+            numberOfInputElementaryFlow += process.getInputFlows().size();
+            numberOfCalculatedElementaryFlow += process.getCalculatedFlows().size();
+            numberOfImpact += process.getImpacts().size();
+        }
+        stats.put("inputFlows", numberOfInputElementaryFlow);
+        stats.put("calculatedFlows", numberOfCalculatedElementaryFlow);
+        stats.put("impacts", numberOfImpact);
+        stats.put("sourceRelations", ontology.getSourceRelations().size());
+        stats.put("derivedRelations", ontology.getDerivedRelations().size());
+        stats.put("references", ontology.getReferences().size());
+
+        dbObject = (BasicDBObject) JSON.parse(mapper.writeValueAsString(stats));
+        statsColl.insert(dbObject);
+
         mongoClose();
         /*DBCollection reportColl = db.getCollection("report");
         reportColl.drop();
@@ -388,6 +414,20 @@ public class Onto extends Controller {
 
             mongoClose();
             return ok("{\"tree\": " + responseTree + ", \"plain\": " + responsePlain + ", \"relationTypes\": " + response + "}");
+        }
+        catch (Exception e) {
+            return ok(e.getMessage());
+        }
+    }
+
+    public static Result getOntologyStats(String database) {
+        authorizeCrossRequests();
+        try {
+            DB db = mongoConnect(database);
+            DBCollection statsColl = db.getCollection("ontologyStats");
+            String response = statsColl.findOne().toString();
+            mongoClose();
+            return ok(response);
         }
         catch (Exception e) {
             return ok(e.getMessage());

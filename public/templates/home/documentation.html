@@ -2,6 +2,7 @@
     <h1>Documentation</h1>
     <ul>
         <li><a href="" ng-click="scrollTo('about')">About</a></li>
+        <li><a href="" ng-click="scrollTo('number-of-datasets')">Number of datasets</a></li>
         <li><a href="" ng-click="scrollTo('help')">Help</a></li>
         <li><a href="" ng-click="scrollTo('versions')">Source data versions</a></li>
         <li><a href="" ng-click="scrollTo('forthcoming')">Forthcoming functionalities</a></li>
@@ -64,6 +65,54 @@
     </p>
     <hr />
 
+    <!-- Figures -->
+
+    <a class="anchor" id="number-of-datasets"></a>
+    <h2>Number of datasets</h2>
+    <table class="table table-nonfluid table-striped">
+        <tbody>
+            <tr>
+                <td>Number of process groups</td>
+                <td>{{stats.processGroups}}</td>
+            </tr>
+            <tr>
+                <td>Number of coefficient groups</td>
+                <td>{{stats.coefficientGroups}}</td>
+            </tr>
+            <tr>
+                <td>Number of processes</td>
+                <td>{{stats.processes}}</td>
+            </tr>
+            <tr>
+                <td>Number of coefficients</td>
+                <td>{{stats.coefficients}}</td>
+            </tr>
+            <tr>
+                <td>Number of source elementary flows</td>
+                <td>{{stats.inputFlows}}</td>
+            </tr>
+            <tr>
+                <td>Number of calculated elementary flows</td>
+                <td>{{stats.calculatedFlows}}</td>
+            </tr>
+            <tr>
+                <td>Number of impacts</td>
+                <td>{{stats.impacts}}</td>
+            </tr>
+            <tr>
+                <td>Number of source relations</td>
+                <td>{{stats.sourceRelations}}</td>
+            </tr>
+            <tr>
+                <td>Number of derived relations</td>
+                <td>{{stats.derivedRelations}}</td>
+            </tr>
+            <tr>
+                <td>Number of references</td>
+                <td>{{stats.references}}</td>
+            </tr>
+        </tbody>
+    </table>
     <!-- Help -->
 
     <a class="anchor" id="help"></a>
