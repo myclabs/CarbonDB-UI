@@ -3,8 +3,7 @@
   <p>Tips: use your mousewheel to zoom in/out, click and move your cursor to pan, drag and drop a group to reorganize the graph, double-click on a group to unpin it.</p>
   Legend - type of relations:
   <span ng-repeat="type in relationTypes">
-    <span style="color: {{type.color}}" data-toggle="tooltip" data-placement="top" title="{{type.comment}}" tooltip>{{type.label}} <span class="glyphicon glyphicon-question-sign"></span><span ng-if="!$last"> | </span>
+    <span style="color: {{type.color}}" data-toggle="tooltip" data-placement="top" title="{{type.comment}}" tooltip>{{type.label}} <span class="glyphicon glyphicon-question-sign"></span><span ng-if="!$last"> | </span></span>
   </span>
-  Selected node: {{selectedNode}}
 </div>
 <div d3-force nodes="d3Nodes" links="d3Links" types="relationTypes" full-page="true" id="graph"></div>
