@@ -203,7 +203,7 @@ scope.render = function(nodes, links, types, fullPage, local, derived, nodeId) {
     d3.select(ele[0]).selectAll('*').remove();
     var svg = d3.select(ele[0])
         .append('svg')
-        .attr('width', $(".container").offsetWidth);
+        .attr('width', window.innerWidth);
     var gZoom = svg.append("g")
         .call(zoom)
         .append("g");
@@ -226,8 +226,8 @@ scope.render = function(nodes, links, types, fullPage, local, derived, nodeId) {
         .attr("width", 100000)
         .attr("height", 100000)
         .attr("opacity", 0)
-        .attr("x", -575)
-        .attr("y", -250);
+        .attr("x", -50000)
+        .attr("y", -50000);
 
     // setting the arrows heads color based on the relation types
     // fill is also used for the edges line color
@@ -328,10 +328,9 @@ scope.render = function(nodes, links, types, fullPage, local, derived, nodeId) {
     resize(true);
 
     function resize(init) {
-        var width = $(".container").width();
+        var width = window.innerWidth;
         var height = svg.attr("height");
         if (fullPage) {
-            width = window.innerWidth;
             height = window.innerHeight - ($("svg").parent().get(0).getBoundingClientRect().top + 5);
         }
         if (init || !local || width != svg.attr("width") || height != svg.attr("height")) {

@@ -1,23 +1,29 @@
-<div class="container" id="groupView">
+<div class="container">
   <h1>{{label}}</h1>
-    <h2 ng-if="type == 'PROCESS'">Local graph <small><a data-toggle="collapse" data-target="#localGraph" style="cursor: pointer;" ng-click="toggleShown();">{{$parent.toggleLabel}} the local graph</a></small></h2>
+  <h2 ng-if="type == 'PROCESS'">Local graph <small><a data-toggle="collapse" data-target="#localGraph" style="cursor: pointer;" ng-click="toggleShown();">{{$parent.toggleLabel}} the local graph</a></small></h2>
+</div>
+<div id="groupView">
     <div ng-if="type == 'PROCESS'" class="collapse" ng-class="{in : $parent.showLocalGraph}" id="localGraph">
-        <p>Tips: use your mousewheel to zoom in/out, click and move your cursor to pan, drag and drop a group to reorganize the graph, double-click on a group to unpin it.</p>
-        Legend - type of relations:
-            <span ng-repeat="type in $parent.relationTypes" style="color: {{type.color}}" data-toggle="tooltip" data-placement="top" title="{{type.comment}}" tooltip>{{type.label}} <span class="glyphicon glyphicon-question-sign"></span><span ng-if="!$last"> | </span>
-        </span>
-        </p>
-        <label class="control-label">Upstream depth:</label>
-        <div class="btn-group">
-            <button class="btn btn-primary btn-xs" ng-class="{active: ($index + 1)==$parent.$parent.upstreamDepth}" ng-click="$parent.$parent.upstreamDepth = ($index + 1)" ng-repeat="n in [1, 2, 3] track by $index">{{n}}</button>
-        </div>
-        <label class="control-label">Downstream depth:</label>
-        <div class="btn-group">
-            <button class="btn btn-primary btn-xs" ng-class="{active: ($index + 1)==$parent.$parent.downstreamDepth}" ng-click="$parent.$parent.downstreamDepth = ($index + 1)" ng-repeat="n in [1, 2, 3] track by $index">{{n}}</button>
+        <div class="container">
+            <p>Tips: use your mousewheel to zoom in/out, click and move your cursor to pan, drag and drop a group to reorganize the graph, double-click on a group to unpin it.</p>
+            Legend - type of relations:
+                <span ng-repeat="type in $parent.relationTypes" style="color: {{type.color}}" data-toggle="tooltip" data-placement="top" title="{{type.comment}}" tooltip>{{type.label}} <span class="glyphicon glyphicon-question-sign"></span><span ng-if="!$last"> | </span>
+            </span>
+            </p>
+            <label class="control-label">Upstream depth:</label>
+            <div class="btn-group">
+                <button class="btn btn-primary btn-xs" ng-class="{active: ($index + 1)==$parent.$parent.upstreamDepth}" ng-click="$parent.$parent.upstreamDepth = ($index + 1)" ng-repeat="n in [1, 2, 3] track by $index">{{n}}</button>
+            </div>
+            <label class="control-label">Downstream depth:</label>
+            <div class="btn-group">
+                <button class="btn btn-primary btn-xs" ng-class="{active: ($index + 1)==$parent.$parent.downstreamDepth}" ng-click="$parent.$parent.downstreamDepth = ($index + 1)" ng-repeat="n in [1, 2, 3] track by $index">{{n}}</button>
+            </div>
         </div>
         <div d3-force nodes="d3Nodes" links="d3Links" types="relationTypes" full-page="false" id="graph" local="true" node-id="nodeId"></div>
     </div>
+</div>
 
+<div class="container">
     <div ng-if="comment">
       <h3>Comment</h3>
       <span ng-bind-html="comment"></span>
