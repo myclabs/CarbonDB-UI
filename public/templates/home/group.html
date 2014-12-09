@@ -91,7 +91,7 @@
       <tr ng-repeat-end>
         <td colspan="4" class="td-collapse">
           <div class="collapse out" id="infos-{{$index}}">
-            <p>Relation type: {{sourceRelation.type.label}}</p>
+            <p>Relation type: <span style="color: {{relationTypes[sourceRelation.type.id].color}}" data-toggle="tooltip" data-placement="top" title="{{relationTypes[sourceRelation.type.id].comment}}" tooltip>{{sourceRelation.type.label}} <span class="glyphicon glyphicon-question-sign"></span></span></p>
             <strong>Derived relations:</strong>
             <div ng-if="sourceRelation.derivedRelations.length == 0">This source relation has no derived relation.</div>
             <table class="table tmd table-nonfluid" ng-if="sourceRelation.derivedRelations.length > 0">

@@ -34,7 +34,7 @@ object Application extends Controller with Security {
         routes.javascript.Onto.getLastReport,
         routes.javascript.Onto.getGraph,
         routes.javascript.Onto.getDerivedGraph,
-        routes.javascript.Onto.getImpactAndFlowTypes,
+        routes.javascript.Onto.getOntologyTypes,
         routes.javascript.Onto.getProcess,
         routes.javascript.Onto.getCoefficient,
         routes.javascript.Onto.getReferences

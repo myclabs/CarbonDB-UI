@@ -5,15 +5,24 @@ define(["angular"], function(angular) {
   var mod = angular.module("common.ontologyTypes", []);
 
   mod.factory('ontologyTypes', ['playRoutes', function (playRoutes) {
-    var impactTypes = new Array();
-    var flowTypes = new Array();
-    var impactTypesTree = new Array();
-    var flowTypesTree = new Array();
-    var promise = playRoutes.controllers.Onto.getImpactAndFlowTypes(activeDatabase).get().success(function(data) {
+    var impactTypes = [];
+    var flowTypes = [];
+    var impactTypesTree = [];
+    var flowTypesTree = [];
+    var relationTypes = {};
+    var promise = playRoutes.controllers.Onto.getOntologyTypes(activeDatabase).get().success(function(data) {
       impactTypes = data.plain.impactTypes;
       flowTypes = data.plain.flowTypes;
       impactTypesTree = data.tree.impactTypesTree;
       flowTypesTree = data.tree.flowTypesTree;
+      // sets the relation types colors
+      var fill = d3.scale.category10();
+      data.relationTypes.relationTypes.forEach(function(type, index) {
+        relationTypes[type.id] = type;
+        relationTypes[type.id].color = fill(index+1);
+        relationTypes[type.id].number = index+1;
+
+      });
     });
     return {
       promise: promise,
@@ -28,6 +37,9 @@ define(["angular"], function(angular) {
       },
       getFlowTypesTree: function() {
         return flowTypesTree;
+      },
+      getRelationTypes: function() {
+        return relationTypes;
       }
     };
   }]);

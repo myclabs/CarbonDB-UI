@@ -16,20 +16,19 @@ define(["angular"], function(angular) {
   };
   HomeCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$window", "playRoutes"];
 
-  var GraphCtrl = function($scope, $rootScope, $location, $window, playRoutes, graph) {
+  var GraphCtrl = function($scope, $rootScope, $location, $window, playRoutes, graph, ontologyTypes) {
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
     $rootScope.pageTitle = "CarbonDB: Graph";
-    $scope.test = function() {$scope.count++;};
+    $scope.relationTypes = ontologyTypes.getRelationTypes();
     graph.promise.success(function() {
       var data = graph.getGraph();
       $scope.d3Nodes = data.nodes;
       $scope.d3Links = data.links;
-      $scope.relationTypes = data.types;
       $scope.showLocalGraph = graph.isShown();
     });
   };
-  GraphCtrl.$inject = ["$scope", "$rootScope", "$location", "$window", "playRoutes", "graph"];
+  GraphCtrl.$inject = ["$scope", "$rootScope", "$location", "$window", "playRoutes", "graph", "ontologyTypes"];
 
   var TreeCtrl = function($scope, $rootScope, $location, $window, playRoutes) {
     if ($location.host() != 'localhost')
@@ -149,6 +148,7 @@ define(["angular"], function(angular) {
     $scope.groupName = $routeParams.uri;
     $scope.impactTypes = ontologyTypes.getImpactTypesTree();
     $scope.flowTypes = ontologyTypes.getFlowTypesTree();
+    $scope.relationTypes = ontologyTypes.getRelationTypes();
 
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
@@ -274,34 +274,35 @@ define(["angular"], function(angular) {
       }
     });
 
-    $scope.loadGraphData = function() {
-        graph.promise.success(function() {
-          var data = graph.getLocalGraph($routeParams.type + '/' + $routeParams.uri, $scope.depth);
-          $scope.nodeId = $routeParams.type + '/' + $routeParams.uri;
-          $scope.d3Nodes = data.nodes;
-          $scope.d3Links = data.links;
-          $scope.relationTypes = data.types;
-          $scope.showLocalGraph = graph.isShown();// ? 'in' : 'out';
-          $scope.toggleLabel = graph.isShown() ? 'hide' : 'show';
+    if ($routeParams.type == 'gp') {
+        $scope.loadGraphData = function() {
+            graph.promise.success(function() {
+              var data = graph.getLocalGraph($routeParams.type + '/' + $routeParams.uri, $scope.depth);
+              $scope.nodeId = $routeParams.type + '/' + $routeParams.uri;
+              $scope.d3Nodes = data.nodes;
+              $scope.d3Links = data.links;
+              $scope.showLocalGraph = graph.isShown();// ? 'in' : 'out';
+              $scope.toggleLabel = graph.isShown() ? 'hide' : 'show';
 
-          $scope.toggleShown = function() {
-            graph.toggleShown();
-            $scope.toggleLabel = graph.isShown() ? 'hide' : 'show';
-          }
+              $scope.toggleShown = function() {
+                graph.toggleShown();
+                $scope.toggleLabel = graph.isShown() ? 'hide' : 'show';
+              }
 
+            });
+        }
+
+        $scope.upstreamDepth = graph.getUpstreamDepth();
+        $scope.$watch("upstreamDepth", function(newData, oldData) {
+            graph.setUpstreamDepth(newData);
+            $scope.loadGraphData();
+        });
+        $scope.downstreamDepth = graph.getDownstreamDepth();
+        $scope.$watch("downstreamDepth", function(newData, oldData) {
+            graph.setDownstreamDepth(newData);
+            $scope.loadGraphData();
         });
     }
-
-    $scope.upstreamDepth = graph.getUpstreamDepth();
-    $scope.$watch("upstreamDepth", function(newData, oldData) {
-        graph.setUpstreamDepth(newData);
-        $scope.loadGraphData();
-    });
-    $scope.downstreamDepth = graph.getDownstreamDepth();
-    $scope.$watch("downstreamDepth", function(newData, oldData) {
-        graph.setDownstreamDepth(newData);
-        $scope.loadGraphData();
-    });
   };
   GroupCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$routeParams", "$window", "playRoutes", "ontologyTypes", "viewType", "graph"];
 
@@ -309,6 +310,7 @@ define(["angular"], function(angular) {
     $rootScope.pageTitle = "CarbonDB: Process view";
     $scope.impactTypes = ontologyTypes.getImpactTypesTree();
     $scope.flowTypes = ontologyTypes.getFlowTypesTree();
+    $scope.relationTypes = ontologyTypes.getRelationTypes();
 
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
@@ -369,7 +371,6 @@ define(["angular"], function(angular) {
           $scope.nodeId = "sp/" + $routeParams.id;
           $scope.d3Nodes = data.nodes;
           $scope.d3Links = data.links;
-          $scope.relationTypes = data.types;
           $scope.showLocalGraph = graph.isDerivedShown();
           $scope.toggleLabel = graph.isDerivedShown() ? 'hide' : 'show';
 

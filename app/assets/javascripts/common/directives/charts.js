@@ -184,7 +184,7 @@ var dblclick = function(d) {
  **************************/
 
 scope.$watch('nodes', function(newData, oldData, scope) {
-    if (scope.nodes || scope.links || scope.types) {
+    if (scope.nodes && scope.links && scope.types) {
         scope.render(scope.nodes, scope.links, scope.types, scope.fullPage, scope.local, scope.derived, scope.nodeId);
     }
 });
@@ -203,7 +203,7 @@ scope.render = function(nodes, links, types, fullPage, local, derived, nodeId) {
     d3.select(ele[0]).selectAll('*').remove();
     var svg = d3.select(ele[0])
         .append('svg')
-        .attr('width', window.innerWidth);
+        .attr('width', function() { return fullPage ? window.innerWidth : window.innerWidth-20 });
     var gZoom = svg.append("g")
         .call(zoom)
         .append("g");
@@ -230,15 +230,11 @@ scope.render = function(nodes, links, types, fullPage, local, derived, nodeId) {
         .attr("y", -50000);
 
     // setting the arrows heads color based on the relation types
-    // fill is also used for the edges line color
-    var fill = d3.scale.category10();
     var numberOfTypes = 0;
     var typesEndMarkers = [{id: 'end0', color: '#aaa'}];
     for(var type in types) {
         if (types.hasOwnProperty(type)) {
-            types[type].color = fill(++numberOfTypes);
-            types[type].number = numberOfTypes;
-            typesEndMarkers.push({id: "end" + numberOfTypes, color: fill(numberOfTypes)});
+            typesEndMarkers.push({id: "end" + ++numberOfTypes, color: types[type].color});
         }
     }
 
@@ -328,7 +324,7 @@ scope.render = function(nodes, links, types, fullPage, local, derived, nodeId) {
     resize(true);
 
     function resize(init) {
-        var width = window.innerWidth;
+        var width = fullPage ? window.innerWidth : window.innerWidth-20;
         var height = svg.attr("height");
         if (fullPage) {
             height = window.innerHeight - ($("svg").parent().get(0).getBoundingClientRect().top + 5);

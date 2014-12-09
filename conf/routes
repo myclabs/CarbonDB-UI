@@ -30,7 +30,7 @@ GET     /lastreport/:database               controllers.Onto.getLastReport(datab
 GET     /graph/:database                    controllers.Onto.getGraph(database: String)
 GET     /derivedgraph/:database             controllers.Onto.getDerivedGraph(database: String)
 GET     /references/:database               controllers.Onto.getReferences(database: String)
-GET     /getImpactAndFlowTypes/:database    controllers.Onto.getImpactAndFlowTypes(database: String)
+GET     /getOntologyTypes/:database         controllers.Onto.getOntologyTypes(database: String)
 GET     /getProcess/sp/:database/:id     	controllers.Onto.getProcess(database: String, id: String)
 GET     /getCoefficient/sc/:database/:id    controllers.Onto.getCoefficient(database: String, id: String)
 

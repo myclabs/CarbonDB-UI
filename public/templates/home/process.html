@@ -111,7 +111,7 @@
       <tr ng-repeat-end>
         <td colspan="4" class="td-collapse">
           <div class="collapse out" id="infos-{{$index}}">
-            <p>Relation type: {{relation.sourceRelation.type.label}}</p>
+            <p>Relation type: <span style="color: {{relationTypes[relation.sourceRelation.type.id].color}}" data-toggle="tooltip" data-placement="top" title="{{relationTypes[relation.sourceRelation.type.id].comment}}" tooltip>{{relation.sourceRelation.type.label}} <span class="glyphicon glyphicon-question-sign"></span></span></p>
             <strong>Derived from:</strong>
             <table class="table tmd table-nonfluid">
               <tr>

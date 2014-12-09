@@ -188,13 +188,20 @@ public class Onto extends Controller {
                 + ", flowTypes:" + elementaryFlowTypesSerialized + "}");
         impactAndFlowTypesColl.insert(dbObject);
 
-        DBCollection impactAndFlowTypesTreeColl = db.getCollection("impactAndFlowTypesTree");
+        DBCollection impactAndFlowTypesTreeColl = db.getCollection("ontologyTypes");
         impactAndFlowTypesTreeColl.drop();
         String impactTypesTreeSerialized = mapper.writeValueAsString(ontology.getImpactTypesTree());
         String elementaryFlowTypesTreeSerialized = mapper.writeValueAsString(ontology.getElementaryFlowTypesTree());
+
         dbObject = (BasicDBObject) JSON.parse("{impactTypesTree:" + impactTypesTreeSerialized
                 + ", flowTypesTree:" + elementaryFlowTypesTreeSerialized + "}");
         impactAndFlowTypesTreeColl.insert(dbObject);
+
+        DBCollection relationTypesColl = db.getCollection("relationTypes");
+        relationTypesColl.drop();
+        String relationTypesTreeSerialized = mapper.writeValueAsString(ontology.getRelationTypes());
+        dbObject = (BasicDBObject) JSON.parse("{relationTypes: " + relationTypesTreeSerialized + "}");
+        relationTypesColl.insert(dbObject);
 
 
         DBCollection groupsColl = db.getCollection("groups");
@@ -270,14 +277,9 @@ public class Onto extends Controller {
                 link.put("type", "#none");
             links.add(link);
         }
-        HashMap<String, RelationType> relationTypes = new HashMap<>();
-        for (RelationType type: ontology.getRelationTypes()) {
-            relationTypes.put(type.getId(), type);
-        }
 
         dbObject = (BasicDBObject) JSON.parse("{nodes:" + toJson(nodes).toString()
-                + ",links:" + toJson(links).toString()
-                + ",types:" + toJson(relationTypes).toString() + "}");
+                + ",links:" + toJson(links).toString() + "}");
         graphColl.insert(dbObject);
 
         DBCollection derivedGraphColl = db.getCollection("derivedGraph");
@@ -297,8 +299,7 @@ public class Onto extends Controller {
         }
 
         dbObject = (BasicDBObject) JSON.parse("{nodes:" + toJson(derivedNodes).toString()
-                + ",links:" + toJson(derivedLinks).toString()
-                + ",types:" + toJson(relationTypes).toString() + "}");
+                + ",links:" + toJson(derivedLinks).toString() + "}");
         derivedGraphColl.insert(dbObject);
 
         mongoClose();
@@ -374,7 +375,7 @@ public class Onto extends Controller {
         }
     }
 
-    public static Result getImpactAndFlowTypes(String database) {
+    public static Result getOntologyTypes(String database) {
         authorizeCrossRequests();
         try {
             DB db = mongoConnect(database);
@@ -382,8 +383,11 @@ public class Onto extends Controller {
             String responseTree = impactAndFlowTypesTreeColl.findOne().toString();
             DBCollection impactAndFlowTypesColl = db.getCollection("impactAndFlowTypes");
             String responsePlain = impactAndFlowTypesColl.findOne().toString();
+            DBCollection relationTypesColl = db.getCollection("relationTypes");
+            String response = relationTypesColl.findOne().toString();
+
             mongoClose();
-            return ok("{\"tree\": " + responseTree + ", \"plain\": " + responsePlain + "}");
+            return ok("{\"tree\": " + responseTree + ", \"plain\": " + responsePlain + ", \"relationTypes\": " + response + "}");
         }
         catch (Exception e) {
             return ok(e.getMessage());
