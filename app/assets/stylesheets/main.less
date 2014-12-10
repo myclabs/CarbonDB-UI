@@ -1,3 +1,6 @@
+@link-color: darken(#428bca, 6.5%);
+@link-hover-color: darken(@link-color, 15%);
+
 body {
   margin-top: 40px;
 }
@@ -53,6 +56,23 @@ a.anchor {
   }
   i {
     font-size: 120px;
+  }
+}
+
+a.collapseHead {
+  &:hover {
+    text-decoration: none;
+    small {
+      text-decoration: underline;
+      color: @link-hover-color;
+    }
+  }
+  h2, h3, h4 {
+    color: #333;
+    text-decoration: none;
+  }
+  small {
+    color: @link-color;
   }
 }
 

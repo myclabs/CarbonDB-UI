@@ -146,7 +146,7 @@ define(["angular"], function(angular) {
   };
   UploadCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$upload", "$window", "playRoutes"];
 
-  var GroupCtrl = function($scope, $rootScope, $location, helper, $http, $routeParams, $window, playRoutes, ontologyTypes, viewType, graph) {
+  var GroupCtrl = function($scope, $rootScope, $location, helper, $http, $routeParams, $window, playRoutes, ontologyTypes, viewType, graph, visibility) {
     $rootScope.pageTitle = "CarbonDB: Group view";
     $scope.groupName = $routeParams.uri;
     $scope.impactTypes = ontologyTypes.getImpactTypesTree();
@@ -278,20 +278,34 @@ define(["angular"], function(angular) {
     });
 
     if ($routeParams.type == 'gp') {
+        $scope.processGroupGraphVisibility = visibility.isVisible("processGroupGraph");
+        $scope.groupDataVisibility = visibility.isVisible("processGroupData");
+        $scope.groupCommentsVisibility = visibility.isVisible("processGroupComments");
+        $scope.groupRelationsVisibility = visibility.isVisible("processGroupRelations");
+        $scope.toggleVisibility = function (target) {
+            if (target == "groupData")
+                visibility.toggleVisibility("processGroupData");
+            else if (target == "groupComments")
+                visibility.toggleVisibility("processGroupComments");
+            else if (target == "groupRelations")
+                visibility.toggleVisibility("processGroupRelations");
+            else visibility.toggleVisibility(target);
+        }
+        $scope.isVisible = function (target) {
+            if (target == "groupData")
+                return visibility.isVisible("processGroupData");
+            else if (target == "groupComments")
+                return visibility.isVisible("processGroupComments");
+            else if (target == "groupRelations")
+                return visibility.isVisible("processGroupRelations");
+            else return visibility.isVisible(target);
+        }
         $scope.loadGraphData = function() {
             graph.promise.success(function() {
               var data = graph.getLocalGraph($routeParams.type + '/' + $routeParams.uri, $scope.depth);
               $scope.nodeId = $routeParams.type + '/' + $routeParams.uri;
               $scope.d3Nodes = data.nodes;
               $scope.d3Links = data.links;
-              $scope.showLocalGraph = graph.isShown();// ? 'in' : 'out';
-              $scope.toggleLabel = graph.isShown() ? 'hide' : 'show';
-
-              $scope.toggleShown = function() {
-                graph.toggleShown();
-                $scope.toggleLabel = graph.isShown() ? 'hide' : 'show';
-              }
-
             });
         }
 
@@ -306,14 +320,48 @@ define(["angular"], function(angular) {
             $scope.loadGraphData();
         });
     }
+    else {
+        $scope.groupDataVisibility = visibility.isVisible("coefficientGroupData");
+        $scope.groupCommentsVisibility = visibility.isVisible("coefficientGroupComments");
+        $scope.groupRelationsVisibility = visibility.isVisible("coefficientGroupRelations");
+        $scope.toggleVisibility = function (target) {
+            if (target == "groupData")
+                visibility.toggleVisibility("coefficientGroupData");
+            else if (target == "groupComments")
+                visibility.toggleVisibility("coefficientGroupComments");
+            else if (target == "groupRelations")
+                visibility.toggleVisibility("coefficientGroupRelations");
+            else visibility.toggleVisibility(target);
+        }
+        $scope.isVisible = function (target) {
+            if (target == "groupData")
+                return visibility.isVisible("coefficientGroupData");
+            else if (target == "groupComments")
+                return visibility.isVisible("coefficientGroupComments");
+            else if (target == "groupRelations")
+                return visibility.isVisible("coefficientGroupRelations");
+            else return visibility.isVisible(target);
+        }
+    }
   };
-  GroupCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$routeParams", "$window", "playRoutes", "ontologyTypes", "viewType", "graph"];
+  GroupCtrl.$inject = ["$scope", "$rootScope", "$location", "helper", "$http", "$routeParams", "$window", "playRoutes", "ontologyTypes", "viewType", "graph", "visibility"];
 
-  var ProcessCtrl = function($scope, $rootScope, $location, $routeParams, $window, playRoutes, ontologyTypes, graph) {
+  var ProcessCtrl = function($scope, $rootScope, $location, $routeParams, $window, playRoutes, ontologyTypes, graph, visibility) {
     $rootScope.pageTitle = "CarbonDB: Process view";
     $scope.impactTypes = ontologyTypes.getImpactTypesTree();
     $scope.flowTypes = ontologyTypes.getFlowTypesTree();
     $scope.relationTypes = ontologyTypes.getRelationTypes();
+
+    $scope.processGraphVisibility = visibility.isVisible("processGraph");
+    $scope.processImpactsVisibility = visibility.isVisible("processImpacts");
+    $scope.processFlowsVisibility = visibility.isVisible("processFlows");
+    $scope.processRelationsVisibility = visibility.isVisible("processRelations");
+    $scope.toggleVisibility = function (target) {
+        visibility.toggleVisibility(target);
+    }
+    $scope.isVisible = function (target) {
+        return visibility.isVisible(target);
+    }
 
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
@@ -397,10 +445,18 @@ define(["angular"], function(angular) {
     });
 
   };
-  ProcessCtrl.$inject = ["$scope", "$rootScope", "$location", "$routeParams", "$window", "playRoutes", "ontologyTypes", "graph"];
+  ProcessCtrl.$inject = ["$scope", "$rootScope", "$location", "$routeParams", "$window", "playRoutes", "ontologyTypes", "graph", "visibility"];
 
-  var CoefficientCtrl = function($scope, $rootScope, $location, $routeParams, $window, playRoutes) {
+  var CoefficientCtrl = function($scope, $rootScope, $location, $routeParams, $window, playRoutes, visibility) {
     $rootScope.pageTitle = "CarbonDB: Coefficient view";
+
+    $scope.coefficientRelationsVisibility = visibility.isVisible("coefficientRelations");
+    $scope.toggleVisibility = function (target) {
+        visibility.toggleVisibility(target);
+    }
+    $scope.isVisible = function (target) {
+        return visibility.isVisible(target);
+    }
 
     if ($location.host() != 'localhost')
       $window.ga('send', 'pageview', { page: $location.path() });
@@ -436,7 +492,7 @@ define(["angular"], function(angular) {
     });
 
   };
-  CoefficientCtrl.$inject = ["$scope", "$rootScope", "$location", "$routeParams", "$window", "playRoutes"];
+  CoefficientCtrl.$inject = ["$scope", "$rootScope", "$location", "$routeParams", "$window", "playRoutes", "visibility"];
 
   /*mod.filter('escape', function(value) {
     return encodeURIComponent(value);

@@ -2,10 +2,10 @@
   <h1>
     <span ng-repeat="keyword in keywords">{{keyword.label}} <span ng-show="!$last">-</span> </span><small>[{{unit.symbol}}]</small>
   </h1>
-  <h2>Local graph <small><a data-toggle="collapse" data-target="#localGraph" style="cursor: pointer;" ng-click="toggleShown();">{{toggleLabel}} the local graph</a></small></h2>
+  <a data-toggle="collapse" data-target="#localGraph" style="cursor: pointer;" ng-click="toggleVisibility('processGraph')" class="collapseHead"><h2>Local graph <small>{{isVisible('processGraph') ? 'hide' : 'show'}}</small></h2></a>
 </div>
 <div id="processView">
-    <div class="collapse" ng-class="{in : showLocalGraph}" id="localGraph">
+    <div class="collapse" ng-class="{in : processGraphVisibility}" id="localGraph">
         <div class="container">
             <p>Tips: use your mousewheel to zoom in/out, click and move your cursor to pan, drag and drop a group to reorganize the graph, double-click on a group to unpin it.</p>
             Legend - type of relations:
@@ -26,108 +26,112 @@
 </div>
 
 <div class="container">
-  <p>
-
-    <h2>Impacts</h2>
-    <div ng-repeat="impactType in impactTypes.children">
-      <h3>{{impactType.label}}</h3>
-      <div ng-if="impactsAndFlows[impactType.id].length == 0">This process has no impact for this impact category.</div>
-      <table class="table tmd table-nonfluid" ng-if="impactsAndFlows[impactType.id].length > 0">
-        <tr>
-          <th>Type</th>
-          <th>Value</th>
-          <th>Unit</th>
-        </tr>
-        <tr ng-repeat="impact in impactsAndFlows[impactType.id]">
-          <td>{{impact.label}}</td>
-          <td>{{impact.value}}</td>
-          <td>{{impact.unit.symbol}} / {{unit.symbol}}</td>
-        </tr>
-      </table>
+    <a data-toggle="collapse" data-target="#impacts" style="cursor: pointer;" ng-click="toggleVisibility('processImpacts')" class="collapseHead"><h2>Impacts <small>{{isVisible('processImpacts') ? 'hide' : 'show'}}</small></h2></a>
+    <div class="collapse" ng-class="{in : processImpactsVisibility}" id="impacts">
+        <div ng-repeat="impactType in impactTypes.children">
+          <h3>{{impactType.label}}</h3>
+          <div ng-if="impactsAndFlows[impactType.id].length == 0">This process has no impact for this impact category.</div>
+          <table class="table tmd table-nonfluid" ng-if="impactsAndFlows[impactType.id].length > 0">
+            <tr>
+              <th>Type</th>
+              <th>Value</th>
+              <th>Unit</th>
+            </tr>
+            <tr ng-repeat="impact in impactsAndFlows[impactType.id]">
+              <td>{{impact.label}}</td>
+              <td>{{impact.value}}</td>
+              <td>{{impact.unit.symbol}} / {{unit.symbol}}</td>
+            </tr>
+          </table>
+        </div>
     </div>
 
-    <h2>Elementary flows</h2>
-    <div ng-repeat="flowType in flowTypes.children">
-      <h3>{{flowType.label}}</h3>
-      <div ng-if="impactsAndFlows[flowType.id].length == 0">This process has no elementary flow for this elementary flow category.</div>
-      <table class="table tmd table-nonfluid" ng-if="impactsAndFlows[flowType.id].length > 0">
-        <tr>
-          <th>Type</th>
-          <th>Value</th>
-          <th>Unit</th>
-        </tr>
-        <tr ng-repeat="flow in impactsAndFlows[flowType.id]">
-          <td>{{flow.label}}</td>
-          <td>{{flow.value}}</td>
-          <td>{{flow.unit.symbol}} / {{unit.symbol}}</td>
-        </tr>
-      </table>
+    <a data-toggle="collapse" data-target="#flows" style="cursor: pointer;" ng-click="toggleVisibility('processFlows')" class="collapseHead"><h2>Elementary flows <small>{{isVisible('processFlows') ? 'hide' : 'show'}}</small></h2></a>
+    <div class="collapse" ng-class="{in : processFlowsVisibility}" id="flows">
+        <div ng-repeat="flowType in flowTypes.children">
+          <h3>{{flowType.label}}</h3>
+          <div ng-if="impactsAndFlows[flowType.id].length == 0">This process has no elementary flow for this elementary flow category.</div>
+          <table class="table tmd table-nonfluid" ng-if="impactsAndFlows[flowType.id].length > 0">
+            <tr>
+              <th>Type</th>
+              <th>Value</th>
+              <th>Unit</th>
+            </tr>
+            <tr ng-repeat="flow in impactsAndFlows[flowType.id]">
+              <td>{{flow.label}}</td>
+              <td>{{flow.value}}</td>
+              <td>{{flow.unit.symbol}} / {{unit.symbol}}</td>
+            </tr>
+          </table>
+        </div>
     </div>
 
-    <h2>Groups containing this process</h2>
-    <ul>
-      <li ng-repeat="group in groups"><a ng-href="#/group/{{group.id}}">{{group.label}}</a></li>
-    </ul>
-
-    <h2>Relations</h2>
+    <a data-toggle="collapse" data-target="#relations" style="cursor: pointer;" ng-click="toggleVisibility('processRelations')" class="collapseHead"><h2>Relations <small>{{isVisible('processRelations') ? 'hide' : 'show'}}</small></h2></a>
+    <div class="collapse" ng-class="{in : processRelationsVisibility}" id="relations">
     <div ng-if="relations.length == 0">This process has no relation.</div>
-  	<table class="table tmd table-nonfluid" ng-if="relations.length > 0">
-  		<tr>
-  			<th>Upsteam</th>
-  			<th>Coefficient</th>
-  			<th>Downstream</th>
-        <th></th>
-  		</tr>
-  		<tr ng-repeat-start="relation in relations">
-  			<td ng-if="relation.sourceId != id">
-          <a ng-href="#/process/{{relation.sourceId}}">
-            {{relation.sourceLabel}}
-            <small>[{{relation.sourceUnit.symbol}}]</small>
-          </a>
-        </td>
-        <td ng-if="relation.sourceId == id">
-          {{relation.sourceLabel}}
-          <small>[{{relation.sourceUnit.symbol}}]</small>
-        </td>
-        <td ng-if="relation.coeffId != id">
-          <a ng-href="#/coefficient/{{relation.coeffId}}">
-            {{relation.coeffLabel}}
-            <small>[{{relation.coeffUnit.symbol}}]</small>
-            <sup ng-if="relation.exponent == -1">-1</sup>
-          </a>
-        </td>
-        <td ng-if="relation.destinationId != id">
-          <a ng-href="#/process/{{relation.destinationId}}">
-            {{relation.destinationLabel}}
-            <small>[{{relation.destinationUnit.symbol}}]</small>
-          </a>
-        </td>
-        <td ng-if="relation.destinationId == id">
-          {{relation.destinationLabel}}
-          <small>[{{relation.destinationUnit.symbol}}]</small>
-        </td>
-        <td><a data-toggle="collapse" data-target="#infos-{{$index}}" style="cursor: pointer;">Infos</a></td>
-  	 	</tr>
-      <tr ng-repeat-end>
-        <td colspan="4" class="td-collapse">
-          <div class="collapse out" id="infos-{{$index}}">
-            <p>Relation type: <span style="color: {{relationTypes[relation.sourceRelation.type.id].color}}" data-toggle="tooltip" data-placement="top" title="{{relationTypes[relation.sourceRelation.type.id].comment}}" tooltip>{{relation.sourceRelation.type.label}} <span class="glyphicon glyphicon-question-sign"></span></span></p>
-            <strong>Derived from:</strong>
-            <table class="table tmd table-nonfluid">
-              <tr>
+        <table class="table tmd table-nonfluid" ng-if="relations.length > 0">
+            <tr>
                 <th>Upsteam</th>
                 <th>Coefficient</th>
                 <th>Downstream</th>
-              </tr>
-              <tr>
-                <td><a ng-href="#/group/{{relation.sourceRelation.source.id}}">{{relation.sourceRelation.source.label}}</a></td>
-                <td><a ng-href="#/group/{{relation.sourceRelation.coeff.id}}">{{relation.sourceRelation.coeff.label}} <sup ng-if="relation.sourceRelation.exponent == -1">-1</sup></a></td>
-                <td><a ng-href="#/group/{{relation.sourceRelation.destination.id}}">{{relation.sourceRelation.destination.label}}</a></td>
-              </tr>
-            </table>
-          </div>
-        </td>
-      </tr>
-  	</table>
+            <th></th>
+            </tr>
+            <tr ng-repeat-start="relation in relations">
+                <td ng-if="relation.sourceId != id">
+              <a ng-href="#/process/{{relation.sourceId}}">
+                {{relation.sourceLabel}}
+                <small>[{{relation.sourceUnit.symbol}}]</small>
+              </a>
+            </td>
+            <td ng-if="relation.sourceId == id">
+              {{relation.sourceLabel}}
+              <small>[{{relation.sourceUnit.symbol}}]</small>
+            </td>
+            <td ng-if="relation.coeffId != id">
+              <a ng-href="#/coefficient/{{relation.coeffId}}">
+                {{relation.coeffLabel}}
+                <small>[{{relation.coeffUnit.symbol}}]</small>
+                <sup ng-if="relation.exponent == -1">-1</sup>
+              </a>
+            </td>
+            <td ng-if="relation.destinationId != id">
+              <a ng-href="#/process/{{relation.destinationId}}">
+                {{relation.destinationLabel}}
+                <small>[{{relation.destinationUnit.symbol}}]</small>
+              </a>
+            </td>
+            <td ng-if="relation.destinationId == id">
+              {{relation.destinationLabel}}
+              <small>[{{relation.destinationUnit.symbol}}]</small>
+            </td>
+            <td><a data-toggle="collapse" data-target="#infos-{{$index}}" style="cursor: pointer;">Infos</a></td>
+            </tr>
+          <tr ng-repeat-end>
+            <td colspan="4" class="td-collapse">
+              <div class="collapse out" id="infos-{{$index}}">
+                <p>Relation type: <span style="color: {{relationTypes[relation.sourceRelation.type.id].color}}" data-toggle="tooltip" data-placement="top" title="{{relationTypes[relation.sourceRelation.type.id].comment}}" tooltip>{{relation.sourceRelation.type.label}} <span class="glyphicon glyphicon-question-sign"></span></span></p>
+                <strong>Derived from:</strong>
+                <table class="table tmd table-nonfluid">
+                  <tr>
+                    <th>Upsteam</th>
+                    <th>Coefficient</th>
+                    <th>Downstream</th>
+                  </tr>
+                  <tr>
+                    <td><a ng-href="#/group/{{relation.sourceRelation.source.id}}">{{relation.sourceRelation.source.label}}</a></td>
+                    <td><a ng-href="#/group/{{relation.sourceRelation.coeff.id}}">{{relation.sourceRelation.coeff.label}} <sup ng-if="relation.sourceRelation.exponent == -1">-1</sup></a></td>
+                    <td><a ng-href="#/group/{{relation.sourceRelation.destination.id}}">{{relation.sourceRelation.destination.label}}</a></td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        <h3>Groups containing this process</h3>
+        <ul>
+            <li ng-repeat="group in groups"><a ng-href="#/group/{{group.id}}">{{group.label}}</a></li>
+        </ul>
+    </div>
   <hr />
 </div>
