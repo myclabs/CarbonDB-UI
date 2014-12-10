@@ -1,4 +1,4 @@
-<table class="table tmd table-nonfluid">
+<table class="table tmd table-nonfluid table-condensed">
  <tr ng-repeat="line in tmd">
   <th ng-if="cell.header && cell.col" ng-repeat="cell in line track by $index" colspan="{{cell.span}}">{{cell.value}}</th>
   <th ng-if="cell.header && !cell.col" ng-repeat="cell in line track by $index" rowspan="{{cell.span}}">{{cell.value}}</th>

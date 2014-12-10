@@ -395,7 +395,30 @@ define(["angular"], function(angular) {
         return 0;
       });
       var types = [$scope.impactTypes, $scope.flowTypes];
+      var elements = ['impacts', 'flows'];
       var processData = [data.impacts, data.flows];
+      for (var t = 0; t < 2; t++) {
+        $scope[elements[t]] = [];
+        for (var i = 0; i < types[t].children.length; i++) {
+          var impactTypeCategory = types[t].children[i];
+          for (var j = 0; j < impactTypeCategory.children.length; j++) {
+            var impactType = impactTypeCategory.children[j];
+            if (processData[t].hasOwnProperty(impactType.id)) {
+              var impact = {
+                category: impactTypeCategory.label,
+                label: impactType.label,
+                value: sigFigs(processData[t][impactType.id].value, 3),
+                uncertainty: processData[t][impactType.id].uncertainty,
+                unit: impactType.unit
+              }
+              $scope[elements[t]].push(impact);
+            }
+          }
+        }
+      }
+      console.log($scope.flows);
+
+
       for (var t = 0; t < 2; t++) {
         for (var i = 0; i < types[t].children.length; i++) {
           var impactTypeCategory = types[t].children[i];
@@ -414,6 +437,7 @@ define(["angular"], function(angular) {
           }
         }
       }
+      console.log($scope.impactsAndFlows);
     });
 
     $scope.loadGraphData = function() {

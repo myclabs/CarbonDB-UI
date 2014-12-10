@@ -27,13 +27,16 @@
     <a data-toggle="collapse" data-target="#relations" style="cursor: pointer;" ng-click="toggleVisibility('groupRelations')" class="collapseHead"><h2>Relations <small>{{isVisible('groupRelations') ? 'hide' : 'show'}}</small></h2></a>
     <div class="collapse" ng-class="{in : groupRelationsVisibility}" id="relations">
         <table class="table tmd table-nonfluid">
-            <tr>
+            <thead>
+              <tr>
                 <th>Upsteam</th>
                 <th>Coefficient</th>
                 <th>Downstream</th>
                 <th></th>
-            </tr>
-            <tr ng-repeat-start="sourceRelation in sourceRelations">
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat-start="sourceRelation in sourceRelations">
                 <td ng-if="sourceRelation.source.id != id"><a ng-href="#/group/{{sourceRelation.source.id}}">{{sourceRelation.source.label}}</a></td>
                 <td ng-if="sourceRelation.source.id == id">{{sourceRelation.source.label}}</td>
                 <td ng-if="sourceRelation.coeff.id != id"><a ng-href="#/group/{{sourceRelation.coeff.id}}">{{sourceRelation.coeff.label}} <sup ng-if="sourceRelation.exponent == -1">-1</sup></a></td>
@@ -41,20 +44,23 @@
                 <td ng-if="sourceRelation.destination.id != id"><a ng-href="#/group/{{sourceRelation.destination.id}}">{{sourceRelation.destination.label}}</a></td>
                 <td ng-if="sourceRelation.destination.id == id">{{sourceRelation.destination.label}}</td>
                 <td><a data-toggle="collapse" data-target="#infos-{{$index}}" style="cursor: pointer;">Infos</a></td>
-            </tr>
-            <tr ng-repeat-end>
+              </tr>
+              <tr ng-repeat-end>
                 <td colspan="4" class="td-collapse">
                     <div class="collapse out" id="infos-{{$index}}">
                         <p>Relation type: <span style="color: {{relationTypes[sourceRelation.type.id].color}}" data-toggle="tooltip" data-placement="top" title="{{relationTypes[sourceRelation.type.id].comment}}" tooltip>{{sourceRelation.type.label}} <span class="glyphicon glyphicon-question-sign"></span></span></p>
                         <strong>Derived relations:</strong>
                         <div ng-if="sourceRelation.derivedRelations.length == 0">This source relation has no derived relation.</div>
-                        <table class="table tmd table-nonfluid" ng-if="sourceRelation.derivedRelations.length > 0">
-                            <tr>
-                                <th>Upsteam</th>
-                                <th>Coefficient</th>
-                                <th>Downstream</th>
-                            </tr>
-                            <tr ng-repeat="relation in sourceRelation.derivedRelations">
+                        <table class="table tmd table-nonfluid table-condensed table-striped" ng-if="sourceRelation.derivedRelations.length > 0">
+                            <thead>
+                              <tr>
+                                  <th>Upsteam</th>
+                                  <th>Coefficient</th>
+                                  <th>Downstream</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr ng-repeat="relation in sourceRelation.derivedRelations">
                                 <td>
                                     <a ng-href="#/process/{{relation.sourceId}}">
                                         {{relation.sourceLabel}}
@@ -74,11 +80,13 @@
                                         <small>[{{relation.destinationUnit.symbol}}]</small>
                                     </a>
                                 </td>
-                            </tr>
+                              </tr>
+                            </tbody>
                         </table>
                     </div>
                 </td>
-            </tr>
+              </tr>
+            </tbody>
         </table>
         <div ng-if="overlap.length > 0">
             <h3>Groups sharing common elements</h3>
