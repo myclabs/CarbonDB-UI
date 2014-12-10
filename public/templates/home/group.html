@@ -112,7 +112,7 @@
     <a data-toggle="collapse" data-target="#data" style="cursor: pointer;" ng-click="toggleVisibility('groupData')" class="collapseHead"><h2>Elements <small>{{isVisible('groupData') ? 'hide' : 'show'}}</small></h2></a>
     <div class="collapse" ng-class="{in : groupDataVisibility}" id="data">
         <p ng-if="commonKeywords">
-            <strong>Common keywords:</strong>
+            <strong>Common tags:</strong>
             <span ng-repeat="keyword in commonKeywords">{{keyword.label}} <span ng-show="!$last">-</span> </span>
         </p>
         <div class="row col-sm-12" ng-show="type == 'PROCESS'">
