@@ -416,28 +416,6 @@ define(["angular"], function(angular) {
           }
         }
       }
-      console.log($scope.flows);
-
-
-      for (var t = 0; t < 2; t++) {
-        for (var i = 0; i < types[t].children.length; i++) {
-          var impactTypeCategory = types[t].children[i];
-          $scope.impactsAndFlows[impactTypeCategory.id] = new Array();
-          for (var j = 0; j < impactTypeCategory.children.length; j++) {
-            var impactType = impactTypeCategory.children[j];
-            if (processData[t].hasOwnProperty(impactType.id)) {
-              var impact = {
-                label: impactType.label,
-                value: sigFigs(processData[t][impactType.id].value, 3),
-                uncertainty: processData[t][impactType.id].uncertainty,
-                unit: impactType.unit
-              }
-              $scope.impactsAndFlows[impactTypeCategory.id].push(impact);
-            }
-          }
-        }
-      }
-      console.log($scope.impactsAndFlows);
     });
 
     $scope.loadGraphData = function() {
