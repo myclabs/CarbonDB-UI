@@ -1,7 +1,7 @@
-<table class="table tmd table-nonfluid table-condensed">
+<table class="table tmd table-nonfluid table-condensed table-centered">
  <tr ng-repeat="line in tmd">
   <th ng-if="cell.header && cell.col" ng-repeat="cell in line track by $index" colspan="{{cell.span}}">{{cell.value}}</th>
-  <th ng-if="cell.header && !cell.col" ng-repeat="cell in line track by $index" rowspan="{{cell.span}}">{{cell.value}}</th>
+  <th ng-if="cell.header && !cell.col" ng-repeat="cell in line track by $index" rowspan="{{cell.span}}" class="header-row">{{cell.value}}</th>
   <!-- <td ng-if="!cell.header && cell.col" ng-repeat="cell in line track by $index" colspan="{{cell.span}}">{{cell.value}} ± {{cell.uncertainty}}%</td>
   <td ng-if="!cell.header && !cell.col" ng-repeat="cell in line track by $index" rowspan="{{cell.span}}">{{cell.value}} ± {{cell.uncertainty}}%</td> -->
 

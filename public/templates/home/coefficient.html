@@ -8,53 +8,57 @@
     <a data-toggle="collapse" data-target="#relations" style="cursor: pointer;" ng-click="toggleVisibility('coefficientRelations')" class="collapseHead"><h2>Relations <small>{{isVisible('coefficientRelations') ? 'hide' : 'show'}}</small></h2></a>
     <div class="collapse" ng-class="{in : coefficientRelationsVisibility}" id="relations">
         <div ng-if="relations.length == 0">This coefficient has relation.</div>
-        <table class="table tmd table-nonfluid" ng-if="relations.length > 0">
-            <tr>
-                <th>Upsteam</th>
-                <th>Coefficient</th>
-                <th>Downstream</th>
-            <th></th>
-            </tr>
-            <tr ng-repeat-start="relation in relations">
-                <td>
-              <a ng-href="#/process/{{relation.sourceId}}">
-                {{relation.sourceLabel}}
-                <small>[{{relation.sourceUnit.symbol}}]</small>
-              </a>
-            </td>
-            <td>
-              {{relation.coeffLabel}}
-              <small>[{{relation.coeffUnit.symbol}}]</small>
-              <sup ng-if="relation.exponent == -1">-1</sup>
-            </td>
-            <td>
-              <a ng-href="#/process/{{relation.destinationId}}">
-                {{relation.destinationLabel}}
-                <small>[{{relation.destinationUnit.symbol}}]</small>
-              </a>
-            </td>
-            <td><a data-toggle="collapse" data-target="#infos-{{$index}}" style="cursor: pointer;">Infos</a></td>
-            </tr>
-          <tr ng-repeat-end>
-            <td colspan="4" class="td-collapse">
-              <div class="collapse out" id="infos-{{$index}}">
-                <p>Relation type: {{relation.sourceRelation.type.label}}</p>
-                <strong>Derived from:</strong>
-                <table class="table tmd table-nonfluid">
-                  <tr>
+        <table class="table table-condensed table-striped4" ng-if="relations.length > 0">
+            <thead>
+                <tr>
                     <th>Upsteam</th>
                     <th>Coefficient</th>
                     <th>Downstream</th>
-                  </tr>
-                  <tr>
-                    <td><a ng-href="#/group/{{relation.sourceRelation.source.id}}">{{relation.sourceRelation.source.label}}</a></td>
-                    <td><a ng-href="#/group/{{relation.sourceRelation.coeff.id}}">{{relation.sourceRelation.coeff.label}} <sup ng-if="relation.sourceRelation.exponent == -1">-1</sup></a></td>
-                    <td><a ng-href="#/group/{{relation.sourceRelation.destination.id}}">{{relation.sourceRelation.destination.label}}</a></td>
-                  </tr>
-                </table>
-              </div>
-            </td>
-          </tr>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat-start="relation in relations">
+                    <td>
+                  <a ng-href="#/process/{{relation.sourceId}}">
+                    {{relation.sourceLabel}}
+                    <small>[{{relation.sourceUnit.symbol}}]</small>
+                  </a>
+                </td>
+                <td>
+                  {{relation.coeffLabel}}
+                  <small>[{{relation.coeffUnit.symbol}}]</small>
+                  <sup ng-if="relation.exponent == -1">-1</sup>
+                </td>
+                <td>
+                  <a ng-href="#/process/{{relation.destinationId}}">
+                    {{relation.destinationLabel}}
+                    <small>[{{relation.destinationUnit.symbol}}]</small>
+                  </a>
+                </td>
+                <td><a data-toggle="collapse" data-target="#infos-{{$index}}" style="cursor: pointer;">Infos</a></td>
+              </tr>
+              <tr ng-repeat-end>
+                <td colspan="4" class="td-collapse">
+                  <div class="collapse out" id="infos-{{$index}}">
+                    <p>Relation type: {{relation.sourceRelation.type.label}}</p>
+                    <strong>Derived from:</strong>
+                    <table class="table table-condensed">
+                      <tr>
+                        <th>Upsteam</th>
+                        <th>Coefficient</th>
+                        <th>Downstream</th>
+                      </tr>
+                      <tr>
+                        <td><a ng-href="#/group/{{relation.sourceRelation.source.id}}">{{relation.sourceRelation.source.label}}</a></td>
+                        <td><a ng-href="#/group/{{relation.sourceRelation.coeff.id}}">{{relation.sourceRelation.coeff.label}} <sup ng-if="relation.sourceRelation.exponent == -1">-1</sup></a></td>
+                        <td><a ng-href="#/group/{{relation.sourceRelation.destination.id}}">{{relation.sourceRelation.destination.label}}</a></td>
+                      </tr>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+          </tbody>
         </table>
         <h3>Groups containing this coefficient</h3>
         <ul>

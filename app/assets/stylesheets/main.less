@@ -1,5 +1,6 @@
 @link-color: darken(#428bca, 6.5%);
 @link-hover-color: darken(@link-color, 15%);
+@table-bg-accent: #f9f9f9;
 
 body {
   margin-top: 40px;
@@ -13,13 +14,27 @@ body {
 .tmd {
   width: auto;
   td, th {
+    min-width: 100px;
+    &.header-row {
+      text-align: left;
+    }
+  }
+  tbody tr:first-child {
+    td, th {
+      border-top: none;
+    }
+  }
+}
+
+.table-centered {
+  td, th {
     text-align: center;
     vertical-align: middle !important;
     width: auto;
   }
-  td {
-    min-width: 100px;
-  }
+}
+
+.table {
   .td-collapse {
     padding: 0;
     padding-left: 40px;
@@ -29,6 +44,15 @@ body {
   tbody tr:first-child {
     td, th {
       border-top: none;
+    }
+  }
+}
+
+.table-striped4 {
+  > tbody > tr:nth-child(4n+1) {
+    > td,
+    > th {
+      background-color: @table-bg-accent;
     }
   }
 }

@@ -407,9 +407,19 @@ define(["angular"], function(angular) {
               var impact = {
                 category: impactTypeCategory.label,
                 label: impactType.label,
-                value: sigFigs(processData[t][impactType.id].value, 3),
+                value: sigFigs(processData[t][impactType.id].value.value, 3),
                 uncertainty: processData[t][impactType.id].uncertainty,
                 unit: impactType.unit
+              }
+              if (processData[t][impactType.id].hasOwnProperty("upstream")) {
+                processData[t][impactType.id].upstream.forEach(function(up) {
+                    up.value = sigFigs(up.value, 3);
+                    if (up.processId != "#own#") {
+                        up.processLabel = up.processKeywords.map(function(k) { return k.label; }).join(' - ');
+                        up.coeffLabel = up.coeffKeywords.map(function(k) { return k.label; }).join(' - ');
+                    }
+                });
+                impact.upStream = processData[t][impactType.id].upstream;
               }
               $scope[elements[t]].push(impact);
             }
