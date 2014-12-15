@@ -12,21 +12,16 @@
             <tr ng-repeat-start="reference in references">
                 <td>{{reference.shortName}}</td>
                 <td>
-                    <span ng-if="reference.creator">{{reference.creator}}, </span>
-                    <span ng-if="reference.title"><em>{{reference.title}}</em></span>
-                    <span ng-if="reference.publisher">, {{reference.publisher}}</span>
-                    <span ng-if="reference.source">, {{reference.source}}</span>
-                    <span ng-if="reference.date">, {{reference.date}}</span>
-                    <span ng-if="reference.url">, <a ng-href="{{reference.url}}" target="_blank">{{reference.url}}</a></span>.
+                    <span ng-if="reference.creator">{{reference.creator}}, </span><span ng-if="reference.title"><em>{{reference.title}}</em></span><span ng-if="reference.publisher">, {{reference.publisher}}</span><span ng-if="reference.source">, {{reference.source}}</span><span ng-if="reference.date">, {{reference.date}}</span><span ng-if="reference.url">, <a ng-href="{{reference.url}}" target="_blank">{{reference.url}}</a></span>.
                 </td>
                 <td>
-                    <span ng-if="reference.groups.length > 0" data-toggle="collapse" data-target="#usages-{{$index}}" style="cursor: pointer;">Usage:&nbsp;<a><strong>{{reference.groups.length}}</strong></a></span>
+                    <a ng-if="reference.groups.length > 0" href="" data-toggle="collapse" data-target="#usages-{{$index}}">Quoted:&nbsp;<strong>{{reference.groups.length}}</strong></a>
                 </td>
             </tr>
             <tr ng-repeat-end>
                 <td colspan="3" class="td-collapse">
                     <div class="collapse out" id="usages-{{$index}}">
-                        Used in:
+                        <h4>Quoted in:</h4>
                         <ul>
                             <li ng-repeat="group in reference.groups">
                                 <a ng-href="#/group/{{group.id}}"><span ng-if="group.type == 'PROCESS'">[P]</span><span ng-if="group.type == 'COEFFICIENT'">[C]</span> {{group.label}}</a>
