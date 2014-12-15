@@ -1,20 +1,41 @@
 <div class="container">
-  <p>
     <h2>References</h2>
-    <ul>
-      <li ng-repeat="reference in references">
-        <span ng-if="reference.shortName">[{{reference.shortName}}] </span><span ng-if="reference.creator">{{reference.creator}}, </span><span ng-if="reference.title"><em>{{reference.title}}</em></span><span ng-if="reference.publisher">, {{reference.publisher}}</span><span ng-if="reference.source">, {{reference.source}}</span><span ng-if="reference.date">, {{reference.date}}</span><span ng-if="reference.url">, <a ng-href="{{reference.url}}" target="_blank">{{reference.url}}</a></span>.
-        <span ng-if="reference.groups.length > 0" data-toggle="collapse" data-target="#usages-{{$index}}" style="cursor: pointer;">| Usage: <a><strong>{{reference.groups.length}}</strong></a></span>
-        <div ng-if="reference.groups.length > 0" class="collapse out" id="usages-{{$index}}">
-          Used in:
-          <ul>
-            <li ng-repeat="group in reference.groups">
-              <a ng-href="#/group/{{group.id}}"><span ng-if="group.type == 'PROCESS'">[P]</span><span ng-if="group.type == 'COEFFICIENT'">[C]</span> {{group.label}}</a>
-            </li>
-          </ul>
-        </div>
-      </li>
-    </ul>
-  </p>
+    <table class="table table-striped4" ng-if="references.length > 0">
+        <thead>
+            <tr>
+                <th>Short name</th>
+                <th>Full reference</th>
+                <th>Quotations</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat-start="reference in references">
+                <td>[{{reference.shortName}}]</td>
+                <td>
+                    <span ng-if="reference.creator">{{reference.creator}}, </span>
+                    <span ng-if="reference.title"><em>{{reference.title}}</em></span>
+                    <span ng-if="reference.publisher">, {{reference.publisher}}</span>
+                    <span ng-if="reference.source">, {{reference.source}}</span>
+                    <span ng-if="reference.date">, {{reference.date}}</span>
+                    <span ng-if="reference.url">, <a ng-href="{{reference.url}}" target="_blank">{{reference.url}}</a></span>.
+                </td>
+                <td>
+                    <span ng-if="reference.groups.length > 0" data-toggle="collapse" data-target="#usages-{{$index}}" style="cursor: pointer;">Usage:&nbsp;<a><strong>{{reference.groups.length}}</strong></a></span>
+                </td>
+            </tr>
+            <tr ng-repeat-end>
+                <td colspan="3" class="td-collapse">
+                    <div class="collapse out" id="usages-{{$index}}">
+                        Used in:
+                        <ul>
+                            <li ng-repeat="group in reference.groups">
+                                <a ng-href="#/group/{{group.id}}"><span ng-if="group.type == 'PROCESS'">[P]</span><span ng-if="group.type == 'COEFFICIENT'">[C]</span> {{group.label}}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
   <hr />
 </div>
