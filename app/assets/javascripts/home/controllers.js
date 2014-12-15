@@ -383,7 +383,7 @@ define(["angular"], function(angular) {
         if (a.originId == $scope.id && b.originId != $scope.id) {
           return 1;
         }
-        else if (a.destId == $scope.id && b.destId != $scope.id) {
+        else if (a.destinationId == $scope.id && b.destinationId != $scope.id) {
           return -1;
         }
         else if (a.coeffLabel < b.coeffLabel) {
