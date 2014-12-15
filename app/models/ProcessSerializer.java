@@ -137,11 +137,14 @@ public class ProcessSerializer extends JsonSerializer<Process> {
         Process process = relation.getDestination();
         Double upConversionFactor = up.getUnit().getConversionFactor();
         Double coeffValue = coeff.getValue().value;
-        if (relation.getExponent() == -1) {
-            coeffValue = 1 / coeffValue;
-        }
         Double coeffConversionFactor = coeff.getUnit().getConversionFactor();
-        Double upValue = (value / upConversionFactor) * (coeffValue * coeffConversionFactor);
+        if (relation.getExponent() == -1) {
+            coeffValue = 1 / (coeffValue * coeffConversionFactor);
+        }
+        else {
+            coeffValue *= coeffConversionFactor;
+        }
+        Double upValue = (value / upConversionFactor) * coeffValue;
         upValue *= process.getUnit().getConversionFactor();
 
         HashMap<String, Object> upStream = new HashMap<>();
