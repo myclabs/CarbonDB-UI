@@ -10,7 +10,7 @@
         </thead>
         <tbody>
             <tr ng-repeat-start="reference in references">
-                <td>[{{reference.shortName}}]</td>
+                <td>{{reference.shortName}}</td>
                 <td>
                     <span ng-if="reference.creator">{{reference.creator}}, </span>
                     <span ng-if="reference.title"><em>{{reference.title}}</em></span>
