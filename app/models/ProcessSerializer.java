@@ -3,17 +3,13 @@ package models;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.mycsense.carbondb.domain.Coefficient;
-import com.mycsense.carbondb.domain.DerivedRelation;
-import com.mycsense.carbondb.domain.ElementaryFlow;
-import com.mycsense.carbondb.domain.Group;
-import com.mycsense.carbondb.domain.Impact;
+import com.mycsense.carbondb.domain.*;
 import com.mycsense.carbondb.domain.Process;
-import com.mycsense.carbondb.domain.Value;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ProcessSerializer extends JsonSerializer<Process> {
     @Override
@@ -55,6 +51,8 @@ public class ProcessSerializer extends JsonSerializer<Process> {
                 jgen.writeObject(impact.getValue());
                 jgen.writeFieldName("upstream");
                 jgen.writeObject(getUpstreamImpacts(process, impact));
+                jgen.writeFieldName("composition");
+                jgen.writeObject(getImpactComposition(process, impact));
                 jgen.writeEndObject();
             }
             jgen.writeEndObject();
@@ -93,6 +91,25 @@ public class ProcessSerializer extends JsonSerializer<Process> {
             upStreamImpacts.add(0, constructOwn(ownValue, totalImpactValue));
         }
         return upStreamImpacts;
+    }
+
+    protected ArrayList<HashMap<String, Object>> getImpactComposition(Process process, Impact impact) {
+        Double impactValue = impact.getValue().value;
+        ArrayList<HashMap<String, Object>> impactComposition = new ArrayList<>();
+        for (Map.Entry<ElementaryFlowType, Value> entry: impact.getType().getComponents().entrySet()) {
+            if (process.getCalculatedFlows().containsKey(entry.getKey().getId())) {
+                ElementaryFlow flow = process.getCalculatedFlows().get(entry.getKey().getId());
+                HashMap<String, Object> component = new HashMap<>();
+                Category cat = entry.getKey().getCategory();
+                component.put("category", entry.getKey().getCategory().getLabel());
+                component.put("type", entry.getKey().getLabel());
+                Double value = flow.getValue().value * entry.getValue().value;
+                component.put("value", value);
+                component.put("contribution", ((double) Math.round((value * 10000) / impactValue)) / 100);
+                impactComposition.add(component);
+            }
+        }
+        return impactComposition;
     }
 
     protected ArrayList<HashMap<String, Object>> getUpstreamFlows(Process process, ElementaryFlow flow) {

@@ -421,6 +421,12 @@ define(["angular"], function(angular) {
                 });
                 impact.upStream = processData[t][impactType.id].upstream;
               }
+              if (processData[t][impactType.id].hasOwnProperty("composition")) {
+                impact.composition = processData[t][impactType.id].composition;
+                processData[t][impactType.id].composition.forEach(function (component) {
+                    component.value = sigFigs(component.value, 3);
+                });
+              }
               $scope[elements[t]].push(impact);
             }
           }
