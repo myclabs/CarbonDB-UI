@@ -100,7 +100,6 @@ public class ProcessSerializer extends JsonSerializer<Process> {
             if (process.getCalculatedFlows().containsKey(entry.getKey().getId())) {
                 ElementaryFlow flow = process.getCalculatedFlows().get(entry.getKey().getId());
                 HashMap<String, Object> component = new HashMap<>();
-                Category cat = entry.getKey().getCategory();
                 component.put("category", entry.getKey().getCategory().getLabel());
                 component.put("type", entry.getKey().getLabel());
                 Double value = flow.getValue().value * entry.getValue().value;
@@ -149,10 +148,10 @@ public class ProcessSerializer extends JsonSerializer<Process> {
 
         HashMap<String, Object> upStream = new HashMap<>();
         upStream.put("processId", up.getId());
-        upStream.put("processKeywords", up.getKeywords().keywords);
+        upStream.put("processKeywords", up.getKeywords());
         upStream.put("processUnit", up.getUnit());
         upStream.put("coeffId", coeff.getId());
-        upStream.put("coeffKeywords", coeff.getKeywords().keywords);
+        upStream.put("coeffKeywords", coeff.getKeywords());
         upStream.put("coeffUnit", coeff.getUnit());
         upStream.put("exponent", relation.getExponent());
         upStream.put("value", upValue);

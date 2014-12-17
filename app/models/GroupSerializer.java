@@ -33,7 +33,7 @@ public class GroupSerializer  extends JsonSerializer<Group> {
         jgen.writeObject(group.getType());
 
         jgen.writeFieldName("commonKeywords");
-        jgen.writeObject(group.getCommonKeywords().keywords);
+        jgen.writeObject(group.getCommonKeywords());
 
         jgen.writeFieldName("dimensions");
         jgen.writeStartArray();
@@ -69,7 +69,7 @@ public class GroupSerializer  extends JsonSerializer<Group> {
         jgen.writeFieldName("elementsURI");
         jgen.writeStartObject();
         for (SingleElement element : group.getElements()) {
-            jgen.writeStringField(StringUtils.join(element.getKeywords().keywords, "+") + "+" + element.getUnit().getId(), element.getId());
+            jgen.writeStringField(StringUtils.join(element.getKeywords(), "+") + "+" + element.getUnit().getId(), element.getId());
         }
         jgen.writeEndObject();
 
@@ -78,7 +78,7 @@ public class GroupSerializer  extends JsonSerializer<Group> {
             jgen.writeStartObject();
             for (SingleElement element : group.getElements()) {
                 Coefficient coeff = (Coefficient) element;
-                jgen.writeFieldName(StringUtils.join(element.getKeywords().keywords, "+") + "+" + element.getUnit().getId());
+                jgen.writeFieldName(StringUtils.join(element.getKeywords(), "+") + "+" + element.getUnit().getId());
                 jgen.writeStartObject();
                 jgen.writeNumberField("value", coeff.getValue().value);
                 jgen.writeNumberField("uncertainty", coeff.getValue().uncertainty);
@@ -91,7 +91,7 @@ public class GroupSerializer  extends JsonSerializer<Group> {
             jgen.writeStartObject();
             for (SingleElement element : group.getElements()) {
                 Process process = (Process) element;
-                jgen.writeFieldName(StringUtils.join(element.getKeywords().keywords, "+") + "+" + element.getUnit().getId());
+                jgen.writeFieldName(StringUtils.join(element.getKeywords(), "+") + "+" + element.getUnit().getId());
                 jgen.writeStartObject();
                 for (ElementaryFlow flow : process.getCalculatedFlows().values()) {
                     jgen.writeFieldName(flow.getType().getId());

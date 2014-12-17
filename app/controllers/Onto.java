@@ -47,11 +47,6 @@ public class Onto extends Controller {
 
     protected static UnitToolsWebService unitTools;
 
-    public class Link {
-        public int source, target;
-        public Link(int source, int target) { this.source = source; this.target = target; }
-    }
-
     public static Result upload(String database) throws Exception {
         play.Logger.info("----------------");
         play.Logger.info("Begin processing");
@@ -96,13 +91,13 @@ public class Onto extends Controller {
                         CarbonOntology.getInstance().clear();
                     }
                     result.put("result", "The ontology has been processed without error");
-                /*if (report.errors.size() > 0) {
-                    result.put("result", "The ontology has been processed and contains some errors");
-                }
-                else {
-                    result.put("result", "The ontology has been processed without error");
-                }*/
-                    //result.put("report", toJson(report));
+                    /*if (report.errors.size() > 0) {
+                        result.put("result", "The ontology has been processed and contains some errors");
+                    }
+                    else {
+                        result.put("result", "The ontology has been processed without error");
+                    }
+                    result.put("report", toJson(report));*/
                     play.Logger.info("Processing finished");
                     return ok(result);
                 } catch (Exception e) {
@@ -114,11 +109,6 @@ public class Onto extends Controller {
         else {
             return badRequest("File missing");
         }
-
-
-
-        //File file = request().body().asRaw().asFile();
-        //return ok("File uploaded");
     }
 
     protected static Model getInferredModel() {
@@ -127,10 +117,10 @@ public class Onto extends Controller {
 
         InputStream in = FileManager.get().open(baseOntoFileName);
         if (in == null) {
-            throw new IllegalArgumentException("File not found");
+            throw new IllegalArgumentException("File " + baseOntoFileName + " not found");
         }
 
-        model.read( in, null );
+        model.read(in, null);
         play.Logger.info("Model size after reading = " + model.size());
 
         //Logger.getLogger("").setLevel(Level.WARNING);
@@ -235,7 +225,7 @@ public class Onto extends Controller {
             HashMap<String, String> node = new HashMap<>();
             node.put("id", process.getId());
             String label = "";
-            for (Keyword keyword : process.getKeywords().keywords) {
+            for (Keyword keyword : process.getKeywords()) {
                 label += keyword.getLabel() + " - ";
             }
             label = label.substring(0, label.length() - 3);

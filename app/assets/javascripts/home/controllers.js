@@ -193,9 +193,9 @@ define(["angular"], function(angular) {
       });
       $scope.sourceRelations.forEach(function(s) {
         s.derivedRelations.forEach(function(d) {
-          d.sourceLabel = d.source.keywords.map(function(k) { return k.label; }).join(' - ');
-          d.coeffLabel = d.coeff.keywords.map(function(k) { return k.label; }).join(' - ');
-          d.destinationLabel = d.destination.keywords.map(function(k) { return k.label; }).join(' - ');
+          d.sourceLabel = d.sourceKeywords.map(function(k) { return k.label; }).join(' - ');
+          d.coeffLabel = d.coeffKeywords.map(function(k) { return k.label; }).join(' - ');
+          d.destinationLabel = d.destinationKeywords.map(function(k) { return k.label; }).join(' - ');
         });
       });
       $scope.unit = data.unit.symbol;
@@ -372,12 +372,12 @@ define(["angular"], function(angular) {
       $scope.unit = data.unit;
       $scope.impactsAndFlows = [];
       $scope.groups = data.groups;
-      $scope.keywords = data.keywords.keywords.sort(sortKeywordsCompare);
+      $scope.keywords = data.keywords.sort(sortKeywordsCompare);
       $scope.relations = data.relations;
       $scope.relations.forEach(function(r) {
-        r.sourceLabel = r.source.keywords.map(function(k) { return k.label; }).join(' - ');
-        r.coeffLabel = r.coeff.keywords.map(function(k) { return k.label; }).join(' - ');
-        r.destinationLabel = r.destination.keywords.map(function(k) { return k.label; }).join(' - ');
+        r.sourceLabel = r.sourceKeywords.map(function(k) { return k.label; }).join(' - ');
+        r.coeffLabel = r.coeffKeywords.map(function(k) { return k.label; }).join(' - ');
+        r.destinationLabel = r.destinationKeywords.map(function(k) { return k.label; }).join(' - ');
       });
       $scope.relations.sort(function(a, b) {
         if (a.originId == $scope.id && b.originId != $scope.id) {
@@ -485,12 +485,12 @@ define(["angular"], function(angular) {
       $scope.unit = data.unit;
       $scope.value = data.value;
       $scope.groups = data.groups;
-      $scope.keywords = data.keywords.keywords.sort(sortKeywordsCompare);
+      $scope.keywords = data.keywords.sort(sortKeywordsCompare);
       $scope.relations = data.relations;
       $scope.relations.forEach(function(r) {
-        r.sourceLabel = r.source.keywords.map(function(k) { return k.label; }).join(' - ');
-        r.coeffLabel = r.coeff.keywords.map(function(k) { return k.label; }).join(' - ');
-        r.destinationLabel = r.destination.keywords.map(function(k) { return k.label; }).join(' - ');
+        r.sourceLabel = r.sourceKeywords.map(function(k) { return k.label; }).join(' - ');
+        r.coeffLabel = r.coeffKeywords.map(function(k) { return k.label; }).join(' - ');
+        r.destinationLabel = r.destinationKeywords.map(function(k) { return k.label; }).join(' - ');
       });
       $scope.relations.sort(function(a, b) {
         if (a.sourceLabel < b.sourceLabel) {
