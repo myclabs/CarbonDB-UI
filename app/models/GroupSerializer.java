@@ -38,7 +38,16 @@ public class GroupSerializer  extends JsonSerializer<Group> {
         jgen.writeFieldName("dimensions");
         jgen.writeStartArray();
         for (Dimension dim : group.getDimSet().dimensions) {
-            jgen.writeObject(dim);
+            jgen.writeStartObject();
+            jgen.writeFieldName("id");
+            jgen.writeObject(dim.getId());
+            jgen.writeFieldName("keywords");
+            jgen.writeObject(dim.keywords);
+            jgen.writeFieldName("keywordsPosition");
+            jgen.writeObject(dim.keywordsPosition);
+            jgen.writeFieldName("orientation");
+            jgen.writeObject(group.getDimSet().getDimensionOrientation(dim));
+            jgen.writeEndObject();
         }
         jgen.writeEndArray();
 
