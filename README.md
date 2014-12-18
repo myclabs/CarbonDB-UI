@@ -14,7 +14,7 @@ The JavaScript modules are organized as follows:
 
     |- app
     |-- assets
-    |--- javascripts    <- contains all the JavaScript/CoffeeScript modules
+    |--- javascripts    <- contains all the JavaScript modules
     |---- app.js        <- app module, wires everything together
     |---- main.js       <- tells RequireJS how to load modules and bootstraps the app
     |---- common/       <- a module, in this case
@@ -44,3 +44,6 @@ This uses the normal JavaScript files and loads libraries from the downloaded We
 * Run `carbondb-ui-x.x.x/bin/play-angular-require-seed -Dhttp.port=9000 -Dconfig.resource=prod.conf`
 
 This uses the uglified JavaScript files and loads WebJars resources from the jsDelivr CDN.
+
+Alternatively, you can find in the deploy.sh file a script we use to run the application
+on [carbondb.org](http://www.carbondb.org) with [Supervisor](http://supervisord.org/).

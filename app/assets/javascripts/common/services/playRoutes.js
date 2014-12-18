@@ -1,4 +1,4 @@
-/**
+ /**
  * Play JavaScript routing as an AngularJS module.
  * Wraps Play's routes to use Angular's $http.
  * Example:
