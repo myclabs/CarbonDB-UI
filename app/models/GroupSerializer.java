@@ -125,11 +125,11 @@ public class GroupSerializer  extends JsonSerializer<Group> {
 
     protected String parseReferencesInComment(Group group) {
         CarbonOntology ontology = CarbonOntology.getInstance();
-        Pattern p = Pattern.compile("\\\\ref\\{[^}]*\\}");
+        Pattern p = Pattern.compile("\\{[^}]*\\}");
         Matcher m = p.matcher(group.getComment());
         StringBuffer sb = new StringBuffer();
         while (m.find()) {
-            String refId = m.group().substring(5, m.group().length()-1);
+            String refId = m.group().substring(1, m.group().length()-1);
             try {
                 Reference ref = ontology.getReference(refId);
                 if (!group.getReferences().contains(ref)) {
