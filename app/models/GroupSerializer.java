@@ -132,6 +132,10 @@ public class GroupSerializer  extends JsonSerializer<Group> {
             String refId = m.group().substring(5, m.group().length()-1);
             try {
                 Reference ref = ontology.getReference(refId);
+                if (!group.getReferences().contains(ref)) {
+                    log.warn("The reference " + ref.getId() + " in the group " + group.getId()
+                             + "comment is not in the group reference list");
+                }
                 m.appendReplacement(sb, "[" + ref.getShortName() + "]");
             } catch (NotFoundException e) {
                 log.warn("Unable to replace a reference in the group " + group.getId() + " comment: " + e.getMessage());
