@@ -49,7 +49,7 @@ public class Onto extends Controller {
 
     public static Result upload(String database) throws Exception {
         play.Logger.info("----------------");
-        play.Logger.info("Begin processing");
+        play.Logger.info("Begin processing (slot: " + database + ")");
         initUnitTools();
         MultipartFormData body = request().body().asMultipartFormData();
         FilePart filePart = body.getFile("file");
@@ -98,7 +98,7 @@ public class Onto extends Controller {
                         result.put("result", "The ontology has been processed without error");
                     }
                     result.put("report", toJson(report));*/
-                    play.Logger.info("Processing finished");
+                    play.Logger.info("Processing finished (slot: " + database + ")");
                     return ok(result);
                 } catch (Exception e) {
                     e.printStackTrace(System.out);
