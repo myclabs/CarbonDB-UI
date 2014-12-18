@@ -247,7 +247,7 @@ public class Onto extends Controller {
         DBCollection refColl = db.getCollection("references");
         refColl.drop();
 
-        String serializedReferences = "{references:" + mapper.writeValueAsString(ontology.getReferences()) + "}";
+        String serializedReferences = "{references:" + mapper.writeValueAsString(ontology.getReferences().values()) + "}";
         dbObject = (BasicDBObject) JSON.parse(serializedReferences);
         refColl.insert(dbObject);
 

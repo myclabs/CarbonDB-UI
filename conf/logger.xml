@@ -20,6 +20,7 @@
   <logger name="com.mycsense.carbondb.Reasoner" level="INFO" />
   <logger name="com.mycsense.carbondb.architecture.AbstractRepo" level="INFO" />
   <logger name="com.mycsense.carbondb.architecture.UnitToolsWebService" level="INFO" />
+  <logger name="models.GroupSerializer" level="INFO" />
   <logger name="org.apache.jena" level="INFO" />
   <logger name="org.mindswap.pellet" level="INFO" />
 

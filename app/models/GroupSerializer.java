@@ -3,29 +3,28 @@ package models;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.mycsense.carbondb.domain.Coefficient;
-import com.mycsense.carbondb.domain.Dimension;
-import com.mycsense.carbondb.domain.ElementaryFlow;
-import com.mycsense.carbondb.domain.Group;
-import com.mycsense.carbondb.domain.Impact;
-import com.mycsense.carbondb.domain.Keyword;
-import com.mycsense.carbondb.domain.Reference;
-import com.mycsense.carbondb.domain.SingleElement;
-import com.mycsense.carbondb.domain.SourceRelation;
-import com.mycsense.carbondb.domain.group.Type;
+import com.mycsense.carbondb.NotFoundException;
+import com.mycsense.carbondb.domain.*;
 import com.mycsense.carbondb.domain.Process;
+import com.mycsense.carbondb.domain.group.Type;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class GroupSerializer  extends JsonSerializer<Group> {
+    private final Logger log = LoggerFactory.getLogger(GroupSerializer.class);
+
     @Override
     public void serialize(Group group, JsonGenerator jgen, SerializerProvider provider)
             throws IOException {
         jgen.writeStartObject();
         jgen.writeStringField("id", group.getId());
-        jgen.writeStringField("comment", group.getComment());
+        jgen.writeStringField("comment", parseReferencesInComment(group));
         jgen.writeStringField("label", group.getLabel());
         jgen.writeFieldName("unit");
         jgen.writeObject(group.getUnit());
@@ -122,6 +121,25 @@ public class GroupSerializer  extends JsonSerializer<Group> {
         }
 
         jgen.writeEndObject();
+    }
+
+    protected String parseReferencesInComment(Group group) {
+        CarbonOntology ontology = CarbonOntology.getInstance();
+        Pattern p = Pattern.compile("\\\\ref\\{[^}]*\\}");
+        Matcher m = p.matcher(group.getComment());
+        StringBuffer sb = new StringBuffer();
+        while (m.find()) {
+            String refId = m.group().substring(5, m.group().length()-1);
+            try {
+                Reference ref = ontology.getReference(refId);
+                m.appendReplacement(sb, "[" + ref.getShortName() + "]");
+            } catch (NotFoundException e) {
+                log.warn("Unable to replace a reference in the group " + group.getId() + " comment: " + e.getMessage());
+                m.appendReplacement(sb, "[" + refId + "]");
+            }
+        }
+        m.appendTail(sb);
+        return sb.toString();
     }
 
     /**
