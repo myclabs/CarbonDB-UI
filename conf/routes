@@ -24,16 +24,16 @@ DELETE  /users/:id              controllers.Users.deleteUser(id: Long)
 
 # Onto
 POST    /upload/:database	                controllers.Onto.upload(database: String)
-GET     /categories/:database               controllers.Onto.getCategories(database: String)
-GET     /group/:database/:uri               controllers.Onto.getGroup(database: String, uri: String)
-GET     /lastreport/:database               controllers.Onto.getLastReport(database: String)
-GET     /graph/:database                    controllers.Onto.getGraph(database: String)
-GET     /derivedgraph/:database             controllers.Onto.getDerivedGraph(database: String)
-GET     /references/:database               controllers.Onto.getReferences(database: String)
-GET     /getOntologyTypes/:database         controllers.Onto.getOntologyTypes(database: String)
-GET     /getProcess/sp/:database/:id     	controllers.Onto.getProcess(database: String, id: String)
-GET     /getCoefficient/sc/:database/:id    controllers.Onto.getCoefficient(database: String, id: String)
-GET     /getOntologyStats/:database         controllers.Onto.getOntologyStats(database: String)
+GET     /:database/categories               controllers.Onto.getCategories(database: String)
+GET     /:database/group/:uri               controllers.Onto.getGroup(database: String, uri: String)
+GET     /:database/lastreport               controllers.Onto.getLastReport(database: String)
+GET     /:database/graph                    controllers.Onto.getGraph(database: String)
+GET     /:database/derivedgraph             controllers.Onto.getDerivedGraph(database: String)
+GET     /:database/references               controllers.Onto.getReferences(database: String)
+GET     /:database/getOntologyTypes         controllers.Onto.getOntologyTypes(database: String)
+GET     /:database/getProcess/sp/:id     	controllers.Onto.getProcess(database: String, id: String)
+GET     /:database/getCoefficient/sc/:id    controllers.Onto.getCoefficient(database: String, id: String)
+GET     /:database/getOntologyStats         controllers.Onto.getOntologyStats(database: String)
 
 # Static
 # ~~~~
