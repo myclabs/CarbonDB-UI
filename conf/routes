@@ -31,8 +31,8 @@ GET     /:database/graph                    controllers.Onto.getGraph(database: 
 GET     /:database/derivedgraph             controllers.Onto.getDerivedGraph(database: String)
 GET     /:database/references               controllers.Onto.getReferences(database: String)
 GET     /:database/getOntologyTypes         controllers.Onto.getOntologyTypes(database: String)
-GET     /:database/getProcess/sp/:id     	controllers.Onto.getProcess(database: String, id: String)
-GET     /:database/getCoefficient/sc/:id    controllers.Onto.getCoefficient(database: String, id: String)
+GET     /:database/process/sp/:id     	    controllers.Onto.getProcess(database: String, id: String)
+GET     /:database/coefficient/sc/:id       controllers.Onto.getCoefficient(database: String, id: String)
 GET     /:database/getOntologyStats         controllers.Onto.getOntologyStats(database: String)
 
 # Static
