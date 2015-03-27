@@ -46,6 +46,7 @@ import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.cache.Cache;
 
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.io.InputStream;
@@ -67,6 +68,8 @@ public class Onto extends Controller {
 
     protected static MongoClient mongoClient;
 
+    protected static InputStream inputStream;
+
     protected static UnitToolsWebService unitTools;
 
     public static Result upload(String database) throws Exception {
@@ -80,7 +83,6 @@ public class Onto extends Controller {
             return badRequest("Invalid slot name");
         }
         else if (filePart != null) {
-            String fileName = filePart.getFilename();
             String contentType = filePart.getContentType();
             if (!contentType.equals("application/rdf+xml")) {
                 play.Logger.error("Aborting: content type not supported");
@@ -88,13 +90,7 @@ public class Onto extends Controller {
             }
             else {
                 File file = filePart.getFile();
-                File newFile = new File(baseOntoFileName);
-                try {
-                    FileUtils.copyFile(file, newFile);
-                } catch (IOException e) {
-                    result.put("result", e.getMessage());
-                    return ok(result);
-                }
+                inputStream = new FileInputStream(file);
                 try {
                     PelletOptions.USE_CLASSIFICATION_MONITOR = PelletOptions.MonitorType.NONE;
 
@@ -137,12 +133,7 @@ public class Onto extends Controller {
         Model model = ModelFactory.createDefaultModel( );
         play.Logger.info("Model size after init = " + model.size());
 
-        InputStream in = FileManager.get().open(baseOntoFileName);
-        if (in == null) {
-            throw new IllegalArgumentException("File " + baseOntoFileName + " not found");
-        }
-
-        model.read(in, null);
+        model.read(inputStream, null);
         play.Logger.info("Model size after reading = " + model.size());
 
         //Logger.getLogger("").setLevel(Level.WARNING);
@@ -516,7 +507,7 @@ public class Onto extends Controller {
             return ok(response);
         }
         catch (Exception e) {
-            return ok(e.getMessage());
+            return ok("error");
         }
     }
 
