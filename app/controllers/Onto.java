@@ -22,6 +22,7 @@
 
 package controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.mongodb.*;
@@ -48,6 +49,7 @@ import play.mvc.Http.MultipartFormData.FilePart;
 import play.cache.Cache;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,8 +76,7 @@ public class Onto extends Controller {
 
     protected static UnitToolsWebService unitTools;
 
-    public static Result upload(String database) throws Exception {
-        DB db = mongoConnect(database);
+    public static Result upload(String database) {
         play.Logger.info("----------------");
         play.Logger.info("Begin processing (slot: " + database + ")");
         initUnitTools();
@@ -93,37 +94,36 @@ public class Onto extends Controller {
             }
             else {
                 File file = filePart.getFile();
-                inputStream = new FileInputStream(file);
+                Cache.set("conversionFactors", unitTools.getConversionFactorsCache());
+                Cache.set("compatibleUnits", unitTools.getCompatibleUnitsCache());
+                Cache.set("unitSymbols", unitTools.getSymbolsCache());
+                // we suppress the Pellet reasoner progression outputs
+                PelletOptions.USE_CLASSIFICATION_MONITOR = PelletOptions.MonitorType.NONE;
                 try {
-                    PelletOptions.USE_CLASSIFICATION_MONITOR = PelletOptions.MonitorType.NONE;
-
-                    try {
-                        Cache.set("conversionFactors", unitTools.getConversionFactorsCache());
-                        Cache.set("compatibleUnits", unitTools.getCompatibleUnitsCache());
-                        Cache.set("unitSymbols", unitTools.getSymbolsCache());
-                        OntoProcessor processor = new OntoProcessor(inputStream, db);
-                        processor.processAndSave();
-                    } catch (Exception e) {
-                        e.printStackTrace(System.out);
-                        return badRequest(e.getMessage());
-                    } finally {
-                        play.Logger.info("Clearing the ontology");
-                        CarbonOntology.getInstance().clear();
-                    }
-                    result.put("result", "The ontology has been processed without error");
-                    /*if (report.errors.size() > 0) {
-                        result.put("result", "The ontology has been processed and contains some errors");
-                    }
-                    else {
-                        result.put("result", "The ontology has been processed without error");
-                    }
-                    result.put("report", toJson(report));*/
-                    play.Logger.info("Processing finished (slot: " + database + ")");
-                    return ok(result);
-                } catch (Exception e) {
-                    e.printStackTrace(System.out);
-                    return badRequest(e.toString());
+                    inputStream = new FileInputStream(file);
+                    DB db = mongoConnect(database);
+                    OntoProcessor processor = new OntoProcessor(inputStream, db);
+                    processor.processAndSave();
+                } catch (FileNotFoundException
+                        | UnknownHostException
+                        | JsonProcessingException e) {
+                    play.Logger.error("Error while processing the ontology", e);
+                    return badRequest(e.getMessage());
+                } finally {
+                    play.Logger.info("Clearing the ontology");
+                    CarbonOntology.getInstance().clear();
                 }
+                result.put("result", "The ontology has been processed without error");
+                // @todo use the logback REPORT appender to get the report
+                /*if (report.errors.size() > 0) {
+                    result.put("result", "The ontology has been processed and contains some errors");
+                }
+                else {
+                    result.put("result", "The ontology has been processed without error");
+                }
+                result.put("report", toJson(report));*/
+                play.Logger.info("Processing finished (slot: " + database + ")");
+                return ok(result);
             }
         }
         else {
@@ -136,7 +136,7 @@ public class Onto extends Controller {
      * @param database database name
      * @throws UnknownHostException
      */
-    protected static DB mongoConnect(String database) throws Exception {
+    protected static DB mongoConnect(String database) throws UnknownHostException {
         mongoClient = new MongoClient( "localhost" , 27017 );
         return mongoClient.getDB( database );
     }

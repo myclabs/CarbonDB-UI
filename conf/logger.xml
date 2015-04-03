@@ -14,10 +14,23 @@
       <pattern>%coloredLevel %logger{15} - %message%n%xException{5}</pattern>
     </encoder>
   </appender>
-  
+
+  <appender name="REPORT" class="ch.qos.logback.core.ConsoleAppender">
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <level>WARN</level>
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>DENY</onMismatch>
+    </filter>
+    <encoder>
+      <pattern>%coloredLevel - Report Logger - %logger{15} - %message%n%xException{5}</pattern>
+    </encoder>
+  </appender>
+
   <logger name="play" level="INFO" />
   <logger name="application" level="INFO" />
-  <logger name="com.mycsense.carbondb.Reasoner" level="INFO" />
+  <logger name="com.mycsense.carbondb.Reasoner" level="INFO">
+    <appender-ref ref="REPORT" />
+  </logger>
   <logger name="com.mycsense.carbondb.architecture.AbstractRepo" level="INFO" />
   <logger name="com.mycsense.carbondb.architecture.UnitToolsWebService" level="INFO" />
   <logger name="models.GroupSerializer" level="INFO" />
