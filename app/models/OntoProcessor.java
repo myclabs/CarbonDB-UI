@@ -22,6 +22,7 @@
 
 package models;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -34,7 +35,6 @@ import com.mongodb.util.JSON;
 import com.mycsense.carbondb.Reasoner;
 import com.mycsense.carbondb.domain.*;
 import com.mycsense.carbondb.domain.Process;
-import com.mycsense.carbondb.domain.group.*;
 
 import java.io.InputStream;
 import java.net.UnknownHostException;
@@ -45,11 +45,23 @@ import static play.libs.Json.toJson;
 
 public class OntoProcessor {
 
-    public OntoProcessor(InputStream inputStream, String databaseName) {
-        this.inputStream = inputStream;
-        this.databaseName = databaseName;
-        initializeMapper();
-    }
+    /**
+     * Contains the ontology
+     */
+    private CarbonOntology ontology;
+
+    /**
+     * The following fields contain the cache for storing
+     * the macro (i.e.: source) and the derived graph
+     * when traversing the ontology to save the groups
+     * and single elements.
+     */
+    private ArrayList<HashMap<String, String>> nodes = new ArrayList<>();
+    private ArrayList<HashMap<String, Object>> links = new ArrayList<>();
+    private ArrayList<String> processesId = new ArrayList<>();
+    private ArrayList<String> processGroupsId = new ArrayList<>();
+    private ArrayList<HashMap<String, String>> derivedNodes = new ArrayList<>();
+    private ArrayList<HashMap<String, Object>> derivedLinks = new ArrayList<>();
 
     /**
      * MongoDB connection
@@ -57,7 +69,7 @@ public class OntoProcessor {
     private MongoClient mongoClient;
 
     /**
-     * Database
+     * Mongo database connection where to store the ontology cache
      */
     private DB db;
 
@@ -72,9 +84,16 @@ public class OntoProcessor {
     protected ObjectMapper mapper;
 
     /**
-     * Name of the Mongo database where to store the ontology cache
+     * Construct an OntoProcessor
+     * 
+     * @param inputStream the RDF file
+     * @param db Mongo connection
      */
-    private String databaseName;
+    public OntoProcessor(InputStream inputStream, DB db) {
+        this.inputStream = inputStream;
+        this.db = db;
+        initializeMapper();
+    }
 
     /**
      * Initialize the Jackson Mapper with personalize serializer
@@ -96,8 +115,15 @@ public class OntoProcessor {
         mapper.registerModule(module);
     }
 
-    public void processOntology() throws UnknownHostException, Exception {
-        mongoConnect(databaseName);
+    /**
+     * Process the ontology and save a cache to Mongo:
+     * <ol>
+     *     <li>Classify the ontology with Pellet and run CarbonDB Reasoner</li>
+     *     <li>Save the ontology to Mongo</li>
+     * </ol>
+     * @throws JsonProcessingException
+     */
+    public void processAndSave() throws JsonProcessingException {
         Model model = ModelFactory.createDefaultModel();
         play.Logger.info("Model size after init = " + model.size());
 
@@ -111,18 +137,25 @@ public class OntoProcessor {
         play.Logger.info("Model size after reasoning = " + model.size());
 
         play.Logger.info("Feeding MongoDB");
-        feedMongoDB();
+        ontology = CarbonOntology.getInstance();
+        saveWorkflow();
     }
 
-    protected void feedMongoDB() throws Exception {
-        ArrayList<String> processGroupsId = new ArrayList<>();
-        ArrayList<HashMap<String, String>> nodes = new ArrayList<>();
-        ArrayList<HashMap<String, Object>> links = new ArrayList<>();
+    protected void saveWorkflow() throws JsonProcessingException {
+        saveCategories();
+        saveImpactAndFlowTypes();
+        saveOntologyTypes();
+        saveRelationTypes();
+        saveGroups();
+        saveProcesses();
+        saveCoefficients();
+        saveReferences();
+        saveGraph();
+        saveDerivedGraph();
+        saveStats();
+    }
 
-        ArrayList<String> processesId = new ArrayList<>();
-        ArrayList<HashMap<String, String>> derivedNodes = new ArrayList<>();
-        ArrayList<HashMap<String, Object>> derivedLinks = new ArrayList<>();
-
+    protected void saveCategories() throws JsonProcessingException {
         BasicDBObject dbObject;
 
         CarbonOntology ontology = CarbonOntology.getInstance();
@@ -133,40 +166,46 @@ public class OntoProcessor {
         dbObject = (BasicDBObject) JSON.parse(serialized);
 
         categoriesColl.insert(dbObject);
+    }
 
-
+    protected void saveImpactAndFlowTypes() throws JsonProcessingException {
         DBCollection impactAndFlowTypesColl = db.getCollection("impactAndFlowTypes");
         impactAndFlowTypesColl.drop();
 
         String impactTypesSerialized = mapper.writeValueAsString(ontology.getImpactTypes());
         String elementaryFlowTypesSerialized = mapper.writeValueAsString(ontology.getElementaryFlowTypes());
 
-        dbObject = (BasicDBObject) JSON.parse("{impactTypes:" + impactTypesSerialized
+        BasicDBObject dbObject = (BasicDBObject) JSON.parse("{impactTypes:" + impactTypesSerialized
                 + ", flowTypes:" + elementaryFlowTypesSerialized + "}");
         impactAndFlowTypesColl.insert(dbObject);
+    }
 
+    protected void saveOntologyTypes() throws JsonProcessingException {
         DBCollection impactAndFlowTypesTreeColl = db.getCollection("ontologyTypes");
         impactAndFlowTypesTreeColl.drop();
         String impactTypesTreeSerialized = mapper.writeValueAsString(ontology.getImpactTypesTree());
         String elementaryFlowTypesTreeSerialized = mapper.writeValueAsString(ontology.getElementaryFlowTypesTree());
 
-        dbObject = (BasicDBObject) JSON.parse("{impactTypesTree:" + impactTypesTreeSerialized
+        BasicDBObject  dbObject = (BasicDBObject) JSON.parse("{impactTypesTree:" + impactTypesTreeSerialized
                 + ", flowTypesTree:" + elementaryFlowTypesTreeSerialized + "}");
         impactAndFlowTypesTreeColl.insert(dbObject);
+    }
 
+    protected void saveRelationTypes() throws JsonProcessingException {
         DBCollection relationTypesColl = db.getCollection("relationTypes");
         relationTypesColl.drop();
         String relationTypesTreeSerialized = mapper.writeValueAsString(ontology.getRelationTypes());
-        dbObject = (BasicDBObject) JSON.parse("{relationTypes: " + relationTypesTreeSerialized + "}");
+        BasicDBObject  dbObject = (BasicDBObject) JSON.parse("{relationTypes: " + relationTypesTreeSerialized + "}");
         relationTypesColl.insert(dbObject);
+    }
 
-
+    protected void saveGroups() throws JsonProcessingException {
         DBCollection groupsColl = db.getCollection("groups");
         groupsColl.drop();
 
         for (Group group: ontology.getGroups().values()) {
             String serializedGroup = mapper.writeValueAsString(group);
-            dbObject = (BasicDBObject) JSON.parse(serializedGroup);
+            BasicDBObject  dbObject = (BasicDBObject) JSON.parse(serializedGroup);
             dbObject.append("_id", group.getId());
             groupsColl.insert(dbObject);
 
@@ -178,13 +217,15 @@ public class OntoProcessor {
                 processGroupsId.add(group.getId());
             }
         }
+    }
 
+    protected void saveProcesses() throws JsonProcessingException {
         DBCollection processesColl = db.getCollection("processes");
         processesColl.drop();
 
         for (Process process : ontology.getProcesses()) {
             String serializedProcess = mapper.writeValueAsString(process);
-            dbObject = (BasicDBObject) JSON.parse(serializedProcess);
+            BasicDBObject dbObject = (BasicDBObject) JSON.parse(serializedProcess);
             dbObject.append("_id", process.getId());
             processesColl.insert(dbObject);
 
@@ -201,23 +242,31 @@ public class OntoProcessor {
             derivedNodes.add(node);
         }
 
+    }
+
+    protected void saveCoefficients() throws JsonProcessingException {
         DBCollection coefficientsColl = db.getCollection("coefficients");
         coefficientsColl.drop();
 
         for (Coefficient coeff : ontology.getCoefficients()) {
             String serializedCoeff = mapper.writeValueAsString(coeff);
-            dbObject = (BasicDBObject) JSON.parse(serializedCoeff);
+            BasicDBObject dbObject = (BasicDBObject) JSON.parse(serializedCoeff);
             dbObject.append("_id", coeff.getId());
             coefficientsColl.insert(dbObject);
         }
 
+    }
+
+    protected void saveReferences() throws JsonProcessingException {
         DBCollection refColl = db.getCollection("references");
         refColl.drop();
 
         String serializedReferences = "{references:" + mapper.writeValueAsString(ontology.getReferences().values()) + "}";
-        dbObject = (BasicDBObject) JSON.parse(serializedReferences);
+        BasicDBObject dbObject = (BasicDBObject) JSON.parse(serializedReferences);
         refColl.insert(dbObject);
+    }
 
+    protected void saveGraph() {
         DBCollection graphColl = db.getCollection("graph");
         graphColl.drop();
 
@@ -235,10 +284,12 @@ public class OntoProcessor {
             links.add(link);
         }
 
-        dbObject = (BasicDBObject) JSON.parse("{nodes:" + toJson(nodes).toString()
+        BasicDBObject dbObject = (BasicDBObject) JSON.parse("{nodes:" + toJson(nodes).toString()
                 + ",links:" + toJson(links).toString() + "}");
         graphColl.insert(dbObject);
+    }
 
+    protected void saveDerivedGraph() {
         DBCollection derivedGraphColl = db.getCollection("derivedGraph");
         derivedGraphColl.drop();
 
@@ -255,10 +306,12 @@ public class OntoProcessor {
             derivedLinks.add(link);
         }
 
-        dbObject = (BasicDBObject) JSON.parse("{nodes:" + toJson(derivedNodes).toString()
+        BasicDBObject dbObject = (BasicDBObject) JSON.parse("{nodes:" + toJson(derivedNodes).toString()
                 + ",links:" + toJson(derivedLinks).toString() + "}");
         derivedGraphColl.insert(dbObject);
+    }
 
+    protected void saveStats() throws JsonProcessingException {
         DBCollection statsColl = db.getCollection("ontologyStats");
         statsColl.drop();
 
@@ -282,25 +335,8 @@ public class OntoProcessor {
         stats.put("derivedRelations", ontology.getDerivedRelations().size());
         stats.put("references", ontology.getReferences().size());
 
-        dbObject = (BasicDBObject) JSON.parse(mapper.writeValueAsString(stats));
+        BasicDBObject dbObject = (BasicDBObject) JSON.parse(mapper.writeValueAsString(stats));
         statsColl.insert(dbObject);
-
-        mongoClose();
-        /*DBCollection reportColl = db.getCollection("report");
-        reportColl.drop();
-
-        dbObject = (BasicDBObject) JSON.parse(toJson(report).toString());
-        reportColl.insert(dbObject);*/
-    }
-
-    /**
-     * Open connection to MongoDB
-     * @param database database name
-     * @throws UnknownHostException
-     */
-    protected void mongoConnect(String database) throws UnknownHostException {
-        mongoClient = new MongoClient( "localhost" , 27017 );
-        db = mongoClient.getDB( database );
     }
 
     protected void mongoClose() {

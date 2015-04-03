@@ -48,6 +48,7 @@ import play.mvc.Http.MultipartFormData.FilePart;
 import play.cache.Cache;
 
 import java.io.FileInputStream;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.io.InputStream;
@@ -74,6 +75,7 @@ public class Onto extends Controller {
     protected static UnitToolsWebService unitTools;
 
     public static Result upload(String database) throws Exception {
+        DB db = mongoConnect(database);
         play.Logger.info("----------------");
         play.Logger.info("Begin processing (slot: " + database + ")");
         initUnitTools();
@@ -99,8 +101,8 @@ public class Onto extends Controller {
                         Cache.set("conversionFactors", unitTools.getConversionFactorsCache());
                         Cache.set("compatibleUnits", unitTools.getCompatibleUnitsCache());
                         Cache.set("unitSymbols", unitTools.getSymbolsCache());
-                        OntoProcessor processor = new OntoProcessor(inputStream, database);
-                        processor.processOntology();
+                        OntoProcessor processor = new OntoProcessor(inputStream, db);
+                        processor.processAndSave();
                     } catch (Exception e) {
                         e.printStackTrace(System.out);
                         return badRequest(e.getMessage());
@@ -129,6 +131,11 @@ public class Onto extends Controller {
         }
     }
 
+    /**
+     * Open connection to MongoDB
+     * @param database database name
+     * @throws UnknownHostException
+     */
     protected static DB mongoConnect(String database) throws Exception {
         mongoClient = new MongoClient( "localhost" , 27017 );
         return mongoClient.getDB( database );
