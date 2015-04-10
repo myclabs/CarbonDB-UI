@@ -22,51 +22,29 @@
 
 package controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.mongodb.*;
-import com.mycsense.carbondb.Reasoner;
 import com.mycsense.carbondb.architecture.UnitToolsWebService;
 import com.mycsense.carbondb.domain.*;
-import com.mycsense.carbondb.domain.Process;
-import com.mycsense.carbondb.domain.group.Type;
 import log.OntoProcessorMessageStore;
-import models.CategorySerializer;
-import models.CoefficientSerializer;
-import models.DerivedRelationSerializer;
-import models.GroupSerializer;
 import models.OntoProcessor;
-import models.ProcessSerializer;
-import models.ReferenceSerializer;
-import models.SourceRelationSerializer;
-import models.TypeSerializer;
-import org.slf4j.Logger;
 import play.*;
 import play.mvc.*;
 import play.libs.Json;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.cache.Cache;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.io.InputStream;
 import java.io.File;
-import java.io.IOException;
-import org.apache.commons.io.FileUtils;
 
-import com.hp.hpl.jena.rdf.model.*;
-import com.hp.hpl.jena.util.FileManager;
 import org.mindswap.pellet.PelletOptions;
-
-import com.mongodb.util.JSON;
-
-import org.slf4j.LoggerFactory;
 
 import static play.libs.Json.toJson;
 
