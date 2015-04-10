@@ -33,6 +33,10 @@ The JavaScript modules are organized as follows:
 * Run via `play run`
 * Go to [localhost:9000](http://localhost:9000)
 
+If any file in `app/log` is modified, you should replace the `lib/log.jar` file:
+
+    activator compile && jar -cf lib/log.jar -C target/scala-2.10/classes log
+
 Or launch activator UI via `activator ui`
 
 This uses the normal JavaScript files and loads libraries from the downloaded WebJars.

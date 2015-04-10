@@ -31,6 +31,7 @@ import com.mycsense.carbondb.architecture.UnitToolsWebService;
 import com.mycsense.carbondb.domain.*;
 import com.mycsense.carbondb.domain.Process;
 import com.mycsense.carbondb.domain.group.Type;
+import log.OntoProcessorMessageStore;
 import models.CategorySerializer;
 import models.CoefficientSerializer;
 import models.DerivedRelationSerializer;
@@ -40,6 +41,7 @@ import models.ProcessSerializer;
 import models.ReferenceSerializer;
 import models.SourceRelationSerializer;
 import models.TypeSerializer;
+import org.slf4j.Logger;
 import play.*;
 import play.mvc.*;
 import play.libs.Json;
@@ -63,6 +65,8 @@ import com.hp.hpl.jena.util.FileManager;
 import org.mindswap.pellet.PelletOptions;
 
 import com.mongodb.util.JSON;
+
+import org.slf4j.LoggerFactory;
 
 import static play.libs.Json.toJson;
 
@@ -113,15 +117,17 @@ public class Onto extends Controller {
                     play.Logger.info("Clearing the ontology");
                     CarbonOntology.getInstance().clear();
                 }
-                result.put("result", "The ontology has been processed without error");
-                // @todo use the logback REPORT appender to get the report
-                /*if (report.errors.size() > 0) {
+                if (OntoProcessorMessageStore.getInstance().hasErrors()) {
                     result.put("result", "The ontology has been processed and contains some errors");
                 }
-                else {
-                    result.put("result", "The ontology has been processed without error");
+                else if (OntoProcessorMessageStore.getInstance().hasWarnings()) {
+                    result.put("result", "The ontology has been processed and contains some warnings");
                 }
-                result.put("report", toJson(report));*/
+                else {
+                    result.put("result", "The ontology has been processed without error and warning");
+                }
+                result.put("report", toJson(OntoProcessorMessageStore.getInstance()));
+
                 play.Logger.info("Processing finished (slot: " + database + ")");
                 return ok(result);
             }

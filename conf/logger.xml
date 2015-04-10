@@ -15,15 +15,10 @@
     </encoder>
   </appender>
 
-  <appender name="REPORT" class="ch.qos.logback.core.ConsoleAppender">
-    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+  <appender name="REPORT" class="log.OntoProcessorAppender">
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>WARN</level>
-      <onMatch>ACCEPT</onMatch>
-      <onMismatch>DENY</onMismatch>
     </filter>
-    <encoder>
-      <pattern>%coloredLevel - Report Logger - %logger{15} - %message%n%xException{5}</pattern>
-    </encoder>
   </appender>
 
   <logger name="play" level="INFO" />
@@ -31,8 +26,12 @@
   <logger name="com.mycsense.carbondb.Reasoner" level="INFO">
     <appender-ref ref="REPORT" />
   </logger>
-  <logger name="com.mycsense.carbondb.architecture.AbstractRepo" level="INFO" />
-  <logger name="com.mycsense.carbondb.architecture.UnitToolsWebService" level="INFO" />
+  <logger name="com.mycsense.carbondb.architecture.AbstractRepo" level="INFO">
+    <appender-ref ref="REPORT" />
+  </logger>
+  <logger name="com.mycsense.carbondb.architecture.UnitToolsWebService" level="INFO">
+    <appender-ref ref="REPORT" />
+  </logger>
   <logger name="models.GroupSerializer" level="INFO" />
   <logger name="org.apache.jena" level="INFO" />
   <logger name="org.mindswap.pellet" level="INFO" />
