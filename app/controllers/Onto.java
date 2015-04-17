@@ -105,6 +105,7 @@ public class Onto extends Controller {
                     result.put("result", "The ontology has been processed without error and warning");
                 }
                 result.put("report", toJson(OntoProcessorMessageStore.getInstance()));
+                OntoProcessorMessageStore.getInstance().clear();
 
                 play.Logger.info("Processing finished (slot: " + database + ")");
                 return ok(result);

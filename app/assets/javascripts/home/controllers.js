@@ -120,13 +120,13 @@ define(["angular"], function(angular) {
       $window.ga('send', 'pageview', { page: $location.path() });
     $scope.latest = {fileUploading: false};
     playRoutes.controllers.Onto.getLastReport('latest').get().success(function(data) {
-      $scope.latest.errors = data.errors;
-      $scope.latest.warnings = data.warnings;
+      $scope.latest.errors = data.messages.errors;
+      $scope.latest.warnings = data.messages.warnings;
     });
     $scope.wip = {fileUploading: false};
     playRoutes.controllers.Onto.getLastReport('wip').get().success(function(data) {
-      $scope.wip.errors = data.errors;
-      $scope.wip.warnings = data.warnings;
+      $scope.wip.errors = data.messages.errors;
+      $scope.wip.warnings = data.messages.warnings;
     });
     $scope.onFileSelect = function($files, slot) {
       $scope[slot].fileUploading = true;

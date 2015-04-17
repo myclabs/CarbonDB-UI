@@ -35,6 +35,7 @@ import com.mongodb.util.JSON;
 import com.mycsense.carbondb.Reasoner;
 import com.mycsense.carbondb.domain.*;
 import com.mycsense.carbondb.domain.Process;
+import log.OntoProcessorMessageStore;
 
 import java.io.InputStream;
 import java.net.UnknownHostException;
@@ -153,6 +154,31 @@ public class OntoProcessor {
         saveGraph();
         saveDerivedGraph();
         saveStats();
+        saveReport();
+    }
+
+    /**
+     * Returns the processing status based on the warnings and errors in the message store
+     * @return status message
+     */
+    public String getStatus() {
+        if (OntoProcessorMessageStore.getInstance().hasErrors()) {
+            return "The ontology has been processed and contains some errors";
+        }
+        else if (OntoProcessorMessageStore.getInstance().hasWarnings()) {
+            return "The ontology has been processed and contains some warnings";
+        }
+        return "The ontology has been processed without error and warning";
+    }
+
+    protected void saveReport() {
+        DBCollection reportColl = db.getCollection("report");
+        reportColl.drop();
+
+        BasicDBObject dbObject = (BasicDBObject) JSON.parse("{status:" + toJson(getStatus())
+                + ",messages:" + toJson(OntoProcessorMessageStore.getInstance()).toString() + "}");
+
+        reportColl.insert(dbObject);
     }
 
     protected void saveCategories() throws JsonProcessingException {
